@@ -694,8 +694,9 @@ def _duration_group_union(uf: "UnionFind",
 
 
 # Candidate routing is deliberately much cheaper than acoustic identity.
-# Duration is used ONLY to decide which pairs deserve the expensive Chromaprint
-# alignment; it never proves or disproves recording identity. Same-base-title
+# Duration routes candidates AND vetoes significant differences in final
+# matching; duration alone never establishes positive recording identity.
+# Same-base-title
 # and byte-identical fingerprint vectors bypass the duration router.
 FP_CANDIDATE_STRONG_SHARED_TOKENS = 64
 FP_CANDIDATE_WEAK_SHARED_TOKENS = 24
@@ -4449,8 +4450,8 @@ def merge_equivalent_tracks(
 ) -> Tuple[Dict[int, List[int]], List[str], List[Dict[str, object]]]:
     """Group acoustic matches automatically with a bounded candidate router.
 
-    Recording identity remains acoustic. Duration, titles and token statistics
-    only route candidates to the expensive Chromaprint alignment.
+    Fingerprints establish positive identity; a meaningful duration difference
+    vetoes grouping and denotes a separate Version. Titles/tokens route pairs.
     """
     uf = UnionFind(len(tracks))
     duration_bounds = [
@@ -14252,6 +14253,53 @@ def _ui_contract_self_test() -> None:
         raise RuntimeError("Standalone Changes board still falsely counts Additions.")
     if 'Proposed retained: ' not in map_html or 'renderAuditBanner()' not in map_html:
         raise RuntimeError("Standalone proposal or audit banner is absent.")
+
+    # MCC 0.5.10: significantly different audio durations mean separate
+    # Versions, even if their overlapping acoustic fingerprints are exact.
+    # Small codec/container length jitter below half a second is tolerated.
+    if _duration_version_conflict(200.0, 200.49):
+        raise RuntimeError("Sub-0.5s duration jitter became a new version.")
+    if not _duration_version_conflict(200.0, 200.5):
+        raise RuntimeError("Different-length version threshold was not enforced.")
+    if not _duration_version_conflict(195.81, 213.33):
+        raise RuntimeError("Body and the Sun 17.52s length delta was missed.")
+    if _duration_version_conflict(0, 205):
+        raise RuntimeError("Unknown duration incorrectly vetoed audio identity.")
+    identical_fp = tuple(range(440))
+    same_length, _ = fingerprint_auto_match_values(
+        identical_fp, 200.0, identical_fp, 200.0
+    )
+    different_length, sim = fingerprint_auto_match_values(
+        identical_fp, 200.0, identical_fp, 217.5
+    )
+    if not same_length or different_length or sim is None:
+        raise RuntimeError("Exact Chromaprint bypassed different-length version rule.")
+    report = _comparison_decision_details(
+        identical_fp, 200.0, identical_fp, 217.5, False, sim
+    )
+    if (not report["duration_version_conflict"]
+            or report["derived_final_match"]
+            or not any("separate version" in line
+                       for line in report["rejection_reasons"])):
+        raise RuntimeError("Length-difference rejection missing from the comparison log.")
+    tmp_union = UnionFind(3)
+    tmp_bounds = [(200.0, 200.0), (200.4, 200.4), (200.8, 200.8)]
+    if not _duration_group_union(tmp_union, tmp_bounds, 0, 1):
+        raise RuntimeError("Short rounding difference unnecessarily split recordings.")
+    if _duration_group_union(tmp_union, tmp_bounds, 1, 2):
+        raise RuntimeError("Transitive A/B/C group merged recordings 0.8s apart.")
+    if tmp_union.find(0) == tmp_union.find(2):
+        raise RuntimeError("Duration-version guard failed at union-find layer.")
+
+    for required in (
+        "function versionLengthDelta(t,other)",
+        "function lengthDeltaText(seconds)",
+        "differentLength",
+        "altLengthDelta",
+        "durationSeconds",
+    ):
+        if required not in map_html:
+            raise RuntimeError("Release Map missing length-difference UI: " + required)
 
     # Real 2026-10-10 Privilege regression. The two versions report the
     # same 170.573-second duration, but one fpcalc vector covered only 10.8407%
