@@ -9932,9 +9932,9 @@ button,input { font:inherit; }
   align-items:start; width:100%; min-width:0;
 }
 #columns.fullMapColumns {grid-template-columns:var(--category-grid,repeat(3,minmax(0,1fr)));}
-@container release-map-viewport (max-width:1450px) {
-  #columns.fullMapColumns {grid-template-columns:repeat(2,minmax(0,1fr));}
-  #columns.fullMapColumns .releaseColumn:last-child:nth-child(odd){grid-column:1/-1;}
+@container release-map-viewport (max-width:1750px) {
+  #columns.fullMapColumns {grid-template-columns:minmax(0,1fr);}
+  #columns.fullMapColumns .releaseColumn:last-child:nth-child(odd){grid-column:auto;}
 }
 @container release-map-viewport (max-width:850px) {
   #columns.fullMapColumns {grid-template-columns:minmax(0,1fr);}
@@ -14660,6 +14660,7 @@ def _ui_contract_self_test() -> None:
             and 'className="releaseGroup"' in map_html
             and 'className="releaseGroups"' in map_html
             and 'container-name:release-category' in map_html
+            and '@container release-map-viewport (max-width:1750px)' in map_html
             and 'const categoryGrid=weights.map(' in map_html,
             "Release Map same-release-family grouping is missing.",
         ),
