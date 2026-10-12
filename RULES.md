@@ -1215,3 +1215,11 @@ This section is HISTORICAL. Its per-recording hard source-floor requirement is s
 
 
 - **Manual grouping export lock:** A manual group state remains pending even if Ignore/Restore switches are toggled or toggled back. Release Map Copy/Move must not re-enable until the currently saved manual group mapping equals the reoptimized baseline or Re-Analyze explicitly updates the plan.
+
+
+## MCC v0.5.9 - mandatory minimum-one-album invariant
+
+- For every album family, the retained collection must include AT LEAST ONE eligible full album edition. The edition with the largest number of distinct tracks is NOT mandatory. Choosing the largest edition as an optimizer seed is allowed, but final retention MUST follow the at-least-one-album rule.
+- Every wanted audio group must still be represented by at least one retained carrier. Unique alternate recordings and bonus tracks are protected by fingerprint-derived group coverage and must never be merged by names alone.
+- A maximum-size Japanese/Deluxe album must be removed if all its eligible audio groups are already carried by other selected releases AND one other eligible album from the same family remains. Smaller album editions must not be pruned merely because a larger edition includes additional tracks that can be obtained elsewhere.
+- Regression: 2026-10-12 INNA I Am the Club Rocker log ID 275 is selected redundantly beside album IDs 4 and 281; all 18 Japanese wanted tracks are already covered. No Limit exists on all versions, but the 2011 CD fingerprint comparison is below mastering threshold. That suspected audio false-negative is a separate investigation; it does not excuse retaining the redundant Japanese CD.
