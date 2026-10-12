@@ -1,16 +1,16 @@
 # Music Collection Cleaner (MCC)
 
-**Version: 0.5.10 - Under construction ⚠️**
+**Version: 0.5.11 - Under construction ⚠️**
 
 Music Collection Cleaner compares existing music releases with new ones, finds the best combination of editions, and helps preserve every wanted unique recording while removing unnecessary redundancy.
 
 ## Download and run
 
-**[Music Collection Cleaner v0.5.10.pyw](Music%20Collection%20Cleaner%20v0.5.10.pyw)** - versioned single-file Windows Python application. **This is a test build, not a stable Windows release.**
+**[Music Collection Cleaner v0.5.11.pyw](Music%20Collection%20Cleaner%20v0.5.11.pyw)** - versioned single-file Windows Python application. **This is a test build, not a stable Windows release.**
 
-Open with Python 3 on Windows 11 (or run from a console with `python "Music Collection Cleaner v0.5.10.pyw"`). The application checks or installs supported dependencies. The GUI uses Microsoft Edge WebView2 through pywebview; it is not a terminal-based replacement.
+Open with Python 3 on Windows 11 (or run from a console with `python "Music Collection Cleaner v0.5.11.pyw"`). The application checks or installs supported dependencies. The GUI uses Microsoft Edge WebView2 through pywebview; it is not a terminal-based replacement.
 
-Source-level regression checks: `python "Music Collection Cleaner v0.5.10.pyw" --ui-self-test`.
+Source-level regression checks: `python "Music Collection Cleaner v0.5.11.pyw" --ui-self-test`.
 
 ## What it does
 
@@ -24,6 +24,14 @@ Source-level regression checks: `python "Music Collection Cleaner v0.5.10.pyw" -
 - Explicitly **Copy OLD + NEW** or **Move OLD + NEW** retained releases into the selected destination; Undo for supported completed moves.
 - Log comparisons, validate incomplete/corrupt inputs, choose I/O worker counts with drive awareness, and manage spawned subprocesses.
 
+
+## v0.5.11 - duration threshold corrected to strictly over 7 seconds
+
+Only a duration difference **greater than 7.0 seconds** is treated as a separate length-based Version. Differences **7.0 seconds or less** do not create a length badge and do not veto an otherwise valid acoustic duplicate match. Both tracks still need a valid Chromaprint match before MCC treats them as the same recording; equal lengths alone never prove duplicate identity.
+
+In the dark WebView2 Release Map, amber duration badges and delta labels appear only for alternatives whose measured durations differ by more than seven seconds. The 0.6s / 0.8s / 4.23s clutter from the previous release is removed. This also updates acoustic group transitivity and manual-merge safeguards, and preserves comparisons/logging and all other application functions.
+
+Regression fixtures cover 0s, 0.6s, 4.23s, exactly 7.0s, 7.01s, 17.52s, identical audio fingerprints and A/B/C transitive grouping. **The source is published but not Windows-tested.** Re-analyze the library to rebuild recording groups under the corrected rule.
 
 ## v0.5.10 - highlight duration differences as separate versions
 
