@@ -1,16 +1,16 @@
 # Music Collection Cleaner (MCC)
 
-**Version: 0.5.14 - Under construction ⚠️**
+**Version: 0.5.15 - Under construction ⚠️**
 
 Music Collection Cleaner compares existing music releases with new ones, finds the best combination of editions, and helps preserve every wanted unique recording while removing unnecessary redundancy.
 
 ## Download and run
 
-**[Music Collection Cleaner v0.5.14.pyw](Music%20Collection%20Cleaner%20v0.5.14.pyw)** - versioned single-file Windows Python application. **This is a test build, not a stable Windows release.**
+**[Music Collection Cleaner v0.5.15.pyw](Music%20Collection%20Cleaner%20v0.5.15.pyw)** - versioned single-file Windows Python application. **This is a test build, not a stable Windows release.**
 
-Open with Python 3 on Windows 11 (or run from a console with `python "Music Collection Cleaner v0.5.14.pyw"`). The application checks or installs supported dependencies. The GUI uses Microsoft Edge WebView2 through pywebview; it is not a terminal-based replacement.
+Open with Python 3 on Windows 11 (or run from a console with `python "Music Collection Cleaner v0.5.15.pyw"`). The application checks or installs supported dependencies. The GUI uses Microsoft Edge WebView2 through pywebview; it is not a terminal-based replacement.
 
-Source-level regression checks: `python "Music Collection Cleaner v0.5.14.pyw" --ui-self-test`.
+Source-level regression checks: `python "Music Collection Cleaner v0.5.15.pyw" --ui-self-test`.
 
 ## What it does
 
@@ -24,6 +24,15 @@ Source-level regression checks: `python "Music Collection Cleaner v0.5.14.pyw" -
 - Explicitly **Copy OLD + NEW** or **Move OLD + NEW** retained releases into the selected destination; Undo for supported completed moves.
 - Log comparisons, validate incomplete/corrupt inputs, choose I/O worker counts with drive awareness, and manage spawned subprocesses.
 
+
+## v0.5.15 - substitute verified edits without conflating audio
+
+- Fixes exact INNA regression in `Music Collection Cleaner Comparison 2026-10-12-23-52-28(1).jsonl` and Re-Analyze audit at `23-58-29`: `INNA – Body And The Sun [Japan] (2015) [FLAC]` (ID 287) was retained solely because of a **17.527777-second-longer Fool Me** (213.333333s vs 195.805556s). The other three supposed unique songs already have fingerprint-matched 2014 singles: Cola Song, Take Me Higher, Good Time. The Japanese Fool Me is an acoustically supported edit of the shorter recording, not an identical track, and it remains a separate actual audio-group ID.
+- `Track.coverage_group_id` is a **planning-only substitute family**; actual `group_id` and Release Map version/length differences are preserved. A length-distinct base-track edit may be substituted ONLY with matching normalized song/primary artist and very strong positive audio evidence: ≥98% fingerprint overlap, ≥90% good fraction, ≥65% excellent, score ≤5, median ≤5, p90 ≤10, and ≥90% aligned acoustic coverage. Protect Remix, Live, Extended, Instrumental, Acoustic and other distinct roots; never merge by title or duration alone.
+- For the supplied INNA log, **only two Fool Me comparisons** among 127 same-title/artist different-length candidates pass this strict substitute test. The global optimizer now treats these two different audio groups as one **replaceable coverage obligation**, so it can select the required full INNA album plus the three individual singles without retaining the Japanese compilation/edition solely for Fool Me. Exact audio identities remain separate and are not relabeled as identical.
+- Release Map track status distinguishes **"Covered by alternate version"** from a true identical recording. JSONL logs `replaceable_version_coverage` records with concrete pair indices/length differences; source includes a regression fixture modeling the INNA Japanese edition and three singles.
+- **Run a NEW FULL ANALYSIS** to compute new version substitutions. Re-Analyze alone reuses old audio groups and cannot repair prior results.
+- GitHub source changes/readback verification only: Python compilation, `--ui-self-test`, Windows WebView2 full run, Copy/Move/Undo are **NOT RUN**. Remains **0.5.15 - Under construction ⚠️**. No GitHub Actions changes.
 
 ## v0.5.14 - eight-second duration-version threshold
 
