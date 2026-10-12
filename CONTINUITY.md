@@ -1,8 +1,17 @@
 # Music Collection Cleaner - Continuity Handoff
 
 Last updated: 2026-10-12
-Status: **0.5.17 - Under construction ⚠️** (source migrated; Windows testing pending)
+Status: **0.5.18 - Under construction ⚠️** (source migrated; Windows testing pending)
 
+
+## Latest checkpoint - 2026-10-13, MCC v0.5.18 actionable integrity warning + responsive map layout
+
+- Canonical source is **`Music Collection Cleaner v0.5.18.pyw`**, `karpuzikov/MCC/main`, **Under construction ⚠️**. v0.5.17 remains as archived prior version. Preserve single-file Python WebView2 and all Copy/Move/Undo safety rules. No GitHub Actions edits.
+- User supplied screenshot `image(10).png` of MCC v0.5.17 Release Map. Orange banner reported **1 integrity/completeness issue in 1 release**, disabled Copy/Move, but failed to identify the release or actual problem. Enlarged screenshot clearly shows a ⚠️ on **`2015-07-24 - Inna [5948204123093]`**. Its specific audit error is not visible in image; do not invent a reason. In v0.5.17 the detail panel already contains `n.auditIssues`, but user had to hunt among 288 releases.
+- Implemented `renderAuditBanner()` using the full `state.nodes` catalog: shows all affected release names and each exact string in their `auditIssues` list, safely via DOM `textContent`. Each warning is a keyboard-focusable button with descriptive title and accessible label. `openAuditRelease(n)` switches to Full map if necessary, selects the exact release ID, opens the existing details panel, and scrolls to its row. Banner still clearly says Copy and Move are blocked; no unsafe bypass, state change or file operation.
+- Screenshot shows Albums 27 vs EPs 111 vs Singles 150 in three fixed equal-width categories, wasting vertical/horizontal map space. `renderFullBoard` now allocates wide-view category widths proportional to sqrt(number of distinct family groups), then flows intact `.releaseGroup` blocks in CSS columns; 1/2/3 internal columns are selected by container widths. Category-level `@container release-map-viewport` stacks them vertically once effective width becomes narrower than 1750px; at 2048px wide the representative distribution produces Albums 1 internal, EPs 2, Singles 3. At 1600/1300px all three category sections are full-width and their groups use three internal columns; at 780px they use two. Changing window or opening details changes layout through CSS without JS rebuild, and `buildRowCenters()` continues to use actual DOM coordinates for relationships.
+- Tests completed: source published and read-back verified; embedded module JavaScript V8 parse PASS. Mocked alert issue rendering, click-to-details, release ID selection and scrolling PASS. Mocked group render of **27 Albums, 111 EPs, 150 Singles** returned exact row counts and weighted category widths; Linux Chromium + Playwright CSS smoke test at multiple widths verified adaptive columns, group wrapping and layout geometry. These are not equivalent to actual Windows WebView2 or user's dataset. Full Python compile, `--ui-self-test`, Windows visual/interaction acceptance, actual Copy/Move/Undo **NOT RUN**. Remains Under construction.
+- Windows verification: run v0.5.18 on the same INNA folders, verify banner names `2015-07-24 - Inna [5948204123093]` and prints the real exact issue; click button and confirm details focus. Validate 2048px/1400px/narrow layouts and details panel opening, connection curves, search, hover, Ignore/Re-Analyze highlights. Fix source issue/rescan before enabling Copy/Move.
 
 ## Latest checkpoint - 2026-10-13, MCC v0.5.17 in-map Re-Analyze selection feedback
 
