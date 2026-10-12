@@ -5,6 +5,12 @@ Last updated: 2026-10-05
 This file is the project-specific rulebook for the Discography Builder and Duplicate / Edition Analyzer.
 The account-wide `SOFTWARE_RULES.md` baseline always applies. This file may add stricter project-specific requirements but must never weaken or override a newer global rule or a newer explicit user instruction. When project rules conflict with the global baseline, the stricter/newer requirement wins.
 
+## Current MCC rule - 2026-10-13: actionable integrity diagnostics and adaptive map columns
+
+Do not show an anonymous `Integrity / completeness: N issue(s)` warning requiring users to hunt manually. Each affected release must be named in the map's warning banner, accompanied by the exact non-invented issue text provided by the scanner. A keyboard- and pointer-accessible action must open that release's details and scroll to the row, even when filtered out of Changes view. Preserve safety: Copy and Move stay disabled until file-integrity/completeness blockers are addressed and the collection is reanalyzed.
+
+Albums, EPs, and Singles must use available window space adaptively. Keep release-family items grouped and chronological within their flowing columns, allow up to three internal columns per category when room permits, and adapt automatically when resizing the window or showing the detail panel. Avoid horizontal overflow or truncated interaction targets and preserve curved relationships, selection, search, manual Ignore/Re-Analyze and 15-second feedback. Keep density/legibility balanced rather than forcing three equal-width one-column strips.
+
 ## Current MCC rule - 2026-10-13: 15-second map feedback after Re-Analyze
 
 The Release Map displays new Re-Analyze selection changes **on the map itself**, without a separate textual result panel. Each newly selected release is highlighted faint green with a +; each deselected release faint red with a −. Indicators automatically clear after **15 seconds** without altering the actual selection. The map should show the actual affected release IDs rather than name-based guesses, including releases with duplicate names; bring changes into view and keep markers correct through redraws. A fresh Re-Analyze starts a fresh timer; repeated state fetches do not. For accessibility, indicators cannot rely on color alone; preserve keyboard and screen-reader text and no flashing. Continue to save technical Re-Analyze logs/audits separately from the UI feedback.
