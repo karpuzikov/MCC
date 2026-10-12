@@ -1,14 +1,14 @@
 # Music Collection Cleaner (MCC)
 
-**Version: 0.5.12 - Under construction ⚠️**
+**Version: 0.5.13 - Under construction ⚠️**
 
 Music Collection Cleaner compares existing music releases with new ones, finds the best combination of editions, and helps preserve every wanted unique recording while removing unnecessary redundancy.
 
 ## Download and run
 
-**[Music Collection Cleaner v0.5.12.pyw](Music%20Collection%20Cleaner%20v0.5.12.pyw)** - versioned single-file Windows Python application. **This is a test build, not a stable Windows release.**
+**[Music Collection Cleaner v0.5.13.pyw](Music%20Collection%20Cleaner%20v0.5.13.pyw)** - versioned single-file Windows Python application. **This is a test build, not a stable Windows release.**
 
-Open with Python 3 on Windows 11 (or run from a console with `python "Music Collection Cleaner v0.5.12.pyw"`). The application checks or installs supported dependencies. The GUI uses Microsoft Edge WebView2 through pywebview; it is not a terminal-based replacement.
+Open with Python 3 on Windows 11 (or run from a console with `python "Music Collection Cleaner v0.5.13.pyw"`). The application checks or installs supported dependencies. The GUI uses Microsoft Edge WebView2 through pywebview; it is not a terminal-based replacement.
 
 Source-level regression checks: `python "Music Collection Cleaner v0.5.11.pyw" --ui-self-test`.
 
@@ -24,6 +24,15 @@ Source-level regression checks: `python "Music Collection Cleaner v0.5.11.pyw" -
 - Explicitly **Copy OLD + NEW** or **Move OLD + NEW** retained releases into the selected destination; Undo for supported completed moves.
 - Log comparisons, validate incomplete/corrupt inputs, choose I/O worker counts with drive awareness, and manage spawned subprocesses.
 
+
+## v0.5.13 - deterministic duration-aware acoustic groups
+
+- Fixes real INNA Hot album false-unique track groups: `Nights & Days` (WEB ID 2, 206.511678s) vs `Days Nights` (CD ID 274, 202.813333s), and `Ladies` (WEB ID 2, 306.033175s) vs `Ladies` (CD ID 274, 307.280000s). Both pairs already **passed** high-confidence Chromaprint tests, but v0.5.12 grouped them separately because other tracks formed transitive group spans greater than seven seconds.
+- Instead of making permanent merges in arbitrary worker-completion order, collect verified acoustic matches and choose deterministic **connected duration-constrained partitions**. Minimize number of recording groups while enforcing the established strict **>7.0-second** version boundary, then maximize verified internal acoustic links and supported membership. Different titles and equal durations alone still never create acoustic identity.
+- Comparison JSONL is now logged with the **final, globally resolved acoustic grouping**, not temporary rejection decisions; a `grouping_policy` row records the new behavior. Preserve all quality thresholds, release Ignore persistence, Re-Analyze and Copy/Move workflow.
+- The supplied INNA comparison and two Re-Analyze audits were examined; offline replay of actual matched-audio pair data demonstrates both Hot fixes. Built-in `--ui-self-test` includes both Hot bridge cases and 7.0/7.01-second boundary checks.
+- **A NEW FULL ANALYSIS IS REQUIRED.** Release Map **Re-Analyze alone reuses old audio group IDs** and will not correct prior false splits.
+- Source published and read back. Python compile, app `--ui-self-test`, real Windows/WebView2 and Copy/Move/Undo **NOT RUN**. `0.5.13 - Under construction ⚠️`; cross-volume Move safety remains unverified.
 
 ## v0.5.12 - auditable Re-Analyze and persistent Ignore
 
