@@ -9789,6 +9789,10 @@ button,input { font:inherit; }
 .track.skipped { opacity:.46; filter:grayscale(.82); }
 .track.skipped:hover { opacity:.60; }
 .track .num,.track .dur { color:#8793a4; text-align:center; align-self:center; }
+.track .dur.differentLength { color:#f3d17a; font-weight:750; }
+.track .dur .lengthDelta { display:inline-block; white-space:nowrap; font-size:9px; font-weight:780; line-height:1.3; color:#ffe2a1; background:#3c2b13; border:1px solid #786033; border-radius:4px; padding:1px 3px; margin-top:2px; }
+.altVersion .altLengthDelta { white-space:nowrap; color:#f3d17a; background:#332716; border:1px solid #776033; border-radius:4px; padding:1px 4px; font-size:10px; font-weight:740; }
+
 .track .titleText {
   overflow:visible; text-overflow:clip; white-space:normal; overflow-wrap:anywhere;
   line-height:1.38; align-self:center; padding:2px 0;
@@ -10589,6 +10593,15 @@ function alternativesForTrack(t,wantFamily) {
   });
 }
 function versionsForTrack(t) { return alternativesForTrack(t,"version"); }
+function versionLengthDelta(t,other){
+  const a=Number(t&&t.durationSeconds),b=Number(other&&other.durationSeconds);
+  if(!Number.isFinite(a)||!Number.isFinite(b)||a<=0||b<=0)return null;
+  const delta=Math.abs(a-b);
+  return delta+0.0000001>=0.5 ? delta : null;
+}
+function lengthDeltaText(seconds){
+  return "\u0394"+(Math.round(seconds*10)/10).toFixed(1)+"s";
+}
 function remixesForTrack(t) { return alternativesForTrack(t,"remix"); }
 function liveForTrack(t) { return alternativesForTrack(t,"live"); }
 function highlightAlternativeVersion(v) {
@@ -10647,6 +10660,8 @@ function openDetails(n) {
       action='<button class="ignoreTrack" data-track="'+t.index+'">'+label+'</button>';
     }
     const versions=versionsForTrack(t), remixes=remixesForTrack(t), live=liveForTrack(t);
+    const timedAlternatives=versions.map(function(v){return versionLengthDelta(t,v);}).filter(function(v){return v!==null;});
+    const nearestDelta=timedAlternatives.length?Math.min.apply(null,timedAlternatives):null;
     let altButtons="";
     if(t.isGem) altButtons+='<span class="trackGem" title="Gem: no duplicates or other Versions">💎</span>';
     if(versions.length) altButtons+='<button class="versionsTrack" data-track="'+t.index+'">Versions '+versions.length+'</button>';
@@ -10659,7 +10674,9 @@ function openDetails(n) {
       :"status";
     tracks+='<div class="'+cls.join(" ")+'" role="button" tabindex="0" aria-label="Inspect track '+esc(t.title)+'" data-group="'+t.groupId+'" data-index="'+t.index+'" title="'+esc(statusText)+'">'
       +'<div class="num">'+esc(t.number)+'</div><div class="titleText" title="'+esc(t.title)+'">'+esc(t.title)+'</div>'
-      +'<div class="dur">'+esc(t.duration)+'</div>'+versionsCell+'<div class="'+statusClass+'">'+esc(statusText)+'</div>'+action+'</div>';
+      +'<div class="dur'+(nearestDelta!==null?' differentLength':'')+'" title="'+esc(nearestDelta!==null?'Different-length version: '+lengthDeltaText(nearestDelta)+' compared with another edition':'Length: '+t.duration)+'">'+esc(t.duration)
+      +(nearestDelta!==null?'<span class="lengthDelta">'+lengthDeltaText(nearestDelta)+'</span>':'')+'</div>'
+      +versionsCell+'<div class="'+statusClass+'">'+esc(statusText)+'</div>'+action+'</div>';
     function addAlternativePanel(items,kind){
       if(!items.length) return "";
       let rows="";
@@ -10667,8 +10684,10 @@ function openDetails(n) {
         const stateText=v.retained?"Retained":(v.available?"Available":"Ignored");
         const stateClass=v.retained?"retained":(v.available?"available":"");
         const releaseText=(v.retainedReleaseNames&&v.retainedReleaseNames.length?v.retainedReleaseNames:v.releaseNames||[]).slice(0,2).join("; ");
+        const delta=versionLengthDelta(t,v);
         rows+='<button class="altVersion" data-kind="'+kind+'" data-parent="'+t.index+'" data-group="'+v.groupId+'" data-release="'+v.releaseId+'">'
           +'<span class="altTitle">'+esc(v.title)+'</span><span class="altDuration">'+esc(v.duration||"")+'</span>'
+          +(delta!==null?'<span class="altLengthDelta" title="Different-length version, not a duplicate">'+lengthDeltaText(delta)+'</span>':'')
           +'<span class="altState '+stateClass+'">'+esc(stateText)+'</span><span class="altReleases">'+esc(releaseText)+'</span></button>';
       });
       const panelClass=kind==="remix"?"altRemixes":(kind==="live"?"altLive":"altVersions");
@@ -11355,6 +11374,7 @@ def _release_map_state_for_ui(
                 {
                     "aliases": set(),
                     "durations": [],
+                    "duration_seconds": [],
                     "families": set(),
                     "carriers": {},
                 },
@@ -11365,6 +11385,12 @@ def _release_map_state_for_ui(
             duration = str(row.get("duration", "") or "").strip()
             if duration and duration not in group["durations"]:
                 group["durations"].append(duration)
+            try:
+                seconds = float(row.get("duration_seconds", 0) or 0)
+            except (ValueError, TypeError):
+                seconds = 0.0
+            if seconds > 0:
+                group["duration_seconds"].append(seconds)
             row_is_live = bool(
                 row.get("is_live")
                 or is_live_text(str(row.get("title", "")))
@@ -11432,6 +11458,9 @@ def _release_map_state_for_ui(
                     "isLive": semantic_family == "live",
                     "aliases": aliases[:6],
                     "duration": (raw.get("durations", []) or [""])[0],
+                    "durationSeconds": round(
+                        min(raw.get("duration_seconds", []) or [0.0]), 3
+                    ),
                     "releaseId": int(preferred[0].get("id", -1)) if preferred else -1,
                     "releaseIds": [int(row.get("id", -1)) for row in carriers],
                     "releaseNames": [str(row.get("name", "")) for row in carriers[:6]],
@@ -11537,6 +11566,7 @@ def _release_map_state_for_ui(
                     "title": str(row.get("title", "")),
                     "album": track_album,
                     "duration": str(row.get("duration", "")),
+                    "durationSeconds": float(row.get("duration_seconds", 0) or 0),
                     "groupId": group_id,
                     "included": included,
                     "excluded": bool(row.get("excluded")),
