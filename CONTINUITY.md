@@ -1,8 +1,18 @@
 # Music Collection Cleaner - Continuity Handoff
 
 Last updated: 2026-10-12
-Status: **0.5.16 - Under construction ⚠️** (source migrated; Windows testing pending)
+Status: **0.5.17 - Under construction ⚠️** (source migrated; Windows testing pending)
 
+
+## Latest checkpoint - 2026-10-13, MCC v0.5.17 in-map Re-Analyze selection feedback
+
+- Canonical versioned single-file source: `Music Collection Cleaner v0.5.17.pyw` on `karpuzikov/MCC/main`. Status **Under construction ⚠️** pending real Windows execution. v0.5.16 remains as historic release. Do not edit Actions workflows.
+- User explicitly requested replacement of text `Re-Analyze result` with **faint 15-second green/red highlights directly on the map**. Green = newly retained selection; red = removed from selection. Remove the textual bottom panel.
+- Implementation: delete `#resultDrawer` HTML/CSS, remove `renderResult()` and calls. Preserve `result` backend JSON because it also supplies audit/selection state, and keep the file-based JSON/JSONL audits. Python ReleaseMapBridge.reanalyze emits `addedReleaseIds`, `removedReleaseIds`, `highlightToken=str(time.time_ns())` in addition to the existing audit and legacy fields.
+- JavaScript `acceptReanalyzeHighlights()` recognizes only a **new** token, so duplicate bridge `getState` calls do not reset the 15s interval. It resets the previous timer if a new Re-Analyze completes, stores changed release IDs in independent added/removed Sets, switches to Full map, and scrolls the first changed row into view. CSS applies subtle backgrounds and an inset line with a + or − character; selected/duplicate opacity is overridden for visibility. `paintReanalyzeHighlight()` applies to both Full map release rows and Changes view entries and augments `title`/`aria-label` with added/removed text. The single timeout clears markers, titles, and labels without discarding selected/ignored states. If the reanalysis changes no selected IDs, no temporary highlights or view switch.
+- UX contract: no dialog/banner/result drawer, no flicker, no mutation of the proposed release plan. Re-Analyze still updates the plan and can enable Copy/Move after all earlier safety gates; result logs remain saved and available in the app's logs folder. Color is supplemented by +/- indicators and accessible labels per UXDT.
+- Validation performed: latest GitHub source read back; **one** embedded `<script type="module">` parsed successfully using V8. An isolated executable V8 test exercised two same-name releases with distinct IDs, 15000ms timer, first-change scroll, duplicate callback prevention, expiry restoring original labels, and second re-analysis restarting with new additions: **PASS**. This is not real WebView2 testing. Full Python compilation, `--ui-self-test`, Windows GUI visual/hover/keyboard tests, Copy/Move/Undo remain **NOT RUN**. Actual user Windows validation needed.
+- Next user test: Analyze, Ignore/Restore an existing release, click Re-Analyze. Confirm immediate Full map, red highlight on dropped edition, green on newly selected replacements, disappearance after 15 seconds, no text result drawer, and normal selection persists. Confirm second run gets a fresh 15 seconds.
 
 ## Latest checkpoint - 2026-10-13, MCC v0.5.16 automatic default Copy/Move destination
 
