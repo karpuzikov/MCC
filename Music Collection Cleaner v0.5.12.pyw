@@ -7369,9 +7369,14 @@ def analyze_prepared(
     progress_cb("Applying saved track skips...", 1, 1)
 
     progress_cb("Optimizing release set...", 0, 1)
+    committed_blocked_ids = {
+        rel.rid for rel in releases
+        if _manual_album_group_path_key(rel.path) in _load_manual_ignored_release_paths()
+    }
     selected = optimize_collection(
         releases,
         groups,
+        blocked_release_ids=committed_blocked_ids,
         progress_cb=progress_cb,
         comparison_log_path=comparison_log_path,
         errors=errors,
@@ -12108,6 +12113,7 @@ def launch_webview_release_map(session: Dict[str, object]) -> Dict[str, object]:
                 self.releases,
                 self.groups,
                 self.blocked_release_ids,
+                comparison_log_path=self.comparison_log_path,
             )
             if new_selected & self.blocked_release_ids:
                 raise RuntimeError("Re-Analyze retained an explicitly ignored release.")
@@ -13554,13 +13560,11 @@ def _webview_main_app() -> int:
                 rel.rid for rel in releases
                 if _manual_album_group_path_key(rel.path) in stored_ignored_paths
             }
+            if selected & blocked_release_ids:
+                raise RuntimeError("Fresh analysis selected a persistently ignored release.")
             if blocked_release_ids:
-                selected = optimize_collection(
-                    releases, groups, blocked_release_ids,
-                    comparison_log_path=ctx.get("comparison_log_path"),
-                )
                 self._append_activity(
-                    f"Applied {len(blocked_release_ids)} saved ignored release(s) to fresh analysis"
+                    f"Applied {len(blocked_release_ids)} saved ignored release(s) during optimization"
                 )
             decisions = build_release_decisions(
                 releases,
@@ -13733,6 +13737,11 @@ def _webview_main_app() -> int:
                 selected = optimize_collection(
                     releases,
                     groups,
+                    blocked_release_ids={
+                        rel.rid for rel in releases
+                        if _manual_album_group_path_key(rel.path)
+                        in _load_manual_ignored_release_paths()
+                    },
                     progress_cb=self._progress,
                     comparison_log_path=comparison_log_path,
                     errors=notes,
