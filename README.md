@@ -1,16 +1,16 @@
 # Music Collection Cleaner (MCC)
 
-**Version: 0.5.16 - Under construction ⚠️**
+**Version: 0.5.17 - Under construction ⚠️**
 
 Music Collection Cleaner compares existing music releases with new ones, finds the best combination of editions, and helps preserve every wanted unique recording while removing unnecessary redundancy.
 
 ## Download and run
 
-**[Music Collection Cleaner v0.5.16.pyw](Music%20Collection%20Cleaner%20v0.5.16.pyw)** - versioned single-file Windows Python application. **This is a test build, not a stable Windows release.**
+**[Music Collection Cleaner v0.5.17.pyw](Music%20Collection%20Cleaner%20v0.5.17.pyw)** - versioned single-file Windows Python application. **This is a test build, not a stable Windows release.**
 
-Open with Python 3 on Windows 11 (or run from a console with `python "Music Collection Cleaner v0.5.16.pyw"`). The application checks or installs supported dependencies. The GUI uses Microsoft Edge WebView2 through pywebview; it is not a terminal-based replacement.
+Open with Python 3 on Windows 11 (or run from a console with `python "Music Collection Cleaner v0.5.17.pyw"`). The application checks or installs supported dependencies. The GUI uses Microsoft Edge WebView2 through pywebview; it is not a terminal-based replacement.
 
-Source-level regression checks: `python "Music Collection Cleaner v0.5.16.pyw" --ui-self-test`.
+Source-level regression checks: `python "Music Collection Cleaner v0.5.17.pyw" --ui-self-test`.
 
 ## What it does
 
@@ -24,6 +24,14 @@ Source-level regression checks: `python "Music Collection Cleaner v0.5.16.pyw" -
 - Explicitly **Copy OLD + NEW** or **Move OLD + NEW** retained releases into the selected destination; Undo for supported completed moves.
 - Log comparisons, validate incomplete/corrupt inputs, choose I/O worker counts with drive awareness, and manage spawned subprocesses.
 
+
+## v0.5.17 - Re-Analyze highlights directly on Release Map
+
+- Removes the bottom **Re-Analyze result** text panel entirely. The back-end's full Re-Analyze audit and JSONL evidence continue to be written to the isolated application log/state folders.
+- After every successful Re-Analyze that actually changes the selected release set, the map switches to **Full map** and briefly highlights changed physical release rows: **faint green +** for newly retained releases, **faint red −** for releases dropped from the selection. Highlights last **15 seconds** and then disappear automatically without changing persistent selection/Ignore status.
+- Uses exact stable-in-session release **IDs**, not release names, so similarly named editions never get each other's highlight. Automatically scrolls to the first changed release. Highlights survive map redraws and view changes during the 15-second interval, and restart the interval for a subsequent Re-Analyze. Duplicate state callbacks do not restart the timer. No animation/flashing or extra result panel; +/− markers and keyboard/screen-reader accessible labels accompany color.
+- The UI still shows the ordinary current KEEP/ADD/REMOVE and ignored states afterward; Copy/Move and safety gates are unchanged. Original Re-Analyze audit remains available through the application's logs.
+- Validation: embedded WebView2 JavaScript parsed in V8; isolated lifecycle/timer test passed (added, removed, same-name IDs, auto-expiry, new run, scroll and accessible labels). Windows GUI, full Python `--ui-self-test` and Copy/Move tests **NOT RUN**; **Under construction ⚠️**. No GitHub Actions changes.
 
 ## v0.5.16 - Copy/Move default destination immediately usable
 
