@@ -5,6 +5,10 @@ Last updated: 2026-10-05
 This file is the project-specific rulebook for the Discography Builder and Duplicate / Edition Analyzer.
 The account-wide `SOFTWARE_RULES.md` baseline always applies. This file may add stricter project-specific requirements but must never weaken or override a newer global rule or a newer explicit user instruction. When project rules conflict with the global baseline, the stricter/newer requirement wins.
 
+## Current MCC rule - 2026-10-13: 15-second map feedback after Re-Analyze
+
+The Release Map displays new Re-Analyze selection changes **on the map itself**, without a separate textual result panel. Each newly selected release is highlighted faint green with a +; each deselected release faint red with a −. Indicators automatically clear after **15 seconds** without altering the actual selection. The map should show the actual affected release IDs rather than name-based guesses, including releases with duplicate names; bring changes into view and keep markers correct through redraws. A fresh Re-Analyze starts a fresh timer; repeated state fetches do not. For accessibility, indicators cannot rely on color alone; preserve keyboard and screen-reader text and no flashing. Continue to save technical Re-Analyze logs/audits separately from the UI feedback.
+
 ## Current MCC rule - 2026-10-13: default export destination must be actionable
 
 A valid live Release Map must calculate `<NEW source folder> - UPDATED` automatically beside the NEW source. When the analyzed plan is ready and has no pending decisions or integrity blockers, both **Copy old + new** and **Move old + new** must be enabled without a Browse click. The displayed destination, Open-folder control, enabled/disabled state, and execution confirmation must all use the same effective destination. Browse remains an optional override; it must never be a prerequisite. When the destination cannot be inferred, require an explicit path rather than guessing. Preserve existing Copy non-destructiveness, Move/Undo safety, and approval confirmation.
