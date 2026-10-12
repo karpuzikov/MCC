@@ -1,8 +1,19 @@
 # Music Collection Cleaner - Continuity Handoff
 
 Last updated: 2026-10-12
-Status: **0.5.14 - Under construction ⚠️** (source migrated; Windows testing pending)
+Status: **0.5.15 - Under construction ⚠️** (source migrated; Windows testing pending)
 
+
+## Latest checkpoint - 2026-10-12, MCC v0.5.15 INNA Fool Me replaceable Version optimization
+
+- Canonical source: `Music Collection Cleaner v0.5.15.pyw`, `karpuzikov/MCC/main`. **Under construction ⚠️**. Prior v0.5.14 preserved. Changes affect optimizer coverage, snapshot/UI explanations and logged evidence; no workflows modified.
+- User's two candidate albums: `2015-07-24 - Inna [5948204123093]` (ID 27), indispensable for other unique core tracks; `INNA – Body And The Sun [Japan] (2015) [FLAC]` (ID 287), selected alongside ID 27 in Re-Analyze 2026-10-12 23-58-29 audit. Japanese edition had four `Unique to this retained release` claims: Cola Song (matched standalone single ID 15), Take Me Higher (matched ID 19), Good Time (matched ID 16), and Fool Me (different-length audio).
+- From v0.5.14 JSONL: Japanese Fool Me index 785 213.333333s vs INNA WEB Fool Me index 163 195.805556s (and Body and the Sun WEB index 146, same audio as index 163): delta 17.527777s; strict/mastering positive acoustic statistics score 4.509301, good .944836, excellent .708146, overlap .999359, median 4, p90 9, acoustic coverage .915981. Hard >8s rule and non-silent unmatched content correctly rejected **exact duplicate** identity. This different-length edit can nevertheless be **substitutable for COLLECTION COVERAGE**, per user's requested Japanese edition removal. Keep actual group IDs separate.
+- Additional matching examples: `Cola Song` index 782 vs single 114 is MATCH, `Take Me Higher` 794 vs single 119 MATCH, `Good Time` 795 vs single 115 MATCH. With Japan blocked, the 23-58-10 audit shows these three singles selected and Japanese Fool Me only missing. With Japan restored, 23-58-29 audit selects Japan + Inna and drops singles. Desired result: keep Inna and three singles, not Japanese, unless some other truly unique content is shown after a new full analysis.
+- Implementation: Track now includes planning-only `coverage_group_id`. `merge_equivalent_tracks` still assigns physical/acoustic `group_id` under 8s rule, then analyzes rejected length-edit pairs using title, primary artist, semantic root family, strong Chromaprint acceptance and ≥90% aligned acoustic coverage. `_assign_replaceable_version_coverage` sets effective provider groups without mutating actual group IDs, so exact optimizer and Release Map unique coverage both use substitional obligation; original acoustic version distinction stays visible. `replaceable_version_coverage` JSONL rows audit the two true matched Fool Me candidates. The UI flags and labels source as an alternate version.
+- Offline read of full user comparison: **127** same-title/artist duration-version-rejected candidate pairs, only **2** meet the strict source-data score/good/overlap/excellent/median/p90/coverage filters, both Fool Me index 785 vs 146/163. New synthetic self-test models Fool Me substitution and a miniature core album + independent single coverage, plus no title-only/extended/weak-audio false positives. This is a regression contract, not a Windows test claim.
+- **Next required:** run `Music Collection Cleaner v0.5.15.pyw` for a full INNA OLD+NEW comparison, inspect whether Japanese edition is removed and Inna plus 2014 singles are retained. The 8s version boundary remains unchanged. Re-Analyze alone cannot rebuild version substitutability. Upload new comparison and Re-Analyze audit if result disagrees.
+- Validation remaining: full Python compile, --ui-self-test, actual Windows GUI, drag/keyboard/hover, copy/move/undo, cross-volume recovery all NOT RUN. Keep status **Under construction ⚠️**; no GitHub Actions modifications.
 
 ## Latest checkpoint - 2026-10-12, MCC v0.5.14 duration threshold 8 seconds
 
