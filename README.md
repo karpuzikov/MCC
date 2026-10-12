@@ -1,16 +1,16 @@
 # Music Collection Cleaner (MCC)
 
-**Version: 0.5.15 - Under construction ⚠️**
+**Version: 0.5.16 - Under construction ⚠️**
 
 Music Collection Cleaner compares existing music releases with new ones, finds the best combination of editions, and helps preserve every wanted unique recording while removing unnecessary redundancy.
 
 ## Download and run
 
-**[Music Collection Cleaner v0.5.15.pyw](Music%20Collection%20Cleaner%20v0.5.15.pyw)** - versioned single-file Windows Python application. **This is a test build, not a stable Windows release.**
+**[Music Collection Cleaner v0.5.16.pyw](Music%20Collection%20Cleaner%20v0.5.16.pyw)** - versioned single-file Windows Python application. **This is a test build, not a stable Windows release.**
 
-Open with Python 3 on Windows 11 (or run from a console with `python "Music Collection Cleaner v0.5.15.pyw"`). The application checks or installs supported dependencies. The GUI uses Microsoft Edge WebView2 through pywebview; it is not a terminal-based replacement.
+Open with Python 3 on Windows 11 (or run from a console with `python "Music Collection Cleaner v0.5.16.pyw"`). The application checks or installs supported dependencies. The GUI uses Microsoft Edge WebView2 through pywebview; it is not a terminal-based replacement.
 
-Source-level regression checks: `python "Music Collection Cleaner v0.5.15.pyw" --ui-self-test`.
+Source-level regression checks: `python "Music Collection Cleaner v0.5.16.pyw" --ui-self-test`.
 
 ## What it does
 
@@ -24,6 +24,13 @@ Source-level regression checks: `python "Music Collection Cleaner v0.5.15.pyw" -
 - Explicitly **Copy OLD + NEW** or **Move OLD + NEW** retained releases into the selected destination; Undo for supported completed moves.
 - Log comparisons, validate incomplete/corrupt inputs, choose I/O worker counts with drive awareness, and manage spawned subprocesses.
 
+
+## v0.5.16 - Copy/Move default destination immediately usable
+
+- **Bug fixed:** In the Release Map, `Copy old + new releases into:` and `Move old + new releases into:` now default to the computed sibling folder `<NEW source name> - UPDATED`; the Copy and Move buttons become enabled immediately when there is a valid analyzed plan, without clicking Browse first.
+- Both buttons, the displayed path, the Open-folder icon, and the final confirmation consume the exact same effective destination. An older/incomplete UI state can derive it from the NEW source root, with a fallback through NEW-release rows. Browse still overrides the destination. Pending Re-Analyze and audit-integrity blockers continue to disable Copy/Move.
+- The backend also recovers the root from NEW snapshot scan roots when the live session did not supply it. A built-in source regression checks the default path and enabled-state contract.
+- **Testing:** GitHub source and static contract verified. Actual Windows/WebView2 interaction and full Python self-tests NOT RUN; status stays **0.5.16 - Under construction ⚠️**. No GitHub Actions changes.
 
 ## v0.5.15 - substitute verified edits without conflating audio
 
