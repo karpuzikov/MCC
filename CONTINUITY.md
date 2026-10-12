@@ -1,12 +1,20 @@
 # Music Collection Cleaner - Continuity Handoff
 
 Last updated: 2026-10-12
-Status: **0.5.0 - Under construction ⚠️** (migration in progress; Windows testing pending)
+Status: **0.5.2 - Under construction ⚠️** (source migrated; Windows testing pending)
+
+## Latest checkpoint - 2026-10-12, v0.5.2 remix-feature policy fix
+
+- User supplied real MCC **v0.5.0** `Music Collection Cleaner Comparison 2026-10-12-10-38-26.jsonl` (872 total tracks, 712 eligible, 151 featured-remix exceptions). INNA release **2017-06-15 - Gimme Gimme (Remixes) [190295779481]**, release ID 45, was selected with Save Remixes OFF; of 11 tracks, **9 named remixes** were wrongly retained as 'added-feature exceptions' because `ARTIST` tags named remix producers (e.g. `Inna;Sak Noel`, `Inna;Ness`, `Inna;Dj Dark;MD DJ`). The Mert Hakan & Ilkay Sencan Remix had already been excluded. Root cause: `configure_exclusions` promoted `_artist_tag_collaborators` to featured performers even where track title established a named remixer.
+- **Current source** `Music Collection Cleaner v0.5.2.pyw` avoids interpreting artist-tag collaborators as added features for explicitly named remixes and contextual remixer edit/club variants; it only accepts explicit feat./ft. credits in such cases, while retaining the generic Remix + demonstrably added feature policy. Added built-in `--ui-self-test` fixtures for all 10 Gimme remixes, JRMX contextual Dub/Club and a genuine remix-added `feat.` after named remix. v0.5.1 was a short intermediate development checkpoint; v0.5.2 supersedes it.
+- The same release contains one non-remix **Gimme Gimme (Extended Version)**, ~245.455s versus original ~176.827s (not an acoustic MATCH). The extended recording also appears on release ID 41, `2017-02-01 - Gimme Gimme (The Remixes) [5948204157593]`, with an acoustic MATCH against ID 45. It is wanted under current rules, so MCC may still retain ONE remix-named package as its only carrier; do **not** promise ID 45 must disappear until the solver is rerun and the wanted Extended Version is accounted for.
+- Source published in `karpuzikov/MCC`, main, WebView2 preserved, v0.5.2 Under construction ⚠️. Real Windows v0.5.2 rerun, Python full-module compilation, built-in self-tests and optimizer selection with the user's actual data **remain unverified**; do not mark stable. Old DEA reference project remains untouched.
+- Exact next check: run v0.5.2 on the **same OLD/NEW INNA collection** with Save Remixes disabled; new JSONL must show 9 previously erroneous named remixes excluded from wanted coverage, while the Extended Version remains eligible, and no other remix false positives remain. Also test Starboy/Weeknd true newly featured cases, Copy/Move/Undo and all previous blockers.
 
 ## Current product and canonical repository
 
 - Product: **Music Collection Cleaner** (MCC); repository: `karpuzikov/MCC`, branch `main`.
-- Canonical new source: `Music Collection Cleaner v0.5.0.pyw` (WebView2/pywebview, original analyzer logic and interactive Release Map preserved).
+- Canonical new source: `Music Collection Cleaner v0.5.2.pyw` (WebView2/pywebview, original analyzer logic and interactive Release Map preserved).
 - Inherits behavior and rules from `karpuzikov/userscripts`, branch `dea-lightweight-modern`, v0.4.9. Root `RULES.md` is the original complete project rulebook; root `SOFTWARE_RULES.md` is the exact canonical global mirror.
 - Separate original production tool `Duplicate Edition Analyzer v0.22.12.pyw` remains **untouched** in `karpuzikov/userscripts`; legacy branch files remain available for reference.
 - Version remains `Under construction ⚠️` until Windows testing. Neither a Windows EXE nor a stable release is claimed.
