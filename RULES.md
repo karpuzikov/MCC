@@ -5,6 +5,12 @@ Last updated: 2026-10-05
 This file is the project-specific rulebook for the Discography Builder and Duplicate / Edition Analyzer.
 The account-wide `SOFTWARE_RULES.md` baseline always applies. This file may add stricter project-specific requirements but must never weaken or override a newer global rule or a newer explicit user instruction. When project rules conflict with the global baseline, the stricter/newer requirement wins.
 
+## Current MCC rule - 2026-10-12: verified replaceable edit coverage
+
+The stricter **>8.0s length threshold** still denotes a separate acoustic Version; it never proves identical audio. Nevertheless, a short/long **replaceable edit of the same recording root** is permitted to fulfill the same **collection coverage** obligation, distinct from acoustically identical grouping, if the shared real audio evidence is strong enough. Both physical tracks must retain their distinct audio-group IDs and their visible length/version differences. Extended, Acoustic, Instrumental, Remix, Live and other distinct roots cannot substitute merely through overlapping audio. The optimizer must not retain an entire edition only to preserve a non-mandatory edit when the base recording is retained elsewhere and its other songs are covered by matching singles. Conversely, missing genuine unique recording roots must never be discarded.
+
+The user-confirmed example is the 2015 INNA WEB album `2015-07-24 - Inna [5948204123093]` plus 2014 independent singles versus the Japanese `INNA – Body And The Sun [Japan] (2015) [FLAC]`: Japanese Fool Me 213.33s vs WEB Fool Me 195.81s is not an identical acoustic file, but may substitute for coverage with exceptional fingerprint similarity (score 4.5093, good 94.48%, overlap 99.94%, acoustic coverage 91.60%). Mark it **"Covered by alternate version"**, not **"identical duplicate"**. Source must log both the real audio distinction and the substitution decision. Testing requires a new full analysis.
+
 ## Current MCC rule - 2026-10-12: duration-version threshold 8 seconds
 
 **Newest explicit user instruction supersedes the historical 7-second rule below.** MCC uses a measured duration difference of **strictly greater than 8.0 seconds** to distinguish length-based Versions. Differences of **exactly 8.0 seconds or less** do not veto an otherwise valid fingerprint match or create a length-based badge. This does NOT permit duplicate merging based on equal or similar duration alone; audio matching remains mandatory.
