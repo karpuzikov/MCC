@@ -1,8 +1,18 @@
 # Music Collection Cleaner - Continuity Handoff
 
 Last updated: 2026-10-12
-Status: **0.5.13 - Under construction ⚠️** (source migrated; Windows testing pending)
+Status: **0.5.14 - Under construction ⚠️** (source migrated; Windows testing pending)
 
+
+## Latest checkpoint - 2026-10-12, MCC v0.5.14 duration threshold 8 seconds
+
+- User explicitly requests 8-second threshold instead of 7. **Supersedes the earlier v0.5.11 strict >7-second rule**, while preserving it as historical documentation.
+- Canonical source: `Music Collection Cleaner v0.5.14.pyw` in `karpuzikov/MCC` (`main`); previous version retained. The app constant is 0.5.14 and its status remains **Under construction ⚠️**.
+- Effective rule: known measured total duration delta **≤8.0 seconds** is NOT by itself a different Version; **>8.0 seconds** is. Acoustic evidence still required to merge. Shared `DURATION_VERSION_MAX_SAME_SECONDS` changed from 7.0 to 8.0. WebView2 `versionLengthDelta` highlights only delta >8.0000001 seconds. Fingerprint matcher, exact-match fast path, group-diameter bounds, deterministic coherent-duration partitions, manual merges, log decision threshold and UI are aligned.
+- Existing INNA Hot log-shaped synthetic regressions adapted: the 210.306667s Days Nights copy differs from 202.812993s by ~7.494s, and 313.293333s Ladies differs from 306.033175s by ~7.260s, so both are **inside** the new 8s window and may join their otherwise acoustically supported component. Keep acoustic graph connectivity and deterministic grouping.
+- Regression boundary expectations changed: exactly 8.0s = allowed when audio matches; 8.01s = distinct Version. Tests check direct fingerprints, transitive group veto, synthetic Hot comparisons, and manual review. No unverified assertions of completed execution.
+- **Important:** Re-Analyze alone does not rebuild old acoustic groups; Windows user must start an entirely new scan of both source pools to apply this threshold.
+- GitHub source written/read back; static source checks only. Python compilation, `--ui-self-test`, actual Windows/WebView2 scan, Copy/Move and Undo **NOT RUN**. Keep `Under construction ⚠️`. No Actions edits.
 
 ## Latest checkpoint - 2026-10-12, MCC v0.5.13 Hot edition acoustic transitivity fix
 
