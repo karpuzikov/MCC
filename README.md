@@ -1,14 +1,14 @@
 # Music Collection Cleaner (MCC)
 
-**Version: 0.5.11 - Under construction ⚠️**
+**Version: 0.5.12 - Under construction ⚠️**
 
 Music Collection Cleaner compares existing music releases with new ones, finds the best combination of editions, and helps preserve every wanted unique recording while removing unnecessary redundancy.
 
 ## Download and run
 
-**[Music Collection Cleaner v0.5.11.pyw](Music%20Collection%20Cleaner%20v0.5.11.pyw)** - versioned single-file Windows Python application. **This is a test build, not a stable Windows release.**
+**[Music Collection Cleaner v0.5.12.pyw](Music%20Collection%20Cleaner%20v0.5.12.pyw)** - versioned single-file Windows Python application. **This is a test build, not a stable Windows release.**
 
-Open with Python 3 on Windows 11 (or run from a console with `python "Music Collection Cleaner v0.5.11.pyw"`). The application checks or installs supported dependencies. The GUI uses Microsoft Edge WebView2 through pywebview; it is not a terminal-based replacement.
+Open with Python 3 on Windows 11 (or run from a console with `python "Music Collection Cleaner v0.5.12.pyw"`). The application checks or installs supported dependencies. The GUI uses Microsoft Edge WebView2 through pywebview; it is not a terminal-based replacement.
 
 Source-level regression checks: `python "Music Collection Cleaner v0.5.11.pyw" --ui-self-test`.
 
@@ -24,6 +24,15 @@ Source-level regression checks: `python "Music Collection Cleaner v0.5.11.pyw" -
 - Explicitly **Copy OLD + NEW** or **Move OLD + NEW** retained releases into the selected destination; Undo for supported completed moves.
 - Log comparisons, validate incomplete/corrupt inputs, choose I/O worker counts with drive awareness, and manage spawned subprocesses.
 
+
+## v0.5.12 - auditable Re-Analyze and persistent Ignore
+
+- **Re-Analyze is selection-only, not a new acoustic scan.** It reruns the complete global release optimizer using already computed recording groups, current track ignores and manual album grouping.
+- Once an Ignore/Restore change is committed by **Re-Analyze**, exact release-path exclusions are stored in `state/manual_ignored_releases.json` and applied **during** the next full scan's initial optimization. Pending unconfirmed Ignore changes are not committed.
+- Every successful Re-Analyze writes `logs/Music Collection Cleaner Re-Analyze YYYY-MM-DD-HH-MM-SS-ffffff.jsonl` and `state/last_reanalysis_audit.json`: blocked paths, previous/new retained IDs, added/removed releases, per-release reasons and replacement-source availability. If comparison logging was enabled for the original scan, append the new optimizer result and reanalysis event to that **same original JSONL**; old acoustic pair results are not overwritten.
+- The Release Map result drawer offers **Open audit log**. Existing Copy/Move gating remains until Re-Analyze completes. `--ui-self-test` now includes isolated audit/persistence assertions.
+- Investigation fixture: `Music Collection Cleaner Comparison 2026-10-12-20-53-24.jsonl` (v0.5.11) contains **only the initial optimizer result** (`blocked_releases: 0`). RuTracker 2011 CD `281` was selected, equivalent-looking edition `280` was not; their **No Limit** fingerprints were rejected against each other at ~74.57% good fraction vs 80% mastering threshold despite equal duration. Do not merge solely on title/length. Rerun v0.5.12 with the two ignored releases and inspect the newly written Re-Analyze audit for the actual post-Ignore decision.
+- **Testing:** source published/read back; full Python compile, `--ui-self-test`, and actual Windows/WebView2 user workflow **NOT RUN**. Status remains **Under construction ⚠️**. Do not modify GitHub Actions.
 
 ## v0.5.11 - duration threshold corrected to strictly over 7 seconds
 
