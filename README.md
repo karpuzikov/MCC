@@ -1,16 +1,16 @@
 # Music Collection Cleaner (MCC)
 
-**Version: 0.5.17 - Under construction ⚠️**
+**Version: 0.5.18 - Under construction ⚠️**
 
 Music Collection Cleaner compares existing music releases with new ones, finds the best combination of editions, and helps preserve every wanted unique recording while removing unnecessary redundancy.
 
 ## Download and run
 
-**[Music Collection Cleaner v0.5.17.pyw](Music%20Collection%20Cleaner%20v0.5.17.pyw)** - versioned single-file Windows Python application. **This is a test build, not a stable Windows release.**
+**[Music Collection Cleaner v0.5.18.pyw](Music%20Collection%20Cleaner%20v0.5.18.pyw)** - versioned single-file Windows Python application. **This is a test build, not a stable Windows release.**
 
-Open with Python 3 on Windows 11 (or run from a console with `python "Music Collection Cleaner v0.5.17.pyw"`). The application checks or installs supported dependencies. The GUI uses Microsoft Edge WebView2 through pywebview; it is not a terminal-based replacement.
+Open with Python 3 on Windows 11 (or run from a console with `python "Music Collection Cleaner v0.5.18.pyw"`). The application checks or installs supported dependencies. The GUI uses Microsoft Edge WebView2 through pywebview; it is not a terminal-based replacement.
 
-Source-level regression checks: `python "Music Collection Cleaner v0.5.17.pyw" --ui-self-test`.
+Source-level regression checks: `python "Music Collection Cleaner v0.5.18.pyw" --ui-self-test`.
 
 ## What it does
 
@@ -24,6 +24,13 @@ Source-level regression checks: `python "Music Collection Cleaner v0.5.17.pyw" -
 - Explicitly **Copy OLD + NEW** or **Move OLD + NEW** retained releases into the selected destination; Undo for supported completed moves.
 - Log comparisons, validate incomplete/corrupt inputs, choose I/O worker counts with drive awareness, and manage spawned subprocesses.
 
+
+## v0.5.18 - actionable integrity warning and responsive Release Map
+
+- **Integrity/completeness warning:** replaces the unhelpful banner that only counted problems. Now shows each affected release **by name and its exact recorded audit issue(s)** in a focusable button at the top of the map. Clicking it switches from Changes to Full map as needed, selects and scrolls to the affected release, and opens its details, including issue text and release folder. **Copy/Move remain blocked** until source issues are fixed and a new analysis is run; safety checks are not bypassed.
+- Screenshot supplied for v0.5.17 shows ⚠️ beside `2015-07-24 - Inna [5948204123093]`. The screenshot itself does **not** reveal the precise file/completeness error, so no specific corruption or missing track may be assumed; the new banner surfaces the scan's actual recorded message.
+- **Responsive layout:** Full map keeps Albums / EPs / Singles and all original groupings, links, icons and interactions. At wide widths it allocates category widths according to the square root of the number of distinct release groups (instead of always equal thirds). Each category flows complete release-family groups into **1, 2, or 3 internal columns** via CSS container queries, without splitting a group. At narrower effective board widths (including when release details is open), category sections stack at full width instead of leaving narrow strips. Existing Changes-only view and 15-second Re-Analyze highlights remain unchanged.
+- **Validation:** GitHub code and embedded JavaScript re-fetched; embedded JS parsed successfully. Isolated executable JS mocks passed named issue / click-to-release navigation and 27 Albums + 111 EPs + 150 Singles weighted-layout rendering. Linux Chromium/Playwright CSS geometry smoke test at 2048/1600/1300/780px showed responsive 1/2/3-column behavior and no horizontal overflow in a representative miniature page. **Windows WebView2, full Python `--ui-self-test`, source repair, and Copy/Move/Undo NOT RUN.** Status remains `0.5.18 - Under construction ⚠️`. No GitHub Actions changes.
 
 ## v0.5.17 - Re-Analyze highlights directly on Release Map
 
