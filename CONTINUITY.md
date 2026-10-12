@@ -1,8 +1,18 @@
 # Music Collection Cleaner - Continuity Handoff
 
 Last updated: 2026-10-12
-Status: **0.5.12 - Under construction ⚠️** (source migrated; Windows testing pending)
+Status: **0.5.13 - Under construction ⚠️** (source migrated; Windows testing pending)
 
+
+## Latest checkpoint - 2026-10-12, MCC v0.5.13 Hot edition acoustic transitivity fix
+
+- Canonical GitHub source: `Music Collection Cleaner v0.5.13.pyw` on `karpuzikov/MCC/main`, **Under construction ⚠️**. v0.5.12 remains archived. No GitHub Actions workflow changes.
+- User provided comparison `Music Collection Cleaner Comparison 2026-10-12-22-08-12.jsonl` (MCC v0.5.12) plus Re-Analyze audit files ending `22-33-16-546527` and `22-33-29-669838`. After ignoring `2005-07-01 - Hot [191018194277]`, `2005-07-01 - Hot [5037128001775]`, and `Inna - New Hot Edition (2010)`, both `2005-07-01 - Hot [5948204431396]` (ID 2) and `2010 - Hot [RDM110]` (ID 274) were retained, each displaying `Ladies` and `Nights & Days / Days Nights` as allegedly unique.
+- **Confirmed from raw logged acoustic comparisons:** ID 2 track 33 `Ladies` 306.033175s vs ID 274 track 644 `Ladies` 307.280000s: `audio_match=true`, good_fraction=1.0, overlap=1.0, score=1.766939, duration delta=1.246825 seconds. ID 2 track 29 `Nights & Days` 206.511678s vs ID 274 track 646 `Days Nights` 202.813333s: `audio_match=true`, good_fraction=1.0, overlap=1.0, score=2.021027, duration delta=3.698345 seconds. Both had `decision=REJECT` and `transitive_duration_version_conflict=true`. Thus NOT an audio fingerprint threshold or a title-spelling problem.
+- Root cause: online union of acoustic groups enforced a max-min length window of 7s; different tracks on `Inna - Hot (2009)` (e.g. Ladies 313.293333s and Days Nights 210.306667s) bridged otherwise valid editions, and worker-completion order could vary. The exact same recorded pairs can be split only because other acoustic links were processed earlier. Keep >7.0 seconds a hard version separation; do not merge by title/length alone.
+- Implemented `_coherent_duration_audio_groups`: collect all positively fingerprint-matched candidate pairs; build connected acoustic components; dynamic-program over duration-sorted intervals of width ≤7.0 seconds; require internal acoustic graph connectivity; lexicographically minimize group count, maximize real within-group fingerprint matches then group size, with deterministic tie-breaking. No worker-order unions. Unknown duration fallback conservative. After partition, log final `comparison` matches/vetoes plus `grouping_policy` marker rather than premature decisions.
+- Offline Python replay of **the actual uploaded match/veto edges** verified that Hot track indices 29/646 and 33/644 join, while >7s outlier 676 (Days Nights 210.306667) and 682 (Ladies 313.293333) do not join the shorter variants. Synthetic regression cases for both bridges and strict 7.0/7.01s rule added to `--ui-self-test`. Real application self-tests and Windows GUI not executed.
+- **Next action:** Download v0.5.13, perform a brand-new full scan of the same INNA OLD+NEW folders (Re-Analyze alone cannot recompute stored fingerprint groups), then repeat the ignore list, inspect both Hot album track details, and provide the fresh comparison + Re-Analyze logs if an unexpected duplicate remains. Do not conclude that an album will automatically be removed until entire track coverage/album-family constraints are recalculated. Persisted ignored releases remain active by physical path. Retain existing dark WebView2 UI and no GitHub Actions changes.
 
 ## Latest checkpoint - 2026-10-12, v0.5.12 Re-Analyze audit and saved release Ignore
 
