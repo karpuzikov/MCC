@@ -4947,6 +4947,8 @@ def merge_equivalent_tracks(
             details["rejection_reasons"].append(
                 "transitive acoustic group would contain differently timed versions"
             )
+            details["derived_final_match"] = False
+            details["decision_consistent"] = not bool(final_matched)
 
         if is_shadow:
             log_counts["shadow_tested"] += 1
@@ -9836,14 +9838,15 @@ button,input { font:inherit; }
 .altRemixesHead { color:#d9b4ff; background:#1d1428; border-bottom-color:#443157; }
 .altLiveHead { color:#98ebce; background:#10251f; border-bottom-color:#315d52; }
 .altVersion {
-  width:100%; display:grid; grid-template-columns:minmax(180px,1fr) 54px 80px minmax(130px,1fr);
+  width:100%; display:grid; grid-template-columns:minmax(160px,1fr) 78px 80px minmax(120px,1fr);
   gap:8px; align-items:center; padding:7px 10px; border:0; border-bottom:1px solid #1f303a;
   background:transparent; color:#e6edf5; text-align:left; cursor:pointer; font-size:11px;
 }
 .altVersion:last-child { border-bottom:0; }
 .altVersion:hover { background:#172630; }
 .altVersion .altTitle { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-weight:650; }
-.altVersion .altDuration { color:#8793a4; text-align:center; }
+.altVersion .altDuration { color:#8793a4; text-align:center; display:flex; flex-direction:column; gap:2px; justify-content:center; align-items:center; }
+.altVersion .altDuration.changed { color:#f3d17a; font-weight:740; }
 .altVersion .altState { color:#9ca7b8; white-space:nowrap; }
 .altVersion .altState.retained { color:#8ee7a7; }
 .altVersion .altState.available { color:#f3d17a; }
@@ -10692,8 +10695,8 @@ function openDetails(n) {
         const releaseText=(v.retainedReleaseNames&&v.retainedReleaseNames.length?v.retainedReleaseNames:v.releaseNames||[]).slice(0,2).join("; ");
         const delta=versionLengthDelta(t,v);
         rows+='<button class="altVersion" data-kind="'+kind+'" data-parent="'+t.index+'" data-group="'+v.groupId+'" data-release="'+v.releaseId+'">'
-          +'<span class="altTitle">'+esc(v.title)+'</span><span class="altDuration">'+esc(v.duration||"")+'</span>'
-          +(delta!==null?'<span class="altLengthDelta" title="Different-length version, not a duplicate">'+lengthDeltaText(delta)+'</span>':'')
+          +'<span class="altTitle">'+esc(v.title)+'</span><span class="altDuration'+(delta!==null?' changed':'')+'">'+esc(v.duration||"")
+          +(delta!==null?'<span class="altLengthDelta" title="Different-length version, not a duplicate">'+lengthDeltaText(delta)+'</span>':'')+'</span>'
           +'<span class="altState '+stateClass+'">'+esc(stateText)+'</span><span class="altReleases">'+esc(releaseText)+'</span></button>';
       });
       const panelClass=kind==="remix"?"altRemixes":(kind==="live"?"altLive":"altVersions");
