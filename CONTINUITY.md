@@ -1,8 +1,17 @@
 # Music Collection Cleaner - Continuity Handoff
 
 Last updated: 2026-10-12
-Status: **0.5.15 - Under construction ⚠️** (source migrated; Windows testing pending)
+Status: **0.5.16 - Under construction ⚠️** (source migrated; Windows testing pending)
 
+
+## Latest checkpoint - 2026-10-13, MCC v0.5.16 automatic default Copy/Move destination
+
+- Source: `Music Collection Cleaner v0.5.16.pyw`, `karpuzikov/MCC/main`. **Under construction ⚠️**. Prior 0.5.15 remains available. No GitHub Actions workflow changes.
+- User-reported bug: `Copy old + new releases into:` showed a supposed default destination, but **Copy old + new** remained disabled until clicking Browse and selecting an explicit path. Intended default destination is adjacent to NEW source as `<NEW source folder name> - UPDATED`; manual selection must not be necessary.
+- Root cause in UI contract: existing `updateExportControls()` disabled buttons when its effective path was empty; missing `defaultExportDestination` state had no fallback. Python live map default derived only from `session.recycle` or computed `sourceRoots.recycle`; it now also checks NEW scan-root snapshots. JavaScript `defaultExportPath()` resolves explicit server default first, then `state.sourceRoots.recycle`, then the NEW node's `sourceRoot`. `selectedExportPath(mode)` always returns user-selected override when present or that default. All visible path/button/open/copy/move operations reuse the same function, preventing discrepancies.
+- Copy and Move should be enabled immediately if and only if the Release Map is editable, the resolved destination is nonempty, Re-Analyze is not pending, and the plan is not blocked by integrity errors. Browse changes only the effective destination, not safety state. File operations still require confirmation; Copy remains non-destructive; no rename or folder deletion behavior changed.
+- Added source-level UI self-test assertions for default resolver and gating. GitHub source written/read back; **no real Windows/WebView2 UI test or complete Python `--ui-self-test` has been run**. User should test open live Release Map after Analyze, verify automatic path shown and Copy active without browsing, choose another path, verify override; edit Ignore to force Re-Analyze and confirm Copy disabled until it completes. Cross-volume Move recovery remains a separate blocker.
+- If symptom remains with nonempty displayed path, inspect `state.applyEnabled`, `state.dirty`, and `auditIssueCount`; these are independent safety gates and should not be silently bypassed.
 
 ## Latest checkpoint - 2026-10-12, MCC v0.5.15 INNA Fool Me replaceable Version optimization
 
