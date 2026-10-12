@@ -24,15 +24,26 @@ Before ANY UI modification, record a control contract for the affected workflows
 | Error, cancellation, persistence, restart, recovery | NOT RUN |
 | Real host/OS end-to-end workflow and final acceptance | NOT RUN |
 
-## Application: Music Collection Cleaner
+## UI surfaces: monorepo
 
-**GUI source:** `Music Collection Cleaner v0.5.0.pyw` embeds WebView2/pywebview for a rich graphical Release Map and analysis controls.
+**Desktop Python GUI utilities:** Corrupt Image Verifier (`image-tools/corrupt-image-verifier/`); Duplicate Edition Analyzer (latest of versioned `.pyw` sources under `audio-tools/discography-torrent-project/tools/`); ALAC Conversion Automation; AudioChecker Automation; CUE Corrector; Folder Structure Scanner; CUE LOG; DriveV AutoInstaller; Priorities. Treat older versioned files as historical; audit the latest active version of each and applicable active development branches.
 
-**Control contract/acceptance:** source OLD and NEW folders, drive-aware workers, Analyze, filter/choose results, Release Map/track overlaps, exclude/restore, Copy OLD+NEW, Move OLD+NEW, Undo, progress/status and stop/cancel. Inspect the actual WebView2 rendering against the Duplicate Edition Analyzer reference; ensure icon before paths, overlay stacking, full keyboard access, resizing, and focus state.
+**Browser and MusicBrainz userscript UI:** Instagram Full Quality, Spotify Hidden Releases, Genius Lyrics Copier, RuTracker Digital Release Linker, SimpCity Media Link Parser, Beatport - MusicBrainz Importer, MusicBrainz Toolbox, Harmony Toolbox, Apple Music Composition/Lyrics Importer and any other scripts that insert controls, overlays, menus or dialogs. Browser Debug Bridge's `popup.html` and related CSS is in scope. Inspect remaining scripts for controls before excluding them.
 
-**Known functional blocker in README:** cross-volume Move can leave a partially removed source if cleanup fails; do not certify destructive operations without disposable failure-injection testing.
+**Interactive console/host scripts:** ArchiveMedia, Windows backup/install/requirements tools if they present menus, confirmations, progress or paths; Photoshop scripts if they present dialogs.
 
-**Real Windows WebView2 screenshots/hover/keyboard/resize/scroll + Skrillex dataset/cross-volume Move and Undo:** NOT RUN.
+### Source audit findings (actual files inspected)
+
+- **FAIL - framework policy:** `Corrupt Image Verifier v1.1.7 NATIVE TEST.pyw`, `Priorities v0.1.0.pyw`, `ALAC Conversion Automation v0.2.pyw`, `AudioChecker Automation v0.1.pyw`, `CUE Corrector - MusicBrainz DiscID 1.3.1.pyw`, `Duplicate Edition Analyzer v0.22.12.pyw` (contains both Qt and Tkinter code), `Folder Structure Scanner.pyw`, `CUE LOG 4.1.pyw`, and `DriveV_AutoInstaller.pyw` still contain Tkinter references. New GUI work must **not** add Tkinter; migration is required to satisfy the no-Tkinter policy. Preserve behavior during migration; no blind framework replacement without rendering and interaction verification.
+- **NOT RUN:** Actual Windows/UI reference and real operation tests for every application.
+
+### Project-specific acceptance focus
+
+- **Corrupt Image Verifier:** multiple folders, drag/drop, drive-aware workers, cancellation/child cleanup, image classification and confirmation, preserve relative paths, Undo; visually compare compact native reference.
+- **Analyzer:** interactive Release Map, filtering, worker selection/detection, preflight safety, overlays, progress, Copy/Move/Undo and collision/restart scenarios.
+- **Media/audio:** file/path picker with folder icon before path, job queue/parallelism, error feedback, dependency bootstrap and process cleanup.
+- **MusicBrainz/Beatport/Harmony:** no duplicate import actions, responsive edit-relationships controls, ISRC/barcode selection and warnings, keyboard and retry behavior, unchanged stored links.
+- **Browser popups/userscripts:** injected controls in real host DOM, overlay stacking, conflicts with existing site controls, tooltips, focus and responsive behavior. Test real browser + Tampermonkey, not an isolated HTML mock.
 
 ## Next action
 
