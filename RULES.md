@@ -5,6 +5,10 @@ Last updated: 2026-10-05
 This file is the project-specific rulebook for the Discography Builder and Duplicate / Edition Analyzer.
 The account-wide `SOFTWARE_RULES.md` baseline always applies. This file may add stricter project-specific requirements but must never weaken or override a newer global rule or a newer explicit user instruction. When project rules conflict with the global baseline, the stricter/newer requirement wins.
 
+## Current MCC rule - 2026-10-13: default export destination must be actionable
+
+A valid live Release Map must calculate `<NEW source folder> - UPDATED` automatically beside the NEW source. When the analyzed plan is ready and has no pending decisions or integrity blockers, both **Copy old + new** and **Move old + new** must be enabled without a Browse click. The displayed destination, Open-folder control, enabled/disabled state, and execution confirmation must all use the same effective destination. Browse remains an optional override; it must never be a prerequisite. When the destination cannot be inferred, require an explicit path rather than guessing. Preserve existing Copy non-destructiveness, Move/Undo safety, and approval confirmation.
+
 ## Current MCC rule - 2026-10-12: verified replaceable edit coverage
 
 The stricter **>8.0s length threshold** still denotes a separate acoustic Version; it never proves identical audio. Nevertheless, a short/long **replaceable edit of the same recording root** is permitted to fulfill the same **collection coverage** obligation, distinct from acoustically identical grouping, if the shared real audio evidence is strong enough. Both physical tracks must retain their distinct audio-group IDs and their visible length/version differences. Extended, Acoustic, Instrumental, Remix, Live and other distinct roots cannot substitute merely through overlapping audio. The optimizer must not retain an entire edition only to preserve a non-mandatory edit when the base recording is retained elsewhere and its other songs are covered by matching singles. Conversely, missing genuine unique recording roots must never be discarded.
