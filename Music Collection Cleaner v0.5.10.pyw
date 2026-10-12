@@ -5211,8 +5211,13 @@ def apply_manual_review_merges(
     reviews: List[Dict[str, object]],
     accepted_keys: Set[str],
 ) -> Dict[int, List[int]]:
-    """Apply only user-confirmed ambiguous acoustic pairs and rebuild groups."""
+    """Apply reviewed pairs without ever collapsing differently timed Versions."""
     uf = UnionFind(len(tracks))
+    bounds = [
+        (float(track.duration), float(track.duration))
+        if float(track.duration or 0) > 0 else (math.inf, -math.inf)
+        for track in tracks
+    ]
     active_indices: Set[int] = set()
 
     for ids in groups.values():
@@ -5226,7 +5231,7 @@ def apply_manual_review_merges(
         active_indices.update(clean_ids)
         root = clean_ids[0]
         for other in clean_ids[1:]:
-            uf.union(root, other)
+            _duration_group_union(uf, bounds, root, other)
 
     for row in reviews:
         key = str(row.get("key", ""))
@@ -5243,7 +5248,7 @@ def apply_manual_review_merges(
             continue
         active_indices.add(a)
         active_indices.add(b)
-        uf.union(a, b)
+        _duration_group_union(uf, bounds, a, b)
 
     # Active singleton tracks must remain represented too.
     for i, track in enumerate(tracks):
@@ -14253,6 +14258,20 @@ def _ui_contract_self_test() -> None:
         raise RuntimeError("Standalone Changes board still falsely counts Additions.")
     if 'Proposed retained: ' not in map_html or 'renderAuditBanner()' not in map_html:
         raise RuntimeError("Standalone proposal or audit banner is absent.")
+
+    # Manual-review acceptance is not allowed to override a length-based
+    # version distinction; otherwise a later confirmation could merge it back.
+    review_a = Track(-9910, Path("same_song_a.flac"), 1, title="Same Song",
+                     duration=200.0, group_id=0)
+    review_b = Track(-9911, Path("same_song_b.flac"), 1, title="Same Song",
+                     duration=217.5, group_id=1)
+    manual_merge = apply_manual_review_merges(
+        [review_a, review_b], {0: [0], 1: [1]},
+        [{"key": "duration-version", "track_a_index": 0, "track_b_index": 1}],
+        {"duration-version"},
+    )
+    if len(manual_merge) != 2:
+        raise RuntimeError("Manual review merged two different-length versions.")
 
     # MCC 0.5.10: significantly different audio durations mean separate
     # Versions, even if their overlapping acoustic fingerprints are exact.
