@@ -1,8 +1,18 @@
 # Music Collection Cleaner - Continuity Handoff
 
 Last updated: 2026-10-12
-Status: **0.5.11 - Under construction ⚠️** (source migrated; Windows testing pending)
+Status: **0.5.12 - Under construction ⚠️** (source migrated; Windows testing pending)
 
+
+## Latest checkpoint - 2026-10-12, v0.5.12 Re-Analyze audit and saved release Ignore
+
+- Canonical source: `Music Collection Cleaner v0.5.12.pyw` (GitHub `karpuzikov/MCC`, `main`), previous versions retained. Versioned filename and app constant both 0.5.12.
+- User's `Music Collection Cleaner Comparison 2026-10-12-20-53-24.jsonl` is **v0.5.11 INITIAL ANALYSIS**, not the Re-Analyze result. One `optimizer` record shows `blocked_releases=0`. Releases `2011-09-16 - I Am the Club Rocker [5948204467029]` (ID 4) and `2019-05-30 - The Best of INNA [4741534637626]` (ID 74) were selected before they were manually ignored. RuTracker `Inna - I Am The Club Rocker (2011)` (ID 280) was not selected; `Inna - I Am The Club Rocker (2011) CD` (ID 281) was selected. The two No Limit tracks were REJECT at score ~4.70073 and good-frame ~0.745742, versus a stricter ~0.80 mastering threshold, notwithstanding both lengths = 206.24s. Thus acoustic matching may distinguish alternative mastering; **never merge by title/duration alone**. The original log cannot establish post-ignore optimization decisions.
+- Re-Analyze originally ran `optimize_collection(releases,groups,blocked_ids)` and rebuilt decisions/snapshots, but it did **not** append optimizer/comparison results; a new full analysis restarted with `blocked_release_ids=set()`. v0.5.12 fixes both defects.
+- At successful Re-Analyze, save ignored **physical release paths** (not temporary IDs) to isolated `Documents/Karpuzikov Tools/Music Collection Cleaner/state/manual_ignored_releases.json`. Pending Ignore/Restore is not saved until Re-Analyze. Full scans apply stored ignores in the initial optimizer, including the manual-review path, with no wasteful second optimizer pass; this preserves fingerprint comparisons among excluded and eligible sources during group construction.
+- A full independent planning audit is saved after Re-Analyze: `state/last_reanalysis_audit.json` and timestamped `logs/Music Collection Cleaner Re-Analyze *.jsonl`. It includes blocked IDs/names, prior and current selected IDs, all release actions/reasons, missing replacement sources, and `acoustic_comparisons_repeated=false`. When initial comparison logging is enabled, Re-Analyze also appends an optimizer row and reanalysis event to that original comparison JSONL; never relabel planning as full fingerprint recomparison. Dark Release Map adds **Open audit log** in the result drawer, preserving existing layout.
+- Safety gate: assert that a blocked release is never in the Re-Analyze selection, and also validate saved ignores after fresh optimization. Added isolated on-disk persistence/audit regression into `--ui-self-test`. `CONTINUITY.md` and `README.md` updated; global rules are mirrored; no GitHub Actions edits.
+- **Validation:** GitHub source written/read back; source-level checks performed. **Python compilation, built-in `--ui-self-test`, end-to-end Windows/WebView2 Ignore > Re-Analyze > close > rescan > Copy/Move/Undo are NOT RUN**; do not call it stable. Known cross-volume Move cleanup blocker remains. Next: run on a copy of the INNA pools, ignore the two named Deezer releases, click Re-Analyze, inspect both retained RuTracker CDs and the new audit file; test reopening/reanalyzing and restart persistence. If both stay, examine per-track No Limit coverage before changing acoustic threshold.
 
 ## Latest checkpoint - 2026-10-12, v0.5.11 strict >7s length rule
 
