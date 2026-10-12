@@ -1213,3 +1213,5 @@ This section is HISTORICAL. Its per-recording hard source-floor requirement is s
 - A manual grouping operation is metadata-only; it must never physically move or delete a release, and Copy/Move must remain disabled until explicit Re-Analyze. Avoid extra uncontrolled UI controls or disruption of the original Release Map/keyboard support.
 - Include regression coverage for Hot 2005/2010/New Hot (11/11 and 9/11), Body and the Sun/Inna/Japan (14/15 and 13/15), transitive connections, unique bonus groups, unrelated lead artists, manual move and reset, saved path identity, and existing album-selection policies.
 
+
+- **Manual grouping export lock:** A manual group state remains pending even if Ignore/Restore switches are toggled or toggled back. Release Map Copy/Move must not re-enable until the currently saved manual group mapping equals the reoptimized baseline or Re-Analyze explicitly updates the plan.
