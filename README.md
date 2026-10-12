@@ -1,16 +1,16 @@
 # Music Collection Cleaner (MCC)
 
-**Version: 0.5.13 - Under construction ⚠️**
+**Version: 0.5.14 - Under construction ⚠️**
 
 Music Collection Cleaner compares existing music releases with new ones, finds the best combination of editions, and helps preserve every wanted unique recording while removing unnecessary redundancy.
 
 ## Download and run
 
-**[Music Collection Cleaner v0.5.13.pyw](Music%20Collection%20Cleaner%20v0.5.13.pyw)** - versioned single-file Windows Python application. **This is a test build, not a stable Windows release.**
+**[Music Collection Cleaner v0.5.14.pyw](Music%20Collection%20Cleaner%20v0.5.14.pyw)** - versioned single-file Windows Python application. **This is a test build, not a stable Windows release.**
 
-Open with Python 3 on Windows 11 (or run from a console with `python "Music Collection Cleaner v0.5.13.pyw"`). The application checks or installs supported dependencies. The GUI uses Microsoft Edge WebView2 through pywebview; it is not a terminal-based replacement.
+Open with Python 3 on Windows 11 (or run from a console with `python "Music Collection Cleaner v0.5.14.pyw"`). The application checks or installs supported dependencies. The GUI uses Microsoft Edge WebView2 through pywebview; it is not a terminal-based replacement.
 
-Source-level regression checks: `python "Music Collection Cleaner v0.5.11.pyw" --ui-self-test`.
+Source-level regression checks: `python "Music Collection Cleaner v0.5.14.pyw" --ui-self-test`.
 
 ## What it does
 
@@ -24,6 +24,14 @@ Source-level regression checks: `python "Music Collection Cleaner v0.5.11.pyw" -
 - Explicitly **Copy OLD + NEW** or **Move OLD + NEW** retained releases into the selected destination; Undo for supported completed moves.
 - Log comparisons, validate incomplete/corrupt inputs, choose I/O worker counts with drive awareness, and manage spawned subprocesses.
 
+
+## v0.5.14 - eight-second duration-version threshold
+
+- At **8.0 seconds or less**, duration difference alone does not separate an otherwise fingerprint-matched recording. Only a duration difference **strictly greater than 8.0 seconds** denotes a different length-based Version.
+- Changed the shared comparison, exact-fingerprint, transitive-group, manual-review, and diagnostic threshold to 8.0 seconds. Release Map duration badges use the same **>8.0s** rule.
+- Updated synthetic boundary tests for exact 8.0 vs 8.01 seconds, and refreshed INNA Hot duration-bridge expectations; known acoustic matches spanning 7.3-7.5 seconds may now be in one recording group.
+- **Requires a new full audio analysis**: Re-Analyze only recomputes release optimization using existing acoustic groups.
+- GitHub source verified, but Python compilation, bundled self-test, and real Windows/WebView2 analysis remain **NOT RUN**. Status: **0.5.14 - Under construction ⚠️**. No GitHub Actions changes.
 
 ## v0.5.13 - deterministic duration-aware acoustic groups
 
