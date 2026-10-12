@@ -8325,10 +8325,16 @@ def _track_distinction_summary(
 
     if _duration_version_conflict(track.duration, other.duration):
         delta = abs(track.duration - other.duration)
+        substitution = (
+            "Distinct audio edit but replaceable for collection coverage."
+            if track.group_id >= 0
+            and _track_coverage_gid(track) == _track_coverage_gid(other)
+            else "Kept as a distinct wanted version."
+        )
         return (
             f"Different-length version of '{other.display_title}' on {other_name}: "
             f"{_duration_display(track.duration)} vs {_duration_display(other.duration)} "
-            f"(difference {delta:.1f}s). Kept as a distinct wanted version."
+            f"(difference {delta:.1f}s). {substitution}"
         )
 
     if not audio_match:
@@ -8517,6 +8523,16 @@ def build_decision_snapshot(
                 )
             )
             covered_by_other_retained = bool(covering_releases)
+            # A replaceable edit can satisfy coverage while its true acoustic
+            # group ID and length badge remain distinct.
+            covered_by_alternate_version = bool(
+                covering_releases
+                and not any(
+                    candidate.group_id == track.group_id
+                    and not candidate.exclude_from_coverage
+                    for cover in covering_releases for candidate in cover.tracks
+                )
+            )
             orphaned = bool(
                 manual_removed
                 and included
@@ -8554,6 +8570,7 @@ def build_decision_snapshot(
                     "manual_skip_rule": track.manual_skip_rule,
                     "available_elsewhere": available_elsewhere,
                     "covered_by_other_retained": covered_by_other_retained,
+                    "covered_by_alternate_version": covered_by_alternate_version,
                     "covered_by_names": [other.path.name for other in covering_releases[:8]],
                     "replacement_source": (
                         covering_releases[0].path.name
@@ -14296,6 +14313,83 @@ def _coherent_duration_regression_self_test() -> None:
         raise RuntimeError("More than eight seconds merged distinct Versions.")
 
 
+
+def _replaceable_version_coverage_regression_self_test() -> None:
+    """2026-10-12 INNA 195.81s/213.33s Fool Me + independent singles."""
+    short = Track(-51001, Path("Inna Fool Me.flac"), 1, title="Fool Me",
+                  artist="INNA", duration=195.805556,
+                  fingerprint=tuple([0x01234567]*1560), group_id=710001)
+    long = Track(-51002, Path("Japan Fool Me.flac"), 1, title="Fool Me",
+                 artist="Inna", duration=213.333333,
+                 fingerprint=tuple([0x76543210]*1702), group_id=710002)
+    # The actual comparison log's 2026-10-12 Fool Me statistics:
+    evidence = (4.509301, 0.944836, 0.999359, -143, 0.708146, 4.0, 9)
+    if not _replaceable_version_acoustic_evidence(short, long, evidence):
+        raise RuntimeError("INNA Fool Me edit substitution was not recognized.")
+    if _replaceable_version_acoustic_evidence(
+        short, Track(-51003, Path("Extended.flac"), 1,
+                     title="Fool Me (Extended Version)", artist="Inna",
+                     duration=213.333333, fingerprint=long.fingerprint,
+                     group_id=710003), evidence
+    ):
+        raise RuntimeError("Extended root incorrectly marked replaceable.")
+    if _replaceable_version_acoustic_evidence(
+        short, Track(-51004, Path("Different.flac"), 1,
+                     title="Different Song", artist="INNA",
+                     duration=213.333333, fingerprint=long.fingerprint,
+                     group_id=710004), evidence
+    ):
+        raise RuntimeError("Different title incorrectly marked replaceable.")
+    if _replaceable_version_acoustic_evidence(
+        short, long, (4.509301, 0.60, 0.999359, -143, 0.50, 4.0, 9)
+    ):
+        raise RuntimeError("Weak acoustic evidence incorrectly substitutes a Version.")
+    matches = _assign_replaceable_version_coverage(
+        [short, long], [(1, 0, 1, False, evidence)]
+    )
+    if (len(matches) != 1
+        or short.group_id == long.group_id
+        or _track_coverage_gid(short) != _track_coverage_gid(long)):
+        raise RuntimeError("Fool Me version coverage collapsed audio identities.")
+
+    # Main album must stay for its unique core songs. The Japanese 19-track
+    # version should become redundant when three one-track singles exist.
+    def t(rid, gid, name):
+        return Track(rid, Path(f"{rid}-{gid}.flac"), gid, title=name,
+                     artist="INNA", group_id=gid)
+    shared = [800000 + k for k in range(15)]
+    inna = Release(
+        -51010, "recycle", Path("2015-07-24 - Inna [5948204123093]"),
+        "Inna", release_type="album", source_medium="WEB",
+        tracks=[t(-51010, gid, f"Album Song {gid}") for gid in shared]
+               + [t(-51010, gid, f"Unique {gid}") for gid in (800100,800101,800102)]
+               + [short]
+    )
+    japan = Release(
+        -51011, "recycle", Path("INNA - Body And The Sun [Japan]"),
+        "Body and the Sun", release_type="album", source_medium="CD",
+        tracks=[t(-51011, gid, f"Album Song {gid}") for gid in shared]
+               + [t(-51011, gid, name) for gid, name in (
+                   (800201, "Cola Song"), (800202, "Take Me Higher"),
+                   (800203, "Good Time"))]
+               + [long]
+    )
+    singles = [
+        Release(-51020-i, "recycle", Path(f"Single {i}"), f"Single {i}",
+                release_type="single",
+                tracks=[t(-51020-i, 800201+i, f"Single {i}")])
+        for i in range(3)
+    ]
+    album_pool = [inna, japan] + singles
+    solved, _ = exact_global_collection_minimize(album_pool, set())
+    if inna.rid not in solved or japan.rid in solved or any(
+        single.rid not in solved for single in singles
+    ):
+        raise RuntimeError(
+            "INNA Japan album selected despite substitutable Fool Me "
+            "and complete independent single coverage."
+        )
+
 def _reanalysis_regression_self_test() -> None:
     """Filesystem-isolated Ignore persistence and truthful planning audit."""
     previous_state_dir = globals()["_state_dir"]
@@ -14334,6 +14428,7 @@ def _reanalysis_regression_self_test() -> None:
 def _ui_contract_self_test() -> None:
     _reanalysis_regression_self_test()
     _coherent_duration_regression_self_test()
+    _replaceable_version_coverage_regression_self_test()
     class _BridgeExposeProbe:
         def __init__(self):
             self.exposed = []
