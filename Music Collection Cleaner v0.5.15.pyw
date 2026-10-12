@@ -10974,12 +10974,12 @@ function trackStatus(t,n) {
     if(t.excluded) return "Skipped by active options";
     if(t.orphaned || !t.replacementSource) return "NO REPLACEMENT - exact recording is not retained elsewhere";
     const more=(t.replacementAlternates||[]).length;
-    return "Sourced from: "+t.replacementSource+(more?" (+"+more+" other retained cop"+(more===1?"y":"ies")+")":"");
+    return (t.coveredByAlternateVersion?"Covered by alternate version: ":"Sourced from: ")+t.replacementSource+(more?" (+"+more+" other retained cop"+(more===1?"y":"ies")+")":"");
   }
   if(t.orphaned) return "Unique - release removal would lose it";
   if(t.isGem) return "Gem - no duplicates or other versions";
   if(t.unique) return "Unique to this retained release";
-  if(t.coveredBy && t.coveredBy.length) return "Also on: "+t.coveredBy.slice(0,2).join("; ");
+  if(t.coveredBy && t.coveredBy.length) return (t.coveredByAlternateVersion?"Replaceable version on: ":"Also on: ")+t.coveredBy.slice(0,2).join("; ");
   if(t.excluded) return "Skipped by active options";
   if(t.distinction) return t.distinction;
   return "Included";
@@ -11933,6 +11933,7 @@ def _release_map_state_for_ui(
                     "unique": unique,
                     "orphaned": bool(row.get("orphaned")),
                     "coveredBy": list(row.get("covered_by_names", []) or []),
+                    "coveredByAlternateVersion": bool(row.get("covered_by_alternate_version")),
                     "replacementSource": str(row.get("replacement_source", "") or ""),
                     "replacementAlternates": list(row.get("replacement_alternates", []) or []),
                     "distinction": str(row.get("distinction", "")),
