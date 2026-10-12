@@ -5,6 +5,12 @@ Last updated: 2026-10-05
 This file is the project-specific rulebook for the Discography Builder and Duplicate / Edition Analyzer.
 The account-wide `SOFTWARE_RULES.md` baseline always applies. This file may add stricter project-specific requirements but must never weaken or override a newer global rule or a newer explicit user instruction. When project rules conflict with the global baseline, the stricter/newer requirement wins.
 
+## Current MCC rule - 2026-10-12: duration-version threshold 8 seconds
+
+**Newest explicit user instruction supersedes the historical 7-second rule below.** MCC uses a measured duration difference of **strictly greater than 8.0 seconds** to distinguish length-based Versions. Differences of **exactly 8.0 seconds or less** do not veto an otherwise valid fingerprint match or create a length-based badge. This does NOT permit duplicate merging based on equal or similar duration alone; audio matching remains mandatory.
+
+Apply identically to ordinary acoustic decisions, byte-identical fingerprints, transitive grouping, manual accepted matches, and Release Map length badges. Test 8.0s (allowed) and 8.01s (separate), including transitive groups. Changes to this threshold require a new full analysis; Re-Analyze alone reuses previously computed groups.
+
 ## 1. Core objective
 
 Build the most complete practical discography while minimizing unnecessary retained tracks.
