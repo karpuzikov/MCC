@@ -1232,3 +1232,12 @@ This section is HISTORICAL. Its per-recording hard source-floor requirement is s
 - In the existing dark WebView2 Release Map, color-highlight the track's duration when another normal Version has a different known length and show an explicit Δseconds badge. Alternate Version entries must display their own duration and signed/absolute comparison delta. Do not mislabel or incorrectly save Live or Remix material when Save Live/Save Remixes are disabled.
 - Preserve the per-track JSONL measured lengths, acceptance thresholds, rejection reasons and transitive-veto details. Keep duration-based candidate routing and audio evidence for positive identity.
 - Include regression tests for identical Chromaprint vectors with >=0.5s duration difference, <0.5s encoder jitter, unknown length, 17.52s Fool Me variation, multi-edge transitivity, explicit manual review, and GUI version highlights. Do not claim stable until full Windows tests pass.
+
+
+## MCC v0.5.11 - newest duration identity rule, overrides v0.5.10
+
+- A duration difference of **EXACTLY 7.0 seconds or LESS is NOT a duration-based Version**, and must never, by itself, create an amber duration badge or force separation of an otherwise accepted acoustic match.
+- ONLY a known measured audio-duration difference **STRICTLY GREATER THAN 7.0 seconds** creates a distinct length-based Version. The rule applies equally to fingerprint matching, fast identical-fingerprint paths, transitive acoustic-group boundaries, accepted manual review, comparison logs, and Release Map badges.
+- The new positive-identity principle remains: matching or close duration alone NEVER proves that two recordings are duplicates. Acoustic matching still decides identity within the seven-second tolerance. A separate recording with incompatible audio may remain distinct even with identical length.
+- Keep the UI free of amber duration-difference badges when all normal alternative versions have duration differences <=7 seconds. Do not alter Remix/Live exclusion behavior or overwrite other project requirements.
+- Tests must explicitly distinguish 7.0s (allowed) from 7.01s (Version), plus 0.6s, 4.23s, 17.52s, identical fingerprints, transitive groups, missing duration and manual review.
