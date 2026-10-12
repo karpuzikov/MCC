@@ -1,16 +1,16 @@
 # Music Collection Cleaner (MCC)
 
-**Version: 0.5.3 - Under construction ⚠️**
+**Version: 0.5.7 - Under construction ⚠️**
 
 Music Collection Cleaner compares existing music releases with new ones, finds the best combination of editions, and helps preserve every wanted unique recording while removing unnecessary redundancy.
 
 ## Download and run
 
-**[Music Collection Cleaner v0.5.3.pyw](Music%20Collection%20Cleaner%20v0.5.3.pyw)** - versioned single-file Windows Python application. **This is a test build, not a stable Windows release.**
+**[Music Collection Cleaner v0.5.7.pyw](Music%20Collection%20Cleaner%20v0.5.7.pyw)** - versioned single-file Windows Python application. **This is a test build, not a stable Windows release.**
 
-Open with Python 3 on Windows 11 (or run from a console with `python "Music Collection Cleaner v0.5.3.pyw"`). The application checks or installs supported dependencies. The GUI uses Microsoft Edge WebView2 through pywebview; it is not a terminal-based replacement.
+Open with Python 3 on Windows 11 (or run from a console with `python "Music Collection Cleaner v0.5.7.pyw"`). The application checks or installs supported dependencies. The GUI uses Microsoft Edge WebView2 through pywebview; it is not a terminal-based replacement.
 
-Source-level regression checks: `python "Music Collection Cleaner v0.5.3.pyw" --ui-self-test`.
+Source-level regression checks: `python "Music Collection Cleaner v0.5.7.pyw" --ui-self-test`.
 
 ## What it does
 
@@ -23,6 +23,19 @@ Source-level regression checks: `python "Music Collection Cleaner v0.5.3.pyw" --
 - Inspect an interactive chronological **Release Map** with connections, per-track coverage, replacement explanations, Ignore/Restore and Re-Analyze.
 - Explicitly **Copy OLD + NEW** or **Move OLD + NEW** retained releases into the selected destination; Undo for supported completed moves.
 - Log comparisons, validate incomplete/corrupt inputs, choose I/O worker counts with drive awareness, and manage spawned subprocesses.
+
+
+## v0.5.7 - automatic 80% album matching and manual groups
+
+Music Collection Cleaner now identifies differently titled editions of one album when **80% or more of the smaller album's distinct wanted acoustic recording groups** also appear in the other. At least four groups must be shared. The comparison uses fingerprint-proven recording groups, not matching names, release dates, barcodes or track order. Different known main artists are not automatically grouped. Album-family connections are transitive.
+
+The uploaded v0.5.3 INNA comparison confirmed:
+- Hot 2005 vs Hot 2010: **11/11 = 100%**; Hot 2010 vs New Hot Edition: **9/11 = 81.8%**. All three belong to one family.
+- Body and the Sun vs Inna (2015): **14/15 = 93.3%**; Body and the Sun vs Japanese edition: **13/15 = 86.7%**. All three belong to one family.
+
+**Manual correction:** After an analysis, open the live Release Map, click an album, select a destination from **Move release into another album group**, and click **Move to group**. To undo that grouping decision, click **Restore automatic**. The assignment survives future scans in the program-specific state/manual_album_groups.json, keyed by full release paths, not temporary scan IDs. Click **Re-Analyze** before applying file operations. Grouping does not move files or merge different recordings.
+
+**Same album family does not imply keeping just one release:** unique songs or bonus recordings on different editions must still be covered; MCC may retain multiple editions for that reason. The change preserves the full dark WebView2 Release Map and adds regression tests. Windows testing remains outstanding and the cross-volume Move recovery risk remains unresolved.
 
 ## v0.5.3 - YO, Unicode and Wow corrections
 
