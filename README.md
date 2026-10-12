@@ -1,16 +1,16 @@
 # Music Collection Cleaner (MCC)
 
-**Version: 0.5.9 - Under construction ⚠️**
+**Version: 0.5.10 - Under construction ⚠️**
 
 Music Collection Cleaner compares existing music releases with new ones, finds the best combination of editions, and helps preserve every wanted unique recording while removing unnecessary redundancy.
 
 ## Download and run
 
-**[Music Collection Cleaner v0.5.9.pyw](Music%20Collection%20Cleaner%20v0.5.9.pyw)** - versioned single-file Windows Python application. **This is a test build, not a stable Windows release.**
+**[Music Collection Cleaner v0.5.10.pyw](Music%20Collection%20Cleaner%20v0.5.10.pyw)** - versioned single-file Windows Python application. **This is a test build, not a stable Windows release.**
 
-Open with Python 3 on Windows 11 (or run from a console with `python "Music Collection Cleaner v0.5.9.pyw"`). The application checks or installs supported dependencies. The GUI uses Microsoft Edge WebView2 through pywebview; it is not a terminal-based replacement.
+Open with Python 3 on Windows 11 (or run from a console with `python "Music Collection Cleaner v0.5.10.pyw"`). The application checks or installs supported dependencies. The GUI uses Microsoft Edge WebView2 through pywebview; it is not a terminal-based replacement.
 
-Source-level regression checks: `python "Music Collection Cleaner v0.5.9.pyw" --ui-self-test`.
+Source-level regression checks: `python "Music Collection Cleaner v0.5.10.pyw" --ui-self-test`.
 
 ## What it does
 
@@ -24,6 +24,16 @@ Source-level regression checks: `python "Music Collection Cleaner v0.5.9.pyw" --
 - Explicitly **Copy OLD + NEW** or **Move OLD + NEW** retained releases into the selected destination; Undo for supported completed moves.
 - Log comparisons, validate incomplete/corrupt inputs, choose I/O worker counts with drive awareness, and manage spawned subprocesses.
 
+
+## v0.5.10 - highlight duration differences as separate versions
+
+**Changed rule:** Two tracks with known measured durations differing by **0.5 seconds or more** must remain **different recording Versions**, even if their overlapping Chromaprint fingerprint segments match perfectly. Ignore sub-0.5-second timestamp/codec rounding differences; duration alone still cannot prove recordings are duplicates. Distinct versions retain separate acoustic group IDs and their unique coverage obligations.
+
+**Release Map:** Open any release, inspect its tracklist, and select a track with other Versions. Its duration is highlighted in amber with a `Δ17.5s`-style difference badge. Each alternate Version also shows the relative length difference. The distinction explanation names both durations and the difference. Existing Remix and Live classifications remain separate; no new standalone interface is introduced.
+
+**Safety:** Different-length versions cannot silently reunite via transitive A/B/C fingerprint grouping or a user-approved manual acoustic match. Per-pair JSONL log records the measured delta, matching threshold, length-based rejection, and any transitive group veto. This applies on a new full comparison, not retroactively to saved Release Map snapshots.
+
+New embedded `--ui-self-test` cases cover exact matching fingerprints with different durations, negligible rounding, 17.52-second edits, A/B/C transitivity, manual review, and map UI controls. **Source published, not yet executed or validated on the user's Windows installation.** Cross-volume Move remains under construction.
 
 ## v0.5.9 - remove redundant maximum-size album editions
 
