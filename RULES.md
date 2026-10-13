@@ -5,6 +5,15 @@ Last updated: 2026-10-05
 This file is the project-specific rulebook for the Discography Builder and Duplicate / Edition Analyzer.
 The account-wide `SOFTWARE_RULES.md` baseline always applies. This file may add stricter project-specific requirements but must never weaken or override a newer global rule or a newer explicit user instruction. When project rules conflict with the global baseline, the stricter/newer requirement wins.
 
+## Shared semantic glossary for MCC and TRRNT - 2026-10-13
+
+The canonical **cross-tool music terminology and track-file naming vocabulary** is maintained in [TRRNT MUSIC_GLOSSARY.md](https://github.com/karpuzikov/TRRNT-project/blob/main/MUSIC_GLOSSARY.md). It draws on the detailed classification below and is shared by MCC, Duplicate Edition Analyzer, Discography Builder, and the planned ALAC track filename organizer.
+
+- In both projects, `01 Plain Jane (Remix) [ft. Nicki Minaj].m4a` denotes an **individual Remix recording with a separate featured-artist credit**, not merely a different format for the feature on a base recording.
+- A genuine remix-**added** featured performer requires proof using the existing MCC original/remix comparison (or explicit remix-attached credit) rules; a bracketed credit alone does not establish that it is new. Remixer and featured artist remain different roles.
+- MCC's `canonical_featured_title()` reformats featured credits only for normalized **matching keys** and does **not** prescribe how filenames must be written on disk. The shared glossary is not an instruction to change MCC's existing acoustic/semantic analysis or UI.
+- The precise filename renderer beyond explicitly approved examples is not yet implemented; all future naming stages must preserve recording descriptors **and** credit metadata.
+
 ## Current MCC rule - 2026-10-13: actionable integrity diagnostics and adaptive map columns
 
 Do not show an anonymous `Integrity / completeness: N issue(s)` warning requiring users to hunt manually. Each affected release must be named in the map's warning banner, accompanied by the exact non-invented issue text provided by the scanner. A keyboard- and pointer-accessible action must open that release's details and scroll to the row, even when filtered out of Changes view. Preserve safety: Copy and Move stay disabled until file-integrity/completeness blockers are addressed and the collection is reanalyzed.
