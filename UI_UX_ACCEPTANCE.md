@@ -24,6 +24,20 @@ Before ANY UI modification, record a control contract for the affected workflows
 | Error, cancellation, persistence, restart, recovery | NOT RUN |
 | Real host/OS end-to-end workflow and final acceptance | NOT RUN |
 
+## MCC v0.5.19 - Album/EP group control contract, 2026-10-14
+
+Affected view: dark WebView2 Release Map, selected release detail panel and full map. No new duplicate controls; existing buttons/select reused.
+
+| Control/state | Purpose, interactions and side effects | Verification |
+| --- | --- | --- |
+| `albumGroupSelect` | For editable Album **and EP** rows: choose another Album/EP family; keyboard Tab/Arrow keys; displays a disabled explicit empty state if none. A choice alone does not change state. | Source check PASS; real Windows interaction NOT RUN |
+| `assignAlbumGroupBtn` | Pointer click or keyboard activation applies path-based family override; updates Release Map grouping immediately; persists only family relation; no audio move; marks state dirty and disables Copy/Move until Re-Analyze. Existing dark button, focus outline and geometry reused. | Source check PASS; real Windows interaction NOT RUN |
+| `resetAlbumGroupBtn` | Shown only for user-assigned family; Restore automatic reverses assignment, persists reversal, requires Re-Analyze. | Source check PASS; real Windows interaction NOT RUN |
+| Album / EP family card and column | Fingerprint-supported mixed family renders once in Albums section, marked `Album / EP`; original type in release details unchanged. Full map responsive/keyboard/scroll and curved links must remain usable. | Source check PASS; screen/resizing NOT RUN |
+| `reanalyze`, `copyPlan`, pending banner | No change to acoustic identity; reanalysis after manual family assignment; Copy/Move remain disabled while dirty or integrity-blocked. | Source contract PASS; actual filesystem safety NOT RUN |
+
+**Required on-device tests:** Run full INNA example scan; inspect grouped cards and `Alright` distinct-track details, tab through both directions, click Restore automatic, Re-Analyze, test dirty-state Copy/Move, resize narrow/wide and capture screenshots. Confirm no non-target file operations. All actual Windows UX acceptance **NOT RUN**; status remains `Under construction ⚠️`.
+
 ## UI surfaces: monorepo
 
 **Desktop Python GUI utilities:** Corrupt Image Verifier (`image-tools/corrupt-image-verifier/`); Duplicate Edition Analyzer (latest of versioned `.pyw` sources under `audio-tools/discography-torrent-project/tools/`); ALAC Conversion Automation; AudioChecker Automation; CUE Corrector; Folder Structure Scanner; CUE LOG; DriveV AutoInstaller; Priorities. Treat older versioned files as historical; audit the latest active version of each and applicable active development branches.
