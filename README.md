@@ -1,16 +1,16 @@
 # Music Collection Cleaner (MCC)
 
-**Version: 0.5.18**
+**Version: 0.5.19 - Under construction ⚠️**
 
 Music Collection Cleaner compares existing music releases with new ones, finds the best combination of editions, and helps preserve every wanted unique recording while removing unnecessary redundancy.
 
 ## Download and run
 
-**[Music Collection Cleaner v0.5.18.pyw](Music%20Collection%20Cleaner%20v0.5.18.pyw)** - versioned single-file Windows Python application. The user confirmed completion of testing for this version.
+**[Music Collection Cleaner v0.5.19.pyw](Music%20Collection%20Cleaner%20v0.5.19.pyw)** - latest single-file Windows Python application. **Under construction ⚠️** until actual Windows WebView2 testing. Previously user-tested v0.5.18 remains available unchanged.
 
-Open with Python 3 on Windows 11 (or run from a console with `python "Music Collection Cleaner v0.5.18.pyw"`). The application checks or installs supported dependencies. The GUI uses Microsoft Edge WebView2 through pywebview; it is not a terminal-based replacement.
+Open with Python 3 on Windows 11 (or run from a console with `python "Music Collection Cleaner v0.5.19.pyw"`). The application checks or installs supported dependencies. The GUI uses Microsoft Edge WebView2 through pywebview; it is not a terminal-based replacement.
 
-Source-level regression checks: `python "Music Collection Cleaner v0.5.18.pyw" --ui-self-test`.
+Source-level regression checks: `python "Music Collection Cleaner v0.5.19.pyw" --ui-self-test`.
 
 ## What it does
 
@@ -24,6 +24,15 @@ Source-level regression checks: `python "Music Collection Cleaner v0.5.18.pyw" -
 - Explicitly **Copy OLD + NEW** or **Move OLD + NEW** retained releases into the selected destination; Undo for supported completed moves.
 - Log comparisons, validate incomplete/corrupt inputs, choose I/O worker counts with drive awareness, and manage spawned subprocesses.
 
+
+## v0.5.19 - cross-type Album/EP release families (Under construction ⚠️)
+
+- **Fix:** An Album and an EP with >=80% **proven shared wanted acoustic groups** (measured against the smaller release, minimum four shared groups) now belong to the same visual edition family. The same safeguards for distinct artist identities, single releases and recording identity remain in force.
+- **INNA regression:** `Inna - Party Never Ends (Part 2) (2013) [WPCR-15062]` (Album) and `2013-03-04 - Party Never Ends, Pt. 2 (Deluxe Editon) [5948204032791]` (EP tag) have six acoustically proven tracks in common out of seven included on the smaller edition (85.7%). `Alright` differs by 39.87 seconds and remains **distinct**; no audio is forcibly merged.
+- **Manual correction:** Both Albums and EPs can use **Move to group** to target either an Album or an EP family; **Restore automatic** reverses a manual assignment. Mixed Album/EP families appear together in the Albums map section with an `Album / EP` label while each edition retains its original release type.
+- **Optimizer safety:** Mandatory full-album representation remains album-only; an EP display assignment cannot silently split an album-only optimization family. Re-Analyze remains required after manual edits before Copy/Move can operate. Physical audio is never moved by a grouping edit.
+- **Validation:** GitHub source readback and static regression-contract checks performed. Complete Python compilation/self-test, actual Windows WebView2 GUI, keyboard/responsive validation, full INNA scan, Copy/Move/Undo are **NOT RUN**. Do not mark stable until the real tests pass. No GitHub Actions modifications.
+- **Test:** Run a fresh full analysis using the user's original INNA folders. In Full map, both Part 2 releases should share one album-family card. Then test EP-to-Album and Album-to-EP manual reassignment, Restore automatic and Re-Analyze.
 
 ## v0.5.18 - actionable integrity warning and responsive Release Map
 
