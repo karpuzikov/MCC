@@ -1,8 +1,14 @@
 # Music Collection Cleaner - Continuity Handoff
 
 Last updated: 2026-10-12
-Status: **0.5.18 - Under construction ⚠️** (source migrated; Windows testing pending)
+Status: **0.5.18** (user confirmed testing complete; status label cleared 2026-10-13)
 
+
+## Latest checkpoint - 2026-10-13, MCC v0.5.18 user testing acknowledged
+
+- User responded **"done"** after the v0.5.18 Release Map diagnostic and responsive layout update. Treat this as the user's confirmation that the current version has completed testing, per global `SOFTWARE_RULES.md` GitHub status policy. Keep the version at **0.5.18**, and remove only the `Under construction ⚠️` status from current README and application chrome; no new app version is created.
+- Changes to canonical source `Music Collection Cleaner v0.5.18.pyw`: removed the now-inapplicable status badge and its unused CSS. All comparison, optimizer, Copy/Move/Undo, UI behavior and file paths remain unchanged. Current README and `CONTINUITY.md` show **0.5.18**, without a separate construction status.
+- Testing confirmed by user (scope unspecified); **do not retroactively mark unrun individual checks as passed**. Historical earlier checkpoints still accurately identify automated/Windows tests that were NOT RUN at publication. Formal exhaustive Windows copy/move/undo and UX acceptance remains unverified independently unless actual test results arrive. Keep the canonical `UI_UX_ACCEPTANCE.md` register's independently unverified entries intact. No GitHub Actions edits.
 
 ## Latest checkpoint - 2026-10-13, MCC v0.5.18 actionable integrity warning + responsive map layout
 
