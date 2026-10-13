@@ -5,6 +5,15 @@ Last updated: 2026-10-05
 This file is the project-specific rulebook for the Discography Builder and Duplicate / Edition Analyzer.
 The account-wide `SOFTWARE_RULES.md` baseline always applies. This file may add stricter project-specific requirements but must never weaken or override a newer global rule or a newer explicit user instruction. When project rules conflict with the global baseline, the stricter/newer requirement wins.
 
+## MCC 2026-10-14 - Album/EP edition families and manual reassignment
+
+- A verified long-form edition may carry an incorrect `EP` tag. Album/EP classification differences alone MUST NOT prevent **family display grouping** when their included acoustic-group sets have >=80% overlap (denominator: smaller release; at least four shared acoustic groups), consistent with the original artist safeguards.
+- Show mixed Album/EP editions inside one Release Map group and category, retaining the real individual release-type metadata. Do not conflate family membership with acoustic-track identity, recording-version roots, complete album representation or file moves.
+- Both an Album and an EP can be manually assigned to a different **Album/EP** family, with an accessible, reversible Restore automatic action, saved using stable release paths. Manual edits require Re-Analyze and must not bypass Copy/Move integrity gates.
+- **Preserve album constraints:** full-album representation stays album-only; when a manual target is an EP outside the album-only clustering set, the detached source album must not be split from its mandatory album-optimization family.
+- Regression: `Inna - Party Never Ends (Part 2) (2013) [WPCR-15062]` and `2013-03-04 - Party Never Ends, Pt. 2 (Deluxe Editon) [5948204032791]` share six proven recordings of seven included CD tracks (85.7%). These should be shown together. `Alright` differs by 39.87 seconds and retains a separate acoustic group. Cover negative cases (below 80%, different primary artist, Singles), both manual directions, undo, and GUI states.
+- Do not change standalone Singles/EP retention or the existing 8-second acoustic-version rule as a side effect of this UI/family feature.
+
 ## Shared semantic glossary for MCC and TRRNT - 2026-10-13
 
 The canonical **cross-tool music terminology and track-file naming vocabulary** is maintained in [TRRNT MUSIC_GLOSSARY.md](https://github.com/karpuzikov/TRRNT-project/blob/main/MUSIC_GLOSSARY.md). It draws on the detailed classification below and is shared by MCC, Duplicate Edition Analyzer, Discography Builder, and the planned ALAC track filename organizer.
