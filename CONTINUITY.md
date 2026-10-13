@@ -1,7 +1,20 @@
 # Music Collection Cleaner - Continuity Handoff
 
-Last updated: 2026-10-12
-Status: **0.5.18** (user confirmed testing complete; status label cleared 2026-10-13)
+Last updated: 2026-10-14
+Status: **v0.5.19 - Under construction ⚠️** (not Windows-verified)
+Canonical file: `Music Collection Cleaner v0.5.19.pyw` on `karpuzikov/MCC/main`. Previous user-tested `v0.5.18.pyw` retained.
+
+## Latest checkpoint - 2026-10-14, v0.5.19 Album/EP grouping fix
+
+- Request: cannot manually move Japanese CD `Inna - Party Never Ends (Part 2) (2013) [WPCR-15062]` into the family of WEB `2013-03-04 - Party Never Ends, Pt. 2 (Deluxe Editon) [5948204032791]`. User's `Music Collection Cleaner Comparison 2026-10-14-01-57-25.jsonl` from v0.5.18 supplies six positive fingerprint matches between release IDs 282 (8 total files, one remix excluded) and 12 (9 files): Be My Lover, World of Love, I Like You, Dame Tu Amor, Tu Si Eu, Light Up. Wanted-set overlap is six of seven groups on the smaller CD (85.7%), above the existing 80% threshold. `Alright` rejected as identical (39.872-second duration difference and acoustic-content gate failure); preserve distinct versions.
+- Root causes: `_album_editions_related_by_audio` rejected any Album/EP mismatch before checking overlap; manual selection and backend required both source and target release type `album`; Release Map rendered Albums and EPs into separate columns even if grouped.
+- Implementation: allow Album/EP pairs into fingerprint-proven release-family matcher (minimum four groups; 80% of smaller included-set; same artist safeguards). The Release Map computes display families across Albums+EPs using `_album_clusters`, resolves cross-type display category `album` without mutating each `releaseType`, labels mixed card `Album / EP`, and makes source/target selection available for both types. Stable path-based overrides persist to `state/manual_album_groups.json`, can be restored, and force Re-Analyze; grouping never merges audio IDs or moves files.
+- Critical optimizer separation: `_album_clusters` detaches a manually assigned release only when source **and target** are both in the passed clustering universe. Album-only solver/complete-album constraints therefore stay unchanged when an album is visually assigned into an EP target family not present in optimizer input. Keep this invariant.
+- Added `--ui-self-test` fixture modeling INNA 6-of-7 overlap, original EP tag, different Alright audio, excluded remix, below-threshold, unrelated performer and Singles; bidirectional manual override regression; same-column grouping/source-type preservation; extended static UI contract. These tests have been **added but NOT EXECUTED**.
+- GitHub commits: `f260d2f` (new version), `0767122` (manual regression correction), `bb20495` (optimizer isolation). Original v0.5.18 left untouched. No Actions changes.
+- Testing: GitHub API source creation, subsequent patch commits, and string-contract validation PASS. Real Python `py_compile` **NOT RUN** (GitHub source unavailable as executable local file in this environment); complete `--ui-self-test` and `--self-test` **NOT RUN**; Windows WebView2 launch/screenshots, keyboard/hover/resize interactions, INNA full scan, restore/reanalysis state, Copy/Move/Undo **NOT RUN**. Do not mark stable.
+- Next precise test: run `python "Music Collection Cleaner v0.5.19.pyw" --ui-self-test` and `python "Music Collection Cleaner v0.5.19.pyw" --self-test`; run full Windows scan of user's INNA OLD/NEW folders and check the two Part 2 entries in one Albums map card, manually assign and Restore automatic both directions, then Re-Analyze and verify Copy/Move remain blocked while dirty. Confirm no false merges, especially `Alright`. Preserve WebView2 and isolated settings.
+
 
 
 ## Latest checkpoint - 2026-10-13, MCC v0.5.18 user testing acknowledged
