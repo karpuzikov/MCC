@@ -6367,7 +6367,13 @@ def _album_clusters(albums: List[Release]) -> List[List[Release]]:
     links = _manual_album_group_links()
     paths = [_manual_album_group_path_key(rel.path) for rel in albums]
     positions = {key: i for i, key in enumerate(paths)}
-    overridden = set(links)
+    # Detach only when both endpoints exist in the current clustering set.
+    # Album-only optimizer checks must not split an album family merely
+    # because a map assignment points to an EP outside that set.
+    overridden = {
+        source for source, target in links.items()
+        if source in positions and target in positions
+    }
 
     # Resolve paths only once: re-resolving them for every candidate pair can
     # saturate slow disks on large music libraries.
@@ -15222,6 +15228,8 @@ def _ui_contract_self_test() -> None:
                 _manual_album_group_path_key(source.path):
                 _manual_album_group_path_key(target.path)
             }
+            if len(_album_clusters([matching_a, matching_b])) != 1:
+                raise RuntimeError("EP map override modified the album-only optimization families.")
             families = _album_clusters([matching_a, matching_b, unrelated_ep])
             # EP -> A joins existing A+B, while A -> EP detaches A from B.
             expected_clusters = 1 if source is unrelated_ep else 2
