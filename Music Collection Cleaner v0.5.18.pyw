@@ -12766,10 +12766,6 @@ button{user-select:none}
 }
 #appTitle{font-size:18px;font-weight:780;letter-spacing:-.01em}
 #version{color:#8b98a9;font-size:12px}
-#statusBadge{
-  margin-left:auto;padding:5px 9px;border:1px solid #4b4221;border-radius:999px;
-  color:#f3d17a;background:#201c10;font-size:11px;font-weight:700
-}
 #content{flex:1;min-height:0;display:grid;grid-template-rows:auto auto minmax(180px,1fr);gap:12px;
   padding:14px 18px 12px;overflow:auto}
 .card{border:1px solid var(--line);border-radius:10px;background:var(--panel);box-shadow:var(--shadow)}
@@ -12881,7 +12877,6 @@ button:focus-visible,input:focus-visible{
 <div id="topbar">
   <div id="appTitle">Music Collection Cleaner</div>
   <div id="version">v__APP_VERSION__</div>
-  <div id="statusBadge">Under construction ⚠️</div>
 </div>
 
 <div id="content">
