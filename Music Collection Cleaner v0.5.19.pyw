@@ -15223,7 +15223,9 @@ def _ui_contract_self_test() -> None:
                 _manual_album_group_path_key(target.path)
             }
             families = _album_clusters([matching_a, matching_b, unrelated_ep])
-            if len(families) != 2 or not any(
+            # EP -> A joins existing A+B, while A -> EP detaches A from B.
+            expected_clusters = 1 if source is unrelated_ep else 2
+            if len(families) != expected_clusters or not any(
                 {source.rid, target.rid} <= {r.rid for r in family}
                 for family in families
             ):
