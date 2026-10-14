@@ -5,6 +5,15 @@ Last updated: 2026-10-05
 This file is the project-specific rulebook for the Discography Builder and Duplicate / Edition Analyzer.
 The account-wide `SOFTWARE_RULES.md` baseline always applies. This file may add stricter project-specific requirements but must never weaken or override a newer global rule or a newer explicit user instruction. When project rules conflict with the global baseline, the stricter/newer requirement wins.
 
+## MCC 2026-10-14 - persistent unknown-pattern Remix/Live decisions
+
+- The Unusual track pattern review must let the user choose for each new canonical pattern: **Skip this run** (temporary exclusion), **Keep / Personal Picks** (positive persisted keep), **Remix** (remember category), or **Live** (remember category). Do not require repeat confirmation for saved positive or category decisions.
+- Store a category selection as a persistent, normalized, reversible rule scoped to that exact unusual-pattern key. A category decision is NOT an acoustic duplicate decision. Apply it at early per-track classification before fingerprint/optimization, using Save Remixes and Save Live global switches. Classifications survive application restarts/scans and settings saves.
+- A previously classified Remix must not survive Save Remixes OFF merely because a remixer/producer appears as a secondary ARTIST; keep only the project's tightly proven added-feature exception. Save Remixes/Live ON must include the category normally. Separate semantic recording roots remain protected.
+- Allow reassigning Remix ↔ Live and forgetting a category from the existing Personal Picks modal, without damaging existing Personal Picks entries or audio files. Forget restores review eligibility. Errors saving a classification must be shown, never silently reported as saved.
+- Regression example: `Wow (JRMX Club)`, a repeatedly prompted unusual pattern, can be marked Remix once. The next scan must start without this review prompt, while other genuinely unresolved patterns still prompt.
+- Reuse the compact dark WebView2 modal/select/button design and implement accessible keyboard controls, labels and visible focus. Keep v0.5.19 Album/EP and all optimizer, copy/move/undo behavior unchanged.
+
 ## MCC 2026-10-14 - Album/EP edition families and manual reassignment
 
 - A verified long-form edition may carry an incorrect `EP` tag. Album/EP classification differences alone MUST NOT prevent **family display grouping** when their included acoustic-group sets have >=80% overlap (denominator: smaller release; at least four shared acoustic groups), consistent with the original artist safeguards.
