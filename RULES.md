@@ -5,6 +5,19 @@ Last updated: 2026-10-05
 This file is the project-specific rulebook for the Discography Builder and Duplicate / Edition Analyzer.
 The account-wide `SOFTWARE_RULES.md` baseline always applies. This file may add stricter project-specific requirements but must never weaken or override a newer global rule or a newer explicit user instruction. When project rules conflict with the global baseline, the stricter/newer requirement wins.
 
+## MCC 2026-10-14 - definitive advisory values and transparent status (v0.5.28)
+
+- **ITUNESADVISORY / RTNG / ADVISORY:** numerical `1 = Explicit`; `2 = Clean`; `0 = Unknown/no information`. Zero must not create an Explicit OR Clean classification. Missing/misleading flags must not manufacture a separate recording. `EXPLICIT=0` is a false Boolean flag, not proof of an intentionally edited Clean recording.
+- Release Map track labels show a compact **E** or **C** only for known affirmative classification. Unknown has no badge. Badges require readable accessibility labels and normal compact theme; no added clicks or panels.
+- When a track is excluded, display its exact named rule: **Explicit > Clean** or a specified Remix/Live/pattern reason. Never use the opaque **"Skipped by active options"** wording. Never say **"Only eligible copy"** to describe a collection that has other physical copies. Distinguish retained coverage from source presence.
+- Future comparison logs must retain original advisory tag values so classifications can be audited. The false-positive `Explicit>Clean` problem with GIMS remains P0 until actual data validates the true source and any proven distinct Explicit content.
+
+## MCC 2026-10-14 - release details overlay must not reflow the map (v0.5.29)
+
+- The Release Map board maintains **identical width, category column geometry, and scroll position** when details are opened or closed. The details pane uses an overlay, not a flex sidebar that shrinks the board and triggers container-query reflow.
+- Position the details overlay away from the clicked release where possible. Preserve its selected highlight. Re-clicking the selected release must **not** dismiss details; Close (×) and Escape dismiss. Preserve keyboard navigation, focus, reduced-motion and independent panel scrolling; don't add clicks or unnecessary UI.
+- Verify actual Windows WebView2 at original and reduced window sizes, opening multiple releases and closing by X/Escape, changes/full view, highlighting and scroll anchoring before marking stable.
+
 ## MCC 2026-10-14 - full-scan evidence takes priority over plan-only uniqueness (v0.5.27)
 
 - A track essential to the optimizer's *retained plan* must not be called physically or acoustically unique when matching physical copies occur in discarded/excluded editions. The user identified this as a recent Release Map status regression.
