@@ -4870,17 +4870,26 @@ def merge_equivalent_tracks(
         # Metadata must never veto a byte-identical acoustic fingerprint.
         if fp_a and fp_a == fp_b:
             candidate_reasons[pair].add("exact_fingerprint")
-            if _semantic_version_conflict(tracks[pair[0]], tracks[pair[1]]):
+            if _candidate_semantic_conflict(
+                pair[0], pair[1], semantic_roots, semantic_hard
+            ):
                 funnel["exact_fingerprint_semantic_override"] += 1
             else:
                 funnel["routed_exact_fingerprint"] += 1
             return
 
-        if _semantic_version_conflict(tracks[pair[0]], tracks[pair[1]]):
+        if _candidate_semantic_conflict(
+            pair[0], pair[1], semantic_roots, semantic_hard
+        ):
             funnel["semantic_version_conflict"] += 1
             return
 
-        metrics = pair_metrics(*pair)
+        common = tokens[pair[0]] & tokens[pair[1]]
+        if len(common) < minimum_route_shared:
+            funnel["token_evidence_rejected"] += 1
+            funnel["fast_token_pairs_rejected"] += 1
+            return
+        metrics = pair_metrics(*pair, common=common, remember=False)
         shared = int(metrics["shared_token_buckets"])
         containment = float(metrics["token_containment"])
         weighted_containment = float(metrics["weighted_token_containment"])
@@ -4910,6 +4919,8 @@ def merge_equivalent_tracks(
             funnel["routed_weak"] += 1
         else:
             funnel["token_evidence_rejected"] += 1
+            return
+        candidate_stats[pair] = metrics
 
     # Bounded duration-neighbour scan. Duration is routing only: every accepted
     # candidate still goes through the same acoustic identity function.
@@ -4951,7 +4962,7 @@ def merge_equivalent_tracks(
     for ids in title_index.values():
         for a, b in itertools.combinations(sorted(set(ids)), 2):
             pair = (a, b)
-            if _semantic_version_conflict(tracks[a], tracks[b]):
+            if _candidate_semantic_conflict(a, b, semantic_roots, semantic_hard):
                 funnel["same_title_semantic_conflict"] += 1
                 continue
             if pair not in candidate_reasons:
@@ -4972,7 +4983,7 @@ def merge_equivalent_tracks(
             if tracks[a].release_id == tracks[b].release_id:
                 continue
             pair = (a, b)
-            if _semantic_version_conflict(tracks[a], tracks[b]):
+            if _candidate_semantic_conflict(a, b, semantic_roots, semantic_hard):
                 funnel["same_album_track_slot_semantic_conflict"] += 1
                 continue
             if pair not in candidate_reasons:
@@ -4991,7 +5002,9 @@ def merge_equivalent_tracks(
         for a, b in itertools.combinations(sorted(ids), 2):
             pair = (a, b)
             already_exact = "exact_fingerprint" in candidate_reasons.get(pair, set())
-            if not already_exact and _semantic_version_conflict(tracks[a], tracks[b]):
+            if not already_exact and _candidate_semantic_conflict(
+                a, b, semantic_roots, semantic_hard
+            ):
                 funnel["exact_fingerprint_semantic_override"] += 1
             candidate_reasons[pair].add("exact_fingerprint")
             pair_metrics(a, b)
@@ -5024,10 +5037,10 @@ def merge_equivalent_tracks(
 
     for pair, _weight in far_weight.items():
         a, b = pair
-        if _semantic_version_conflict(tracks[a], tracks[b]):
+        if _candidate_semantic_conflict(a, b, semantic_roots, semantic_hard):
             funnel["far_rare_semantic_conflict"] += 1
             continue
-        metrics = pair_metrics(a, b)
+        metrics = pair_metrics(a, b, remember=False)
         shared = int(metrics["shared_token_buckets"])
         containment = float(metrics["token_containment"])
         weighted_containment = float(metrics["weighted_token_containment"])
@@ -5037,6 +5050,7 @@ def merge_equivalent_tracks(
             and weighted_containment >= 0.55
         ):
             candidate_reasons[pair].add("fingerprint_tokens_far_rare")
+            candidate_stats[pair] = metrics
             funnel["routed_far_rare"] += 1
         else:
             funnel["far_rare_rejected"] += 1
@@ -5066,7 +5080,9 @@ def merge_equivalent_tracks(
         pair = (a, b) if a < b else (b, a)
         if pair in candidate_reasons or pair in shadow_seen:
             continue
-        if _semantic_version_conflict(tracks[pair[0]], tracks[pair[1]]):
+        if _candidate_semantic_conflict(
+            pair[0], pair[1], semantic_roots, semantic_hard
+        ):
             continue
         shadow_seen.add(pair)
         shadow_pairs.append(pair)
@@ -5111,6 +5127,9 @@ def merge_equivalent_tracks(
 
     work_pairs = sorted(candidate_reasons, key=candidate_priority)
     total_work_pairs = len(work_pairs)
+    routing_seconds = round(time.monotonic() - candidate_route_started, 3)
+    funnel["semantic_profiles_cached"] = indexed
+    funnel["rejected_pair_metrics_not_cached"] = funnel["token_evidence_rejected"]
 
     # Store individual acoustic verdicts until a deterministic, global duration
     # partition is selected. Completion order of parallel workers must not
@@ -5171,6 +5190,8 @@ def merge_equivalent_tracks(
                 ),
                 "possible_pairs": total_possible,
                 "candidate_pairs": routed_candidate_count,
+                "candidate_routing_seconds": routing_seconds,
+                "candidate_diagnostic_pairs_cached": len(candidate_stats),
                 "shadow_validation_pairs": len(shadow_pairs),
                 "prefilter_rejected_pairs": prefilter_rejected,
                 "candidate_routes": dict(sorted(route_counts.items())),
@@ -5520,6 +5541,8 @@ def merge_equivalent_tracks(
                 "generated": datetime.now().isoformat(timespec="seconds"),
                 "possible_pairs": total_possible,
                 "candidate_pairs": routed_candidate_count,
+                "candidate_routing_seconds": routing_seconds,
+                "candidate_diagnostic_pairs_cached": len(candidate_stats),
                 "shadow_validation_pairs": len(shadow_pairs),
                 "prefilter_rejected_pairs": prefilter_rejected,
                 "work_pairs": total_work_pairs,
