@@ -8596,9 +8596,11 @@ def remove_persistent_track_skip(rule_id: str, tracks: List[Track]) -> None:
     group_ids = {
         track.group_id for track in targeted if track.group_id >= 0
     }
+    targeted_ids = {id(track) for track in targeted}
     peer_keys = {
         _track_instance_key(track) for track in tracks
-        if track.group_id in group_ids or track in targeted
+        if (track.group_id >= 0 and track.group_id in group_ids)
+        or id(track) in targeted_ids
     }
     ids_to_remove = {str(rule_id or "")}
     for rule in _load_manual_track_skip_rules():
@@ -11602,9 +11604,9 @@ function exclusionStatus(t) {
   return "Excluded from analysis (reason not recorded)";
 }
 function trackStatus(t,n) {
-  if(t.pendingIgnore) return "Pending ignore - Re-Analyze required";
-  if(t.pendingRestore) return "Pending restore - Re-Analyze required";
-  if(t.manualSkip) return "Ignored by you";
+  if(t.pendingIgnore) return (Number(t.groupId)>=0?"Ignore recording everywhere":"Ignore this track")+" - Re-Analyze required";
+  if(t.pendingRestore) return (Number(t.groupId)>=0?"Restore recording everywhere":"Restore this track")+" - Re-Analyze required";
+  if(t.manualSkip) return Number(t.groupId)>=0?"Ignored recording everywhere":"Ignored this track";
   if(n && n.manualRemoved){
     if(t.excluded) return exclusionStatus(t);
     if(t.orphaned || !t.replacementSource) return "NO REPLACEMENT - exact recording is not retained elsewhere";
@@ -11666,7 +11668,7 @@ function openDetails(n) {
     let action="";
     if(state.editable && !t.excluded){
       const label=(t.manualSkip||t.pendingIgnore)?"Restore":"Ignore";
-      action='<button class="ignoreTrack" data-track="'+t.index+'">'+label+'</button>';
+      action='<button class="ignoreTrack" data-track="'+t.index+'" aria-label="'+label+(Number(t.groupId)>=0?' this recording everywhere':' this track')+'">'+label+'</button>';
     }
     const versions=versionsForTrack(t), remixes=remixesForTrack(t), live=liveForTrack(t);
     const timedAlternatives=versions.map(function(v){return versionLengthDelta(t,v);}).filter(function(v){return v!==null;});
@@ -11889,16 +11891,41 @@ function receiveTrackToggle(raw) {
   replacementCache=null;
   const p=JSON.parse(raw);
   if(!p || p.kind!=="trackToggle") { receiveState(raw); return; }
-  (state.nodes||[]).some(function(n){
-    const t=(n.tracks||[]).find(function(row){return Number(row.index)===Number(p.trackIndex);});
-    if(!t) return false;
-    t.manualSkip=!!p.manualSkip;
-    t.pendingIgnore=!!p.pendingIgnore;
-    t.pendingRestore=!!p.pendingRestore;
-    return true;
+  const updated=Array.isArray(p.tracks)&&p.tracks.length
+    ?p.tracks:[{index:p.trackIndex,manualSkip:p.manualSkip,pendingIgnore:p.pendingIgnore,pendingRestore:p.pendingRestore}];
+  const updates=new Map(updated.map(function(row){return [Number(row.index),row];}));
+  (state.nodes||[]).forEach(function(n){
+    (n.tracks||[]).forEach(function(t){
+      const row=updates.get(Number(t.index));
+      if(!row)return;
+      t.manualSkip=!!row.manualSkip;
+      t.pendingIgnore=!!row.pendingIgnore;
+      t.pendingRestore=!!row.pendingRestore;
+    });
   });
   applyRootPatch(p);
-  if(selectedId!=null && getNode(selectedId)) openDetails(getNode(selectedId));
+  // Update the existing panel IN PLACE. Redrawing it would reset the user's
+  // scroll position and focus, repeating the old Release Map UX regression.
+  const current=selectedId==null?null:getNode(selectedId);
+  if(!current)return;
+  document.querySelectorAll("#details .track[data-index]").forEach(function(el){
+    const t=(current.tracks||[]).find(function(row){
+      return Number(row.index)===Number(el.dataset.index);
+    });
+    if(!t||!updates.has(Number(t.index)))return;
+    el.classList.toggle("manual",!!(t.manualSkip||t.pendingIgnore||t.pendingRestore));
+    const status=trackStatus(t,current);
+    el.title=status;
+    const statusEl=el.querySelector(".status");
+    if(statusEl)statusEl.textContent=status;
+    const button=el.querySelector(".ignoreTrack");
+    if(button){
+      const restoring=!!(t.manualSkip||t.pendingIgnore);
+      button.textContent=restoring?"Restore":"Ignore";
+      button.setAttribute("aria-label",(restoring?"Restore":"Ignore")
+        +(Number(t.groupId)>=0?" this recording everywhere":" this track"));
+    }
+  });
 }
 function receiveReleaseToggle(raw) {
   replacementCache=null;
@@ -12882,33 +12909,53 @@ def launch_webview_release_map(session: Dict[str, object]) -> Dict[str, object]:
     
             track = self.tracks[track_index]
             label = track.display_title
+            before = [bool(row.manual_skip_rule) for row in self.tracks]
             if track.manual_skip_rule:
                 remove_persistent_track_skip(track.manual_skip_rule, self.tracks)
-                self._mark_dirty(f'IF track: "{label}" restored')
+                self._mark_dirty(f'IF recording everywhere: "{label}" restored')
             else:
                 add_persistent_track_skip(track, self.tracks)
-                self._mark_dirty(f'IF track: "{label}" ignored')
+                self._mark_dirty(f'IF recording everywhere: "{label}" ignored')
     
-            initial_state = bool(self.initial_track_skip_state.get(track_index, False))
-            if bool(track.manual_skip_rule) == initial_state:
-                self.pending_track_indices.discard(track_index)
-            else:
-                self.pending_track_indices.add(track_index)
+            changed = [
+                i for i, row in enumerate(self.tracks)
+                if before[i] != bool(row.manual_skip_rule)
+            ]
+            if not changed:
+                return self._state()
+            for i in changed:
+                initial = bool(self.initial_track_skip_state.get(i, False))
+                if bool(self.tracks[i].manual_skip_rule) == initial:
+                    self.pending_track_indices.discard(i)
+                else:
+                    self.pending_track_indices.add(i)
     
             self._refresh_pending_state()
-            self._patch_cached_track_state(track_index)
+            for i in changed:
+                self._patch_cached_track_state(i)
+            patched = [
+                {
+                    "index": int(i),
+                    "manualSkip": bool(self.tracks[i].manual_skip_rule),
+                    "pendingIgnore": bool(
+                        i in self.pending_track_indices
+                        and self.tracks[i].manual_skip_rule
+                    ),
+                    "pendingRestore": bool(
+                        i in self.pending_track_indices
+                        and not self.tracks[i].manual_skip_rule
+                    ),
+                }
+                for i in changed
+            ]
+            clicked = next(row for row in patched if row["index"] == track_index)
             payload = {
                 "kind": "trackToggle",
                 "trackIndex": int(track_index),
-                "manualSkip": bool(track.manual_skip_rule),
-                "pendingIgnore": bool(
-                    track_index in self.pending_track_indices
-                    and track.manual_skip_rule
-                ),
-                "pendingRestore": bool(
-                    track_index in self.pending_track_indices
-                    and not track.manual_skip_rule
-                ),
+                "tracks": patched,
+                "affectedCopies": len(changed),
+                "scope": "acoustic-recording" if track.group_id >= 0 else "instance",
+                **{key: clicked[key] for key in ("manualSkip", "pendingIgnore", "pendingRestore")},
                 **self._toggle_delta_base(),
             }
             return _json_ui_dumps(payload)
