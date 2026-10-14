@@ -1,16 +1,16 @@
 # Music Collection Cleaner (MCC)
 
-**Version: 0.5.24 - Under construction ⚠️**
+**Version: 0.5.25 - Under construction ⚠️**
 
 Music Collection Cleaner compares existing music releases with new ones, finds the best combination of editions, and helps preserve every wanted unique recording while removing unnecessary redundancy.
 
 ## Download and run
 
-**[Music Collection Cleaner v0.05.24.pyw](Music%20Collection%20Cleaner%20v0.05.24.pyw)** - latest single-file Windows Python application. **Under construction ⚠️** until actual Windows WebView2 testing. Earlier source versions remain available.
+**[Music Collection Cleaner v0.05.25.pyw](Music%20Collection%20Cleaner%20v0.05.25.pyw)** - latest single-file Windows Python application. **Under construction ⚠️** until actual Windows WebView2 testing. Earlier source versions remain available.
 
-Open with Python 3 on Windows 11 (or run from a console with `python "Music Collection Cleaner v0.05.24.pyw"`). The application checks or installs supported dependencies. The GUI uses Microsoft Edge WebView2 through pywebview; it is not a terminal-based replacement.
+Open with Python 3 on Windows 11 (or run from a console with `python "Music Collection Cleaner v0.05.25.pyw"`). The application checks or installs supported dependencies. The GUI uses Microsoft Edge WebView2 through pywebview; it is not a terminal-based replacement.
 
-Source-level regression checks: `python "Music Collection Cleaner v0.05.24.pyw" --ui-self-test`. `--self-test` additionally requires a packaged standalone EXE.
+Source-level regression checks: `python "Music Collection Cleaner v0.05.25.pyw" --ui-self-test`. `--self-test` additionally requires a packaged standalone EXE.
 
 ## What it does
 
@@ -24,6 +24,15 @@ Source-level regression checks: `python "Music Collection Cleaner v0.05.24.pyw" 
 - Explicitly **Copy OLD + NEW** or **Move OLD + NEW** retained releases into the selected destination; Undo for supported completed moves.
 - Log comparisons, validate incomplete/corrupt inputs, choose I/O worker counts with drive awareness, and manage spawned subprocesses.
 
+
+## v0.5.25 - full GIMS comparison log audit and one-track Remix correction (Under construction ⚠️)
+
+- **Actual attached run:** `Music Collection Cleaner Comparison 2026-10-14-08-17-53.jsonl`, identifies itself as **v0.5.24**, 2026-10-14 08:20-08:21 local log timestamps. Parsed 27,243 valid records: 1,604 tracks across 153 physical releases, 1,508 eligible complete-fingerprint tracks, 96 excluded (86 Explicit/Clean decisions, 10 remix exclusions), 25,569 detailed comparison rows, 8,277 accepted audio match edges, 256 all-rejected shadow pairs. 252 original recording groups; exact optimizer used 250 wanted coverage groups after separate version-coverage substitutions, chose 72 of 146 active releases (7 dominated) totaling 304 retained physical tracks. Zero logged integrity failures, zero eligible incomplete fingerprints, zero logged comparison decision inconsistencies; no blocked releases or late quality tie-break rollback. These statistics do **not** certify exhaustive pair testing or a real filesystem Copy/Move operation.
+- **One confirmed classification bug:** Eight different physically single-track releases with a `Remix` name were labeled `EP` (`release_type_source=name`), rather than `Single`. Seven had zero eligible tracks due remix exclusions. Release ID 17 `Sapés comme jamais ... (Remix)` was retained with one legitimate featured-remix exception; the classifier's incorrect EP label did not itself prove wrong retention. Root cause: `infer_release_type()` unconditionally returned `ep/name` for a `Remix` title after explicit release tags. **Fixed generally:** single-track inferred remix packages now return `single/name`; multi-track remix packages still use the established EP fallback, explicitly tagged EP and single releases still take precedence. No title-specific exception.
+- **Optimizer audit:** 9 retained Albums (7 OLD/CD/WEB existing and 2 additions), 1 retained former EP (now correctly Single), 62 other Singles; *no retained Single* has a confirmed acoustic MATCH with another retained release in the supplied comparison. The additional `Ceinture noire [3616401604548]` release ID 39 has 2 recordings without a confirmed match to other selected releases (`La nuit c'est fait pour dormir`, `Caméléon`); `Le fléau [3616550229623]` release ID 54 has 2 (`Intro`, `Immortel`). Do not discard these releases solely because another album edition is present.
+- **Explicit/Clean audit limitation:** All 86 excluded tracks have an eligible alternate with matching normalized title/artist signature and duration within 8 seconds somewhere in the scan; 13 excluded `Corazón` instances lack such an exact tag-signature match **among selected** tracks because the retained CD credits Lil Wayne/French Montana in the title rather than in `ARTIST`. The old track JSONL omitted the actual `explicit` state and `excluded_by_pattern` for each file, so its pre-fingerprint removal cannot be independently proven acoustically correct. No forced audio merges or destructive changes made. v0.5.25 adds `explicit_state` and `excluded_by_pattern` as additive per-track audit fields for the next scan.
+- Embedded classifier regression fixtures reproduce **all eight actual Remix cases**, a multi-track Remix EP, explicit EP precedence, explicit `single;remix` tag priority, and the new Explicit/Clean diagnostic fields. Source published to GitHub; full application Python compile, embedded `--ui-self-test`, Windows WebView2 run, real collection rerun and Copy/Move/Undo **NOT RUN**. Remains **Under construction ⚠️**. No Actions modified.
+- **Next:** Run `python -m py_compile "Music Collection Cleaner v0.05.25.pyw"`, then `python "Music Collection Cleaner v0.05.25.pyw" --ui-self-test` on Windows. Reanalyze GIMS and confirm all eight one-track remix entries appear as Singles (including retained release ID 17), selected set preserves four noted unmatched selected-album tracks, and new explicit/exclusion fields explain filtered variants. Test actual UI and Copy/Move/Undo only on disposable music copies.
 
 ## v0.5.24 - mandatory radical simplicity UI pass (Under construction ⚠️)
 
