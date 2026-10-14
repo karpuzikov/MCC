@@ -1,16 +1,16 @@
 # Music Collection Cleaner (MCC)
 
-**Version: 0.5.20 - Under construction ⚠️**
+**Version: 0.5.21 - Under construction ⚠️**
 
 Music Collection Cleaner compares existing music releases with new ones, finds the best combination of editions, and helps preserve every wanted unique recording while removing unnecessary redundancy.
 
 ## Download and run
 
-**[Music Collection Cleaner v0.05.20.pyw](Music%20Collection%20Cleaner%20v0.05.20.pyw)** - latest single-file Windows Python application. **Under construction ⚠️** until actual Windows WebView2 testing. Earlier v0.5.18 and v0.5.19 remain available unchanged.
+**[Music Collection Cleaner v0.05.21.pyw](Music%20Collection%20Cleaner%20v0.05.21.pyw)** - latest single-file Windows Python application. **Under construction ⚠️** until actual Windows WebView2 testing. Earlier v0.5.18, v0.5.19 and v0.5.20 remain available unchanged.
 
-Open with Python 3 on Windows 11 (or run from a console with `python "Music Collection Cleaner v0.05.20.pyw"`). The application checks or installs supported dependencies. The GUI uses Microsoft Edge WebView2 through pywebview; it is not a terminal-based replacement.
+Open with Python 3 on Windows 11 (or run from a console with `python "Music Collection Cleaner v0.05.21.pyw"`). The application checks or installs supported dependencies. The GUI uses Microsoft Edge WebView2 through pywebview; it is not a terminal-based replacement.
 
-Source-level regression checks: `python "Music Collection Cleaner v0.05.20.pyw" --ui-self-test`.
+Source-level regression checks: `python "Music Collection Cleaner v0.05.21.pyw" --ui-self-test`.
 
 ## What it does
 
@@ -24,6 +24,15 @@ Source-level regression checks: `python "Music Collection Cleaner v0.05.20.pyw" 
 - Explicitly **Copy OLD + NEW** or **Move OLD + NEW** retained releases into the selected destination; Undo for supported completed moves.
 - Log comparisons, validate incomplete/corrupt inputs, choose I/O worker counts with drive awareness, and manage spawned subprocesses.
 
+
+## v0.5.21 - compilation classification from the full tracklist (Under construction ⚠️)
+
+- **Disciple 02 false negative fixed:** In the user's `Music Collection Cleaner Comparison 2026-10-14-05-36-10.jsonl`, release ID 43 `2015-05-18 - Disciple 02_ The Second Coming [3614592021540]` was classified **Album**, with all 22 physical tracks but only 14 counted after eight remixes were excluded. It is a multi-artist compilation; the recorded artist signatures include 19 distinct performers, and even the most frequent appears on just 8 of 22 tracks. The classifier now uses the **complete release tracklist before remix/live exclusion** to recognize this independent-performer anthology even when ALBUM or folder location says otherwise.
+- **Texx Mars false positive fixed:** Release ID 31 `2009-01-14 - Texx Mars EP [190374272483]` was classified **Compilation**, though both tracks credit Datsik. An explicit EP name or EP primary type now takes priority over a conflicting weak/general `COMPILATION=1`/Various Artists flag when the release lacks strong independent-performer evidence. A genuine various-artists EP with sufficient diversity can still classify as Compilation.
+- Preserve direct compilation indicators such as `Best Of`, `Greatest Hits`, and collection titles, plus the existing Trilogy and Highlights long-form exceptions. Standalone albums with several guest artists remain Album when a common principal artist is present. No changes to fingerprinting, track identity, releases' physical files, or Copy/Move/Undo algorithms.
+- **Optimizer behavior:** Compilations remain **last-resort carriers** for wanted recordings not otherwise represented; reclassification removes mistaken ordinary-album status but does **not** categorically delete a compilation that uniquely contains wanted music.
+- **Validation:** Real JSONL track-artist signatures were evaluated in an isolated deterministic regression calculation (Disciple 02 true; Texx Mars and Datsik artist albums false). Embedded app self-test cases added but **full Python compilation, --ui-self-test, --self-test, Windows GUI, full scan and Copy/Move/Undo NOT RUN**. Retain **Under construction ⚠️** until end-to-end Windows verification.
+- **Next action:** Run `python "Music Collection Cleaner v0.05.21.pyw" --ui-self-test`, `python "Music Collection Cleaner v0.05.21.pyw" --self-test`, then rescan the user's Datsik folders; confirm Disciple 02 is Compilation and both Texx Mars EPs are EP. Verify any final compilation retention is justified solely by unique wanted audio and not an ordinary album-family constraint.
 
 ## v0.5.20 - remembered Remix/Live unusual patterns (Under construction ⚠️)
 
