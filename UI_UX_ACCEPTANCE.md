@@ -1,3 +1,12 @@
+## MCC v0.5.31 - candidate discovery performance and parity (2026-10-15)
+
+- Problem: user reports the Finding audio candidates stage remains CPU/SSD underutilized with 28 I/O workers. Prior actual GIMS v0.5.29 JSONL: 1,604 tracks, 1,594 fingerprinted, 846,840 duration-neighbor pairs, 801,294 rejected on token evidence, 48,066 routed candidates.
+- New algorithm: cache immutable semantic roots and hard version families per track; use exactly equivalent per-pair cache-based semantic conflict. Fast-reject duration-neighbor pairs that cannot satisfy any current strong/weak/weighted shared-token threshold. Do not cache metrics for rejected pairs; remove redundant visited-pair tuples whose sole subsequent purpose is guaranteed by the far-rare duration boundary.
+- Safety routes preserved: exact fingerprint, same base title, same album slot, rare far-duration tokens, deterministic shadow sampling. No changes to audio thresholds, selected releases, GUI, original media or Copy/Move/Undo.
+- Instrumentation: new JSONL run and summary candidate_routing_seconds, candidate_diagnostic_pairs_cached, and candidate funnel profile/fast-reject counts.
+- Regression code authored and hooked into --ui-self-test: semantic-cache parity against previous function, route-token minimum mathematical gate, far-rare duration check. Static source/readback and front-end JavaScript syntax PASS. From old JSONL no token-routed comparison row fell below the 12-token threshold. A separate synthetic benchmark showed faster cached semantic lookups but is NOT a real MCC runtime measurement.
+- Release blockers NOT RUN: full Python py_compile, the embedded test, Windows GIMS re-analysis with before/after candidate-group parity and elapsed time, GUI interaction, filesystem Copy/Move/Undo. v0.5.31 - Under construction ⚠️.
+
 ## MCC v0.5.30 - CD-first album representation / guest safety (2026-10-15)
 
 - **Goal:** retain fully eligible EU CD `Ceinture noire (Décennie) [EU - 19439710432 - 2019]` in preference to its smaller WEB sibling `[3616402785413]` when all WEB wanted audio is already on the CD. Enforce as an exact solver album-provider requirement, not a loose source score at the end.
