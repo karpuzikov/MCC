@@ -1,16 +1,16 @@
 # Music Collection Cleaner (MCC)
 
-**Version: 0.5.21 - Under construction ⚠️**
+**Version: 0.5.22 - Under construction ⚠️**
 
 Music Collection Cleaner compares existing music releases with new ones, finds the best combination of editions, and helps preserve every wanted unique recording while removing unnecessary redundancy.
 
 ## Download and run
 
-**[Music Collection Cleaner v0.05.21.pyw](Music%20Collection%20Cleaner%20v0.05.21.pyw)** - latest single-file Windows Python application. **Under construction ⚠️** until actual Windows WebView2 testing. Earlier v0.5.18, v0.5.19 and v0.5.20 remain available unchanged.
+**[Music Collection Cleaner v0.05.22.pyw](Music%20Collection%20Cleaner%20v0.05.22.pyw)** - latest single-file Windows Python application. **Under construction ⚠️** until actual Windows WebView2 testing. Earlier source versions remain available.
 
-Open with Python 3 on Windows 11 (or run from a console with `python "Music Collection Cleaner v0.05.21.pyw"`). The application checks or installs supported dependencies. The GUI uses Microsoft Edge WebView2 through pywebview; it is not a terminal-based replacement.
+Open with Python 3 on Windows 11 (or run from a console with `python "Music Collection Cleaner v0.05.22.pyw"`). The application checks or installs supported dependencies. The GUI uses Microsoft Edge WebView2 through pywebview; it is not a terminal-based replacement.
 
-Source-level regression checks: `python "Music Collection Cleaner v0.05.21.pyw" --ui-self-test`.
+Source-level regression checks: `python "Music Collection Cleaner v0.05.22.pyw" --ui-self-test`. `--self-test` additionally requires a packaged standalone EXE.
 
 ## What it does
 
@@ -24,6 +24,15 @@ Source-level regression checks: `python "Music Collection Cleaner v0.05.21.pyw" 
 - Explicitly **Copy OLD + NEW** or **Move OLD + NEW** retained releases into the selected destination; Undo for supported completed moves.
 - Log comparisons, validate incomplete/corrupt inputs, choose I/O worker counts with drive awareness, and manage spawned subprocesses.
 
+
+## v0.5.22 - classification evidence and compilation test correction (Under construction ⚠️)
+
+- **Verified original log (v0.5.20):** Release 43 Disciple 02 was mislabeled Album and selected; it has 22 physical tracks, eight excluded remixes and 14 eligible recordings. None of the 14 has a confirmed cross-release MATCH in the supplied comparison JSONL. Release 31 Texx Mars EP was mislabeled Compilation and not selected; the alternate release 3 was correctly EP and selected.
+- **v0.5.21 classification correction retained:** Full physical artist distribution identifies Disciple as a multi-artist compilation; explicit EP evidence protects the two-track Texx release. The optimizer still retains a genuine compilation **when necessary to preserve unique wanted audio**. Classification alone must not silently delete the 14 distinct wanted recordings.
+- **New evidence:** Comparison track records now include `release_classification_tags`, preserving every original tag with release-type relevance for each track (`RELEASETYPE`, `MUSICBRAINZ_ALBUMTYPE`, `COMPILATION`, `ITUNESCOMPILATION`, `ALBUMARTIST`, etc.). Optimizer `release_source_catalog` entries include `release_type_source`. The old JSONL did not include raw classification tags; its exact inherited compilation-flag trigger cannot be established retroactively.
+- **Regression fix:** Updated outdated `--ui-self-test` policy expectations that contradicted the already nondestructive `apply_compilation_policy()`. Added an assertion for original tag diagnostics. No change to the acoustic grouping, optimizer algorithm, Copy/Move/Undo, UI controls or GitHub Actions.
+- **Validation:** Re-parsed the actual 947-record comparison log. Independent log-based Python assertions **PASS** for Disciple, both Texx editions and Datsik albums, including unmatched wanted-coverage evidence. GitHub source readback/static checks **PASS**. Complete Python compilation, application's `--ui-self-test`, standalone EXE `--self-test`, real Windows WebView2 interactions, end-to-end scan and Copy/Move/Undo are **NOT RUN**.
+- **Next action:** Run `python "Music Collection Cleaner v0.05.22.pyw" --ui-self-test` and `python -m py_compile "Music Collection Cleaner v0.05.22.pyw"` on Windows; rescan Datsik and verify Disciple=Compilation, both Texx=EP. Confirm whether its 14 eligible recordings should remain in the wanted collection. Do not mark stable without real GUI/filesystem safety tests.
 
 ## v0.5.21 - compilation classification from the full tracklist (Under construction ⚠️)
 
