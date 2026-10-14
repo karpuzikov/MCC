@@ -8517,23 +8517,41 @@ def apply_persistent_track_skips(tracks: List[Track]) -> int:
         return 0
 
     groups: Dict[int, List[int]] = defaultdict(list)
+    instance_index: Dict[str, List[int]] = defaultdict(list)
+    fingerprint_index: Dict[str, List[int]] = defaultdict(list)
+    has_audio_rules = any(rule.get("fingerprint_evidence") for rule in rules)
     for i, track in enumerate(tracks):
+        instance_index[_track_instance_key(track)].append(i)
         if track.group_id >= 0:
             groups[int(track.group_id)].append(i)
+        if has_audio_rules and track.fingerprint:
+            fingerprint_index[_track_fingerprint_hash(track)].append(i)
 
-    # Match each saved rule once and expand every hit to its verified group;
-    # only the original instance is affected when acoustic evidence is absent.
+    # Index lookup avoids rehashing every fingerprint for each saved rule.
+    # Expand only positively matched instances/recordings to their verified
+    # acoustic group; never use title, performer, or replaceable-version ID.
     for rule in rules:
         rule_id = str(rule.get("id", "")).strip()
         if not rule_id:
             continue
+        direct: Set[int] = set()
+        for key in rule.get("instance_keys", []):
+            direct.update(instance_index.get(str(key), []))
+        for evidence in rule.get("fingerprint_evidence", []):
+            if not isinstance(evidence, dict):
+                continue
+            raw_hash = str(evidence.get("sha256", ""))
+            saved_duration = float(evidence.get("duration_seconds", 0) or 0)
+            for i in fingerprint_index.get(raw_hash, []):
+                if not _duration_version_conflict(saved_duration, tracks[i].duration):
+                    direct.add(i)
         matched: Set[int] = set()
-        for i, track in enumerate(tracks):
-            if _manual_skip_rule_matches_track(rule, track):
-                if track.group_id >= 0:
-                    matched.update(groups[int(track.group_id)])
-                else:
-                    matched.add(i)
+        for i in direct:
+            gid = int(tracks[i].group_id)
+            if gid >= 0:
+                matched.update(groups[gid])
+            else:
+                matched.add(i)
         for i in matched:
             track = tracks[i]
             if not track.manual_skip_rule:
@@ -8603,12 +8621,15 @@ def remove_persistent_track_skip(rule_id: str, tracks: List[Track]) -> None:
         or id(track) in targeted_ids
     }
     ids_to_remove = {str(rule_id or "")}
+    group_peers = [
+        track for track in tracks
+        if track.group_id >= 0 and track.group_id in group_ids
+    ]
     for rule in _load_manual_track_skip_rules():
         if any(key in peer_keys for key in rule.get("instance_keys", [])):
             ids_to_remove.add(str(rule.get("id", "")))
-        if group_ids and any(
-            track.group_id in group_ids and _manual_skip_rule_matches_track(rule, track)
-            for track in tracks
+        elif any(
+            _manual_skip_rule_matches_track(rule, track) for track in group_peers
         ):
             ids_to_remove.add(str(rule.get("id", "")))
     rules = [
@@ -11666,7 +11687,9 @@ function openDetails(n) {
     if(t.manualSkip||t.pendingIgnore||t.pendingRestore) cls.push("manual");
     if(activeTrack && Number(activeTrack.groupId)===Number(t.groupId)) cls.push("activeTrack");
     let action="";
-    if(state.editable && !t.excluded){
+    // Persisted ignored tracks remain restorable AFTER Re-Analyze even
+    // though their current exclusion flag is now true.
+    if(state.editable && (!t.excluded || t.manualSkip || t.pendingRestore)){
       const label=(t.manualSkip||t.pendingIgnore)?"Restore":"Ignore";
       action='<button class="ignoreTrack" data-track="'+t.index+'" aria-label="'+label+(Number(t.groupId)>=0?' this recording everywhere':' this track')+'">'+label+'</button>';
     }
