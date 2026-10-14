@@ -1,3 +1,12 @@
+## MCC v0.5.32 - track Ignore scope correction (2026-10-15)
+
+- **Reproduction:** in `Ceinture noire [3616401604548]`, user clicked Ignore for Caméléon 03:27 (credited GIMS;Quincy) and expected every acoustic copy of this recording to be ignored. MCC instead treated only that physical track as ignored and sourced another album's copy. In v0.5.31 `add_persistent_track_skip` stored one `instance_key`; `apply_persistent_track_skips` matched exact paths only.
+- **Uploaded v0.5.30 log:** track index 1173 is MATCH (exact audio fingerprints) with indices 312 and 1134. Index 59, Caméléon GIMS 239.866667s versus feat Quincy 207.04s is REJECT at +32.826667s. No reanalysis event in uploaded file; user reports the GUI behavior, root cause proven by source.
+- **v0.5.32 logic:** Ignoring any member adds one saved schema-3 group rule (all current group member paths, SHA256 fingerprints and actual durations). Re-analysis and future scans use exact evidence to discover current groups, then ignore all members by `track.group_id`. Legacy v2 path-only rules expand only if their exact instance is present. Restore clears overlapping group rules. Same-title versions and separate featured performances retain independent coverage. Ignoring a release still applies only `blocked_release_ids`.
+- **v0.5.32 UI:** `toggleTrack` returns all affected indices; JS patches all corresponding release nodes and active DOM rows without reset of scroll/focus. The visible action remains Ignore/Restore with accessible recording-wide description; statuses indicate global scope and Re-Analyze requirement. Restore is available after reanalysis even when a manual skip has set track excluded.
+- **Tests written:** regression under isolated temp state covers three GIMS guest copies, original and Extended, old v2 rule, path/group-ID change between scans, duration guard for same fingerprint, group Restore, overlapping old rules; wired into `--ui-self-test`.
+- **Not run:** whole Python compile, embedded `--ui-self-test`, actual Windows WebView2 interactions, real GIMS reanalysis, safe Copy/Move/Undo. Under construction ⚠️.
+
 ## MCC v0.5.31 - candidate discovery performance and parity (2026-10-15)
 
 - Problem: user reports the Finding audio candidates stage remains CPU/SSD underutilized with 28 I/O workers. Prior actual GIMS v0.5.29 JSONL: 1,604 tracks, 1,594 fingerprinted, 846,840 duration-neighbor pairs, 801,294 rejected on token evidence, 48,066 routed candidates.
