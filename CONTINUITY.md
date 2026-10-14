@@ -1,8 +1,18 @@
 # Music Collection Cleaner - Continuity Handoff
 
 Last updated: 2026-10-14
-Status: **v0.5.29 - Under construction ⚠️** (not Windows-verified)
-Canonical file: `Music Collection Cleaner v0.05.29.pyw` on `karpuzikov/MCC/main`. Earlier v0.5.28, v0.5.27, v0.5.26, v0.5.19 and user-tested v0.5.18 retained.
+Status: **v0.5.30 - Under construction ⚠️** (not Windows-verified)
+Canonical file: `Music Collection Cleaner v0.05.30.pyw` on `karpuzikov/MCC/main`. Earlier v0.5.29, v0.5.28, v0.5.27, v0.5.26, v0.5.19 and user-tested v0.5.18 retained.
+
+## Latest checkpoint - 2026-10-15, MCC v0.5.30 CD-first update
+
+- **Implemented on GitHub main:** `Music Collection Cleaner v0.05.30.pyw`, version `0.5.30 - Under construction ⚠️`. The update makes eligible complete CDs mandatory album-family anchor providers inside `_album_requirement_provider_ids` / the exact global solver when each maximum-edition missing acoustic group has an independent valid provider elsewhere. Album-only extras remain separate mandatory group constraints. Smaller WEB albums fully acoustically covered by the CD can no longer win solely by saving physical files.
+- **Featured regression:** new `_track_guest_signature` combines `_featured_credit_signature(title)` and `_artist_tag_collaborators(track)`; `_replaceable_version_acoustic_evidence` refuses substitution when signatures differ. The real `Caméléon` 239.866667s (GIMS) and guest `Caméléon` 207.04s (GIMS;Quincy; also explicitly feat in Bonus Track Version) were acoustically REJECTED in the uploaded run and must remain two distinct wanted groups, never interchangeable.
+- **GIMS source log checked:** `Music Collection Cleaner Comparison 2026-10-14-23-52-46.jsonl` (v0.5.29), CD release 3 57 groups, WEB Décennie release 27 55 groups all proven on CD, WEB `Ceinture noire [3615930950287]` release 38 40 eligible files/39 groups, including TWO additional audio groups outside CD: Quincy guest track 1134 and `La nuit c'est fait pour dormir` track 1127. Thus retaining CD as *only family album* remains conditional on both groups having independently provided audio, which user scan does not presently confirm. No downloads/extraction or file-by-file pruning authorized.
+- **Tests added:** embedded GIMS CD57 + WEB55 + 39-core+2 extra album; CD+WEB when extras album-only; Quincy Single alone insufficient; two independent Singles allow CD-only within album family; CD14/WEB18 unavailable wanted bonuses must prefer WEB; artist-only and title-only feat both protected; preserve old Starboy CD+remix singles vs blocked cases and older regression suites. New Release Map decision reason explains CD-priority anchor when existing album kept. No new UI widgets.
+- **Validation actually performed:** GitHub write and readback exact; separate local Python model of revised CD album provider selection shows GIMS CD candidate, Starboy complete CD+Singles candidate, incomplete CD+WEB fallback (PASS). **Not performed:** compilation of complete application, embedded self-test run, target Windows WebView2, genuine GIMS re-run, source-safe Copy/Move/Undo. Do NOT claim stable; user needs Windows testing.
+- **Pending unrelated items:** fully investigate false `Explicit>Clean` flags with fresh raw advisory logs (0 unknown, 1 explicit, 2 clean); single-threaded "Finding audio candidates" bottleneck benchmark/parallel optimization (reported 28 configured Audio I/O workers but 2% SSD/11% CPU).
+- **Next action:** run `py -m py_compile "Music Collection Cleaner v0.05.30.pyw"` then `py "Music Collection Cleaner v0.05.30.pyw" --ui-self-test`; fix any failure, run original Windows Ceinture noire pool, compare chosen CD/WEB releases and per-track guest coverage with actual GUI; then Copy/Move/Undo on disposable fixture. Keep status construction until fully verified.
 
 ## New user priority rule - 2026-10-15, CD anchor vs WEB family and extras
 
