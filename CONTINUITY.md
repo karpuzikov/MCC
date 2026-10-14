@@ -1,8 +1,18 @@
 # Music Collection Cleaner - Continuity Handoff
 
 Last updated: 2026-10-14
-Status: **v0.5.26 - Under construction ⚠️** (not Windows-verified)
-Canonical file: `Music Collection Cleaner v0.05.26.pyw` on `karpuzikov/MCC/main`. Earlier v0.5.19 and user-tested v0.5.18 retained.
+Status: **v0.5.27 - Under construction ⚠️** (not Windows-verified)
+Canonical file: `Music Collection Cleaner v0.05.27.pyw` on `karpuzikov/MCC/main`. Earlier v0.5.26, v0.5.19 and user-tested v0.5.18 retained.
+
+## Latest checkpoint - 2026-10-14, v0.5.27 full-scan Release Map status
+
+- **User request:** "you need to figure out why ... La même and Laissez-moi tranquille ... Only eligible copy" and "this is a bug that was introduced in somes recent update". The recent *wording* appeared in v0.5.26; pre-fingerprint Explicit>Clean exclusion already exists in v0.5.18 and v0.5.23.
+- **Actual new file:** `Music Collection Cleaner Comparison 2026-10-14-09-22-38.jsonl`, v0.5.26, 1,604 tracks / 153 source releases / 72 selected releases, 96 excluded (86 Explicit>Clean; 10 remixes). Both album titles were visible in many editions, but old UI only counted selected eligible-group providers.
+- **La même:** 19 physical copies (200.04s / GIMS+Vianney). Track 61 retained CD group fingerprinted; track 280 standalone Single marked `explicit_state=explicit`, acoustically MATCH to CD 61 but not retained; the other 17 album copies have `explicit_state=clean`, `excluded_by_pattern=Explicit>Clean`, zero fingerprint frames (including retained WEB track 1147). **Do NOT interpret explicit metadata as proof of an actual explicit recording.** Need original `ITUNESADVISORY`/source raw tags and matched cause in diagnostic; this P0 upstream filter remains unresolved.
+- **Laissez-moi tranquille:** 13 physical copies (207.4s / GIMS), all eligible. Retained CD track 64 has **12 confirmed MATCH comparisons** to other editions, which were not selected by optimizer; therefore "Only eligible copy" was misleading, even though group is essential within retained releases.
+- **New v0.5.27 changes:** created versioned single-file Python/WebView2 source. Release Map now reports number of acoustically matched other source editions independently from title+performer+duration-consistent unverified editions across the complete scan. Expected display: La même **"Audio match on 1 other edition; Also listed on 17 editions (audio unverified)"**; Laissez-moi tranquille **"Audio match on 12 other editions"**. Normalized signature/title + <=1s duration for candidate listing; actual shared `group_id` and eligible inclusion for audio confirmation. Preserves optimizer plan, exclusions, original files, Copy/Move/Undo and all existing UI components; no added controls/clicks.
+- **Validation:** Static GitHub source patch assertions PASS and independent supplied-JSONL cross-match counts PASS (1+17; 12+0). Added in-app synthetic snapshot/UI regression fixture for retained CD, retained excluded WEB, and non-retained acoustically identical release. **NOT RUN:** full Python compilation, actual `--ui-self-test`, actual Windows WebView2 UI screenshots/interactions, fresh source scan, Copy/Move/Undo. No status upgrade. The old v0.5.26 app remains available.
+- **Next:** compile/run `Music Collection Cleaner v0.05.27.pyw --ui-self-test` in Windows; rescan exact GIMS folders, verify both Release Map labels and compare counts to new log. Next P0 fix: trace exact raw metadata on wrongly excluded La même tracks, determine trigger/counterpart and revise false Explicit>Clean classification without risking distinct audio, preserve policy for genuine positive pairs.
 
 ## Latest checkpoint - 2026-10-14, chat closeout: La même false Explicit/Clean inference remains unresolved
 
