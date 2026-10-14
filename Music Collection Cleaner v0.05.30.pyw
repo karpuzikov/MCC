@@ -8014,6 +8014,15 @@ def build_release_decisions(
 ) -> List[ReleaseDecision]:
     selected_rels = [r for r in releases if r.rid in selected]
     selected_groups = _selected_group_union(releases, selected)
+    blocked = set(blocked_release_ids or set())
+    active = [r for r in releases if r.rid not in blocked]
+    cd_anchor_ids: Set[int] = set()
+    for family in _album_clusters([
+        r for r in active if r.release_type == "album" and not r.excluded_only
+    ]):
+        allowed = _album_requirement_provider_ids(family, active)
+        if allowed and all(source_rank(next(r for r in active if r.rid == rid)) >= 2 for rid in allowed):
+            cd_anchor_ids.update(allowed)
 
     existing_groups: Set[int] = set()
     for r in releases:
@@ -8143,15 +8152,17 @@ def build_release_decisions(
         if rel.rid in selected:
             if rel.root_kind == "existing":
                 action = "KEEP"
-                if essential_tracks:
+                if rel.rid in cd_anchor_ids:
+                    reason = (
+                        "Keep: CD-priority album anchor."
+                        + (f" {len(essential_tracks)} recording(s) also depend on this release."
+                           if essential_tracks else
+                           " Distinct bonus/featured recordings remain separately protected.")
+                    )
+                elif essential_tracks:
                     reason = f"Keep: {len(essential_tracks)} recording(s) are not covered by any other retained release."
                 elif rel.release_type == "album":
-                    reason = (
-                        "Keep: CD-priority album anchor; preserves the full album while "
-                        "other releases cover any additional wanted recordings."
-                        if source_rank(rel) >= 2
-                        else "Keep: required album representation in the minimum-track solution."
-                    )
+                    reason = "Keep: required album representation in the minimum-track solution."
                 else:
                     reason = "Keep: selected by the automatic minimum-track coverage solution."
             else:
@@ -8230,6 +8241,8 @@ def build_release_decisions(
         factors: List[str] = []
 
         if rel.rid in selected:
+            if rel.rid in cd_anchor_ids:
+                factors.append("CD-priority full-album anchor: preferred over smaller WEB editions; unique bonus/featured recordings still require verified providers.")
             if essential_tracks:
                 factors.append(f"{len(essential_tracks)} eligible recording(s) depend on this release in the retained set.")
             elif rel.release_type == "album":
@@ -16721,10 +16734,18 @@ def _ui_contract_self_test() -> None:
             for i, gid in enumerate(gids, 1)
         ]
         if extra_guest:
-            items.append(Track(
-                rid, Path(f"{rid}-Caméléon-feat-Quincy.flac"), len(items)+1,
-                title="Caméléon", artist="GIMS;Quincy", duration=207.04,
-                group_id=620500,
+            items.extend((
+                Track(
+                    rid, Path(f"{rid}-Caméléon-feat-Quincy.flac"), len(items)+1,
+                    title="Caméléon", artist="GIMS;Quincy", duration=207.04,
+                    group_id=620500,
+                ),
+                Track(
+                    rid, Path(f"{rid}-La-nuit-edit.flac"), len(items)+2,
+                    title="La nuit c'est fait pour dormir",
+                    artist="GIMS;Orelsan;H Magnum", duration=251.44,
+                    group_id=620501,
+                ),
             ))
         return Release(
             rid, "existing" if medium == "CD" else "recycle",
@@ -16760,11 +16781,27 @@ def _ui_contract_self_test() -> None:
                   group_id=620500)
         ],
     )
-    gims_with_single = optimize_collection(gims_pool + [featured_single], {})
-    if gims_with_single != {gims_cd.rid, featured_single.rid}:
+    gims_with_one_single = optimize_collection(gims_pool + [featured_single], {})
+    if gims_with_one_single != {gims_cd.rid, gims_bonus.rid}:
         raise RuntimeError(
-            "Independent featured Single should replace redundant bonus album, "
-            f"not the CD: {sorted(gims_with_single)}"
+            "A single external guest copy cannot erase the album-only La nuit version."
+        )
+    night_single = Release(
+        6205, "recycle", Path("La nuit - Single"),
+        "La nuit c'est fait pour dormir", release_type="single",
+        source_medium="WEB", tracks=[
+            Track(6205, Path("La nuit edit single.flac"), 1,
+                  title="La nuit c'est fait pour dormir",
+                  artist="GIMS;Orelsan;H Magnum", group_id=620501)
+        ],
+    )
+    gims_with_both_singles = optimize_collection(
+        gims_pool + [featured_single, night_single], {}
+    )
+    if gims_with_both_singles != {gims_cd.rid, featured_single.rid, night_single.rid}:
+        raise RuntimeError(
+            "All exclusive recordings sourced separately should leave CD as "
+            f"only family album: {sorted(gims_with_both_singles)}"
         )
 
     blocked_reminder = optimize_collection(
