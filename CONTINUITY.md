@@ -1,8 +1,17 @@
 # Music Collection Cleaner - Continuity Handoff
 
 Last updated: 2026-10-14
-Status: **v0.5.20 - Under construction ⚠️** (not Windows-verified)
-Canonical file: `Music Collection Cleaner v0.05.20.pyw` on `karpuzikov/MCC/main`. Earlier v0.5.19 and user-tested v0.5.18 retained.
+Status: **v0.5.21 - Under construction ⚠️** (not Windows-verified)
+Canonical file: `Music Collection Cleaner v0.05.21.pyw` on `karpuzikov/MCC/main`. Earlier v0.5.19 and user-tested v0.5.18 retained.
+
+## Latest checkpoint - 2026-10-14, v0.5.21 compilation/EP false-negative and false-positive
+
+- User supplied `Music Collection Cleaner Comparison 2026-10-14-05-36-10.jsonl` (actual MCC v0.5.20 Datsik analysis). This log is the source of the regression cases and proves **release 43** `2015-05-18 - Disciple 02_ The Second Coming [3614592021540]` was falsely classified `album` and selected, with 22 physical tracks (8 excluded as remixes, 14 eligible) by many independent acts; 19 unique artist signature members, top performer Barely Alive on 8/22. **Release 31** `2009-01-14 - Texx Mars EP [190374272483]` was falsely classified `compilation` and omitted; release 3 alternate `2009-11-10 - Texx Mars - EP [SMOG 005]` correctly `ep`. Both Texx recordings include Datsik in the artist credit.
+- Root cause: `infer_release_type` trusted first-track tags and compilation flags before an explicitly titled EP, ignored the rest of a release's performer distribution, and fell back to `album` on 22-track VA compilations without keyword metadata. Excluding remixes first could also hide the various-artist evidence if the test were performed too late.
+- New single-file source `Music Collection Cleaner v0.05.21.pyw` (semantic `APP_VERSION=0.5.21`): `_has_various_primary_performers(track_artists)` recognizes a multi-act compilation only when at least eight tracks, >=80% known track artist signatures, six separate credited artist keys and six distinct track-credit combinations, and no artist on >50% of the known tracks. `infer_release_type` accepts an optional full physical track-artist sequence, detects proven diverse compilations before album tags, preserves title-based compilations/Trilogy/Highlights, and gives explicit EP a priority over contradictory general compilation flags lacking diverse-artist evidence. Both `finalize_release_metadata` and `refresh_heuristic_release_types` pass the **complete** track artist list, not the checkbox-filtered list.
+- Existing compilation optimizer rules unchanged: compilations do NOT satisfy mandatory regular album representation and remain last-resort providers of otherwise unavailable wanted audio. Thus classification as Compilation may STILL result in selection if needed to preserve otherwise unique wanted groups. Do not promise automatic deletion of all compilations.
+- Added source-embedded `--ui-self-test` fixture with the full 22 Datsik-log performers, two Texx tracks and conflicting tags, Datsik album collaboration negative test, explicit compilation tag/no EP positive, 8 independent artist sampler positive. Actual source file was created and read back from GitHub, and independent isolated Python validation on uploaded JSONL checked 43=true, 31=false, 3=false, Datsik original albums 14 and 19=false. **Complete program Python compilation and --ui-self-test/--self-test NOT RUN**; Windows WebView2 visual scan, classification, user interaction, export integrity, Copy/Move/Undo NOT RUN.
+- Next action: run `python "Music Collection Cleaner v0.05.21.pyw" --ui-self-test` and `python "Music Collection Cleaner v0.05.21.pyw" --self-test`; launch v0.5.21 on Windows with Datsik OLD/NEW folders and check Disciple 02 as Compilation and Texx Mars as EP. Inspect **reasons for retention** rather than presuming all compilation selections are bugs; leave source files unchanged. Do not mark stable without testing. No GitHub Actions edits.
 
 ## 2026-10-14 - GitHub-wide lexicographic version filename policy
 
