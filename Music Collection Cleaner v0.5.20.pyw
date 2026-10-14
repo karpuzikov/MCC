@@ -2249,7 +2249,7 @@ def _normalize_pattern_categories(raw: object) -> Dict[str, Dict[str, str]]:
     cleaned: Dict[str, Dict[str, str]] = {}
     if isinstance(raw, dict):
         source = [
-            {"key": key, **value}
+            {**value, "key": key}
             for key, value in raw.items()
             if isinstance(key, str) and isinstance(value, dict)
         ]
