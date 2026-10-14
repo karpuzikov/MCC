@@ -5,6 +5,12 @@ Last updated: 2026-10-05
 This file is the project-specific rulebook for the Discography Builder and Duplicate / Edition Analyzer.
 The account-wide `SOFTWARE_RULES.md` baseline always applies. This file may add stricter project-specific requirements but must never weaken or override a newer global rule or a newer explicit user instruction. When project rules conflict with the global baseline, the stricter/newer requirement wins.
 
+## MCC 2026-10-14 - never conflate physical presence with eligible recording coverage
+
+- The Release Map may call an included audio group **essential/only eligible copy in the retained plan** if all other selected releases' copies are excluded, but MUST NOT call the song physically unique if the same song title appears elsewhere. Example: `2018-03-23 - Ceinture noire (Décennie) [EU - 19439710432 - 2019]` and `2018-03-23 - Ceinture noire [3616401604548]` both physically include `La même`; the latter's file was excluded before fingerprinting.
+- For informative physical references, use **exact normalized title + performer signature + near-identical duration** to note another selected edition's excluded track, explicitly qualified as excluded/unverified. This is a display-only association. No matching fingerprints, merging acoustic groups, relaxing differences, or declaring identical audio from metadata; no changing selected releases, original files, Copy/Move/Undo or release-level obligations.
+- The user-facing labels `Unique to this retained release` / `N unique` / `Adds unique recordings` are misleading if their technical test is only final-plan eligible coverage. Say `Only eligible copy`, `N essential`, `Adds needed recordings`, respectively. Preserve keyboard and pointer behavior and no extra UI controls. Test both positive excluded-edition metadata evidence and negative dissimilar-artist/duration cases.
+
 ## MCC 2026-10-14 - single-click unusual-pattern classification UI
 
 - User explicitly rejected the nested four-item dropdown, redundant Keep all / Skip all controls, and separate Save choices & Continue. The review displays **exactly four inline per-pattern actions: Remix, Live, Keep, Skip**. Classify with one mouse click or keyboard activation per unresolved pattern; Remix/Live appear first. The final choice must automatically submit the full validated set and resume analysis, without an extra save/confirm control.
