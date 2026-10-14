@@ -8478,7 +8478,7 @@ def _manual_skip_rule_matches_track(rule: Dict[str, object], track: Track) -> bo
     same recording if a fingerprint vector happens to be identical.
     """
     key = _track_instance_key(track)
-    if key and key in rule.get("instance_keys", []):
+    if key and key in (rule.get("instance_keys") or []):
         return True
     fingerprint_evidence = rule.get("fingerprint_evidence", [])
     if not track.fingerprint or not isinstance(fingerprint_evidence, list):
@@ -8487,8 +8487,15 @@ def _manual_skip_rule_matches_track(rule: Dict[str, object], track: Track) -> bo
     for item in fingerprint_evidence:
         if not isinstance(item, dict) or item.get("sha256") != digest:
             continue
-        saved_duration = float(item.get("duration_seconds", 0.0) or 0.0)
-        if not _duration_version_conflict(saved_duration, track.duration):
+        try:
+            saved_duration = float(item.get("duration_seconds", 0.0) or 0.0)
+        except (ValueError, TypeError, OverflowError):
+            continue
+        if (
+            math.isfinite(saved_duration) and saved_duration > 0
+            and math.isfinite(track.duration) and track.duration > 0
+            and not _duration_version_conflict(saved_duration, track.duration)
+        ):
             return True
     return False
 
@@ -8535,15 +8542,24 @@ def apply_persistent_track_skips(tracks: List[Track]) -> int:
         if not rule_id:
             continue
         direct: Set[int] = set()
-        for key in rule.get("instance_keys", []):
+        for key in (rule.get("instance_keys") or []):
             direct.update(instance_index.get(str(key), []))
-        for evidence in rule.get("fingerprint_evidence", []):
+        for evidence in (rule.get("fingerprint_evidence") or []):
             if not isinstance(evidence, dict):
                 continue
             raw_hash = str(evidence.get("sha256", ""))
-            saved_duration = float(evidence.get("duration_seconds", 0) or 0)
+            try:
+                saved_duration = float(evidence.get("duration_seconds", 0) or 0)
+            except (ValueError, TypeError, OverflowError):
+                continue
+            if not math.isfinite(saved_duration) or saved_duration <= 0:
+                continue
             for i in fingerprint_index.get(raw_hash, []):
-                if not _duration_version_conflict(saved_duration, tracks[i].duration):
+                current = tracks[i].duration
+                if (
+                    math.isfinite(current) and current > 0
+                    and not _duration_version_conflict(saved_duration, current)
+                ):
                     direct.add(i)
         matched: Set[int] = set()
         for i in direct:
@@ -8626,7 +8642,7 @@ def remove_persistent_track_skip(rule_id: str, tracks: List[Track]) -> None:
         if track.group_id >= 0 and track.group_id in group_ids
     ]
     for rule in _load_manual_track_skip_rules():
-        if any(key in peer_keys for key in rule.get("instance_keys", [])):
+        if any(key in peer_keys for key in (rule.get("instance_keys") or [])):
             ids_to_remove.add(str(rule.get("id", "")))
         elif any(
             _manual_skip_rule_matches_track(rule, track) for track in group_peers
