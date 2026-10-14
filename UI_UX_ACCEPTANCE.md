@@ -1,3 +1,11 @@
+## MCC v0.5.22 - release classification evidence (2026-10-14)
+
+- No GUI controls, icons, layout, interaction routes or persistent settings were changed. Existing Release Map classification labels and optimizer explanations now have richer JSONL diagnostic evidence only.
+- **Log audit PASS (independent Python):** 947-record v0.5.20 Datsik JSONL, Disciple 02 release 43 = false Album / selected; 22 tracks with 8 excluded remix rows and 14 eligible, zero confirmed cross-release audio MATCH edges for those 14; Texx Mars release 31 = false Compilation / not selected, alternate release 3 = EP / selected. Datsik artist albums remain independent negative controls.
+- **Source readback/static PASS:** `APP_VERSION=0.5.22`; raw `release_classification_tags` per track; `release_type_source` per optimizer release; outdated destructive compilation self-test expectation removed. Retains v0.5.21 full-tracklist inference and nondestructive optimizer semantics.
+- **NOT RUN:** full Python compilation, embedded `--ui-self-test`, standalone packaged EXE `--self-test`, Windows WebView2 startup/screenshots/hover/keyboard/resizing, actual Datsik rerun, original tags examination, Copy/Move/Undo end-to-end, cross-volume Move recovery.
+- **Acceptance:** verify Disciple displays Compilation and is retained **only if wanted unique audio still needs it**; both Texx releases display EP. Read comparison JSONL's newly exposed raw fields to identify contradictory metadata track by track. Test with disposable library/output paths. Status remains `0.5.22 - Under construction ⚠️`.
+
 ## MCC v0.5.21 - release-type evidence in existing Release Map (2026-10-14)
 
 - No new controls. Existing Albums / EPs / Singles / Compilations category labels and release details must reflect **Disciple 02 = Compilation**, **Texx Mars = EP** following reanalysis; do not change keyboard, pointer, scroll, focus and highlight rules.
