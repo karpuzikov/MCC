@@ -1,8 +1,19 @@
 # Music Collection Cleaner - Continuity Handoff
 
-Last updated: 2026-10-14
-Status: **v0.5.30 - Under construction ⚠️** (not Windows-verified)
-Canonical file: `Music Collection Cleaner v0.05.30.pyw` on `karpuzikov/MCC/main`. Earlier v0.5.29, v0.5.28, v0.5.27, v0.5.26, v0.5.19 and user-tested v0.5.18 retained.
+Last updated: 2026-10-15
+Status: **v0.5.31 - Under construction ⚠️** (not Windows-verified)
+Canonical file: `Music Collection Cleaner v0.05.31.pyw` on `karpuzikov/MCC/main`. Earlier v0.5.30, v0.5.29, v0.5.28, v0.5.27, v0.5.26, v0.5.19 and user-tested v0.5.18 retained.
+
+## Latest checkpoint - 2026-10-15, MCC v0.5.31 candidate router acceleration
+
+- User: "Finding audio candidates is still bottlenecking". 28 workers affect probing/fingerprints and later comparison, not serial candidate discovery. Latest GitHub application is Music Collection Cleaner v0.05.31.pyw, version 0.5.31 - Under construction ⚠️; v0.5.30 CD-first and guest safety preserved.
+- Real prior GIMS comparison file Music Collection Cleaner Comparison 2026-10-14-23-52-46.jsonl: 1,604 tracks, 1,594 with fingerprints, 846,840 duration-neighbor pairs, 801,294 token-rejected, 48,066 candidate pairs plus 256 shadow pairs; 48,322 work pairs and 29,757 detailed comparison rows.
+- Performance code fixes: _candidate_semantic_profiles computes immutable recording-root and hard-semantic version data once for each fingerprinted track; _candidate_semantic_conflict yields the same decisions as _semantic_version_conflict without rerunning regex for every pair. Duration-neighbor fast-reject below the mathematically minimum possible shared-token route; same-title, same-album-slot, exact-fingerprint, rare-far and deterministic shadow routes remain. Store metric dictionaries only for routed/safety pairs (not ~800k rejected), and remove redundant ~846k considered_pairs tuple set because far-rare route already applies the exact same <=45s duration veto.
+- Run and summary JSONL fields candidate_routing_seconds and candidate_diagnostic_pairs_cached enable actual speed measurement. Funnel also logs cached semantic profile count, fast-rejected token pairs, and rejected diagnostics not cached. No worker selector change, threshold reduction, audio/file ops change, or GUI replacement.
+- Validation performed: reviewed real GIMS JSONL; no originally token-routed comparison row violated 12-token necessary threshold. Isolated synthetic 846,840-pair metadata regex vs cached comparison showed 23.5x improvement in that microbenchmark alone, NOT validated complete-stage runtime. GitHub source and readback reviewed; client Release Map JS parsed; embedded _candidate_router_regression_self_test authored and hooked, but NOT executed.
+- BLOCKERS: Python syntax compile and --ui-self-test on actual full file, Windows WebView2/GUI inspection, fresh comparison of same GIMS inputs and candidate route/group parity vs baseline, candidate_routing_seconds/speed, and Copy/Move/Undo disposable fixtures. Do not call stable until passing. If still slow, profile token-set intersections and weighted scoring before considering Windows multiprocessing; do not promise speedup without measured full scan.
+- Existing independent P0 Explicit>Clean classification audit remains pending; current 0/1/2 advisory mapping must remain as user directed.
+- NEXT: Windows run py -m py_compile "Music Collection Cleaner v0.05.31.pyw" and py "Music Collection Cleaner v0.05.31.pyw" --ui-self-test; then full real GIMS scan with logs and compare same baseline candidate counts, source selection, elapsed time, GUI and file safety.
 
 ## Latest checkpoint - 2026-10-15, MCC v0.5.30 CD-first update
 
@@ -34,7 +45,7 @@ Canonical file: `Music Collection Cleaner v0.05.30.pyw` on `karpuzikov/MCC/main`
 - **User-provided actual v0.5.27 log `Music Collection Cleaner Comparison 2026-10-14-22-39-22(1).jsonl` (40 MiB):** 1604 tracks; 96 pre-excluded, including 86 `Explicit>Clean`. `La même`: 19 copies, 1 explicit, 17 clean, 1 unknown; all 17 clean excluded. `Caméléon`: 21 copies; 5 explicit, 15 clean, 1 unknown; 13 excluded as Explicit>Clean. `Corazón`: 20 copies; 3 explicit, 17 clean; 13 excluded. `Christophe`: 15 copies; 3 explicit, 11 clean, 1 unknown; 11 excluded. `Miami Vice`: 18 copies; 1 explicit, 16 clean, 1 unknown; 16 excluded. This is metadata-only classification; raw advisory fields weren't logged in v0.5.27 so their exact source remains unknown. Investigate after fresh v0.5.29 scan. The pre-fingerprint `Explicit>Clean` P0 issue remains unresolved.
 - **Next actions:** actually run `python "Music Collection Cleaner v0.05.29.pyw" --ui-self-test` and `py_compile` on Windows; verify actual layout opening/closing several releases at multiple window sizes and keyboard/mouse use; rescan actual GIMS files, review `explicit_advisory_tags` and exclusion reasons, confirm no wrong exclusions; test Copy/Move/Undo, maintain Under construction ⚠️. Also retain user-deferred single-threaded candidate routing optimization backlog below.
 
-## Next-update backlog - 2026-10-14: "Finding audio candidates" performance bottleneck
+## Historical backlog - 2026-10-14: "Finding audio candidates" performance bottleneck (initial optimization in v0.5.31; Windows verification pending)
 
 - **User deferred this separate optimization.** Preserve this as the next dedicated performance-update task after correctness/UI v0.5.29, rather than mixing an unbenchmarked router rewrite into an unrelated hotfix. v0.5.29 stays Under construction ⚠️ until tested.
 - **Reported observation:** with **28 Audio I/O workers** selected, "Finding audio candidates..." runs slowly while Windows Task Manager shows approximately **2% SSD** and **11% CPU** use. These utilization figures are user-reported, not independently profiled.
