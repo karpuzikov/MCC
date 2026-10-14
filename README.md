@@ -6,11 +6,11 @@ Music Collection Cleaner compares existing music releases with new ones, finds t
 
 ## Download and run
 
-**[Music Collection Cleaner v0.5.20.pyw](Music%20Collection%20Cleaner%20v0.5.20.pyw)** - latest single-file Windows Python application. **Under construction ⚠️** until actual Windows WebView2 testing. Earlier v0.5.18 and v0.5.19 remain available unchanged.
+**[Music Collection Cleaner v0.05.20.pyw](Music%20Collection%20Cleaner%20v0.05.20.pyw)** - latest single-file Windows Python application. **Under construction ⚠️** until actual Windows WebView2 testing. Earlier v0.5.18 and v0.5.19 remain available unchanged.
 
-Open with Python 3 on Windows 11 (or run from a console with `python "Music Collection Cleaner v0.5.20.pyw"`). The application checks or installs supported dependencies. The GUI uses Microsoft Edge WebView2 through pywebview; it is not a terminal-based replacement.
+Open with Python 3 on Windows 11 (or run from a console with `python "Music Collection Cleaner v0.05.20.pyw"`). The application checks or installs supported dependencies. The GUI uses Microsoft Edge WebView2 through pywebview; it is not a terminal-based replacement.
 
-Source-level regression checks: `python "Music Collection Cleaner v0.5.20.pyw" --ui-self-test`.
+Source-level regression checks: `python "Music Collection Cleaner v0.05.20.pyw" --ui-self-test`.
 
 ## What it does
 
