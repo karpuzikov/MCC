@@ -2439,11 +2439,14 @@ def configure_exclusions(
     rules = list(personal_keep_rules or [])
     categories = _normalize_pattern_categories(pattern_categories)
     contextual_remix_ids = _contextual_remix_track_ids(releases)
+    user_named_remix_ids: Set[int] = set()
 
     # Pass 1: classify every track before deciding the featured-remix exception.
     for track in tracks:
         classification_text = f"{track.display_title} {strip_track_number(track.path.stem)}"
         user_kinds = _classified_track_pattern_kinds(track, categories)
+        if "remix" in user_kinds:
+            user_named_remix_ids.add(id(track))
         track.is_remix = bool(
             is_remix_text(classification_text)
             or id(track) in contextual_remix_ids
@@ -2480,6 +2483,7 @@ def configure_exclusions(
         # when an ordinary counterpart proves the collaborator is actually new.
         named_remixer = track.is_remix and (
             id(track) in contextual_remix_ids
+            or id(track) in user_named_remix_ids
             or any(
                 _remix_credit_key_from_explicit_descriptor(part)
                 for text in (track.display_title, strip_track_number(track.path.stem))
@@ -14713,7 +14717,71 @@ def _reanalysis_regression_self_test() -> None:
         globals()["_logs_dir"] = previous_logs_dir
 
 
+
+def _remembered_pattern_categories_regression_self_test() -> None:
+    """Persistent category is recognized, reversible, and respects inclusion toggles."""
+    from tempfile import TemporaryDirectory
+    global _state_dir
+    old_state_dir = _state_dir
+    try:
+        with TemporaryDirectory(prefix="mcc-pattern-category-") as root:
+            _state_dir = lambda: Path(root) / "state"
+            remix_track = Track(
+                990020, Path("01 Wow (JRMX Club).flac"), 1,
+                title="Wow (JRMX Club)", artist="INNA;JRMX",
+            )
+            live_track = Track(
+                990021, Path("01 Wow (Unusual Club Edit).flac"), 2,
+                title="Wow (Unusual Club Edit)", artist="INNA",
+            )
+            remix_key = canonical_track_pattern("JRMX Club")
+            live_key = canonical_track_pattern("Unusual Club Edit")
+            if remix_key not in track_pattern_keys(remix_track):
+                raise RuntimeError("JRMX Club cannot be classified from the reviewed track.")
+            # Live fixture is deliberately formed from a track pattern in the
+            # parser's unresolved descriptor family.
+            if live_key not in track_pattern_keys(live_track):
+                live_track.title = "Wow (Unusual Club Mix)"
+                live_track.path = Path("01 Wow (Unusual Club Mix).flac")
+                live_key = canonical_track_pattern("Unusual Club Mix")
+            if live_key not in track_pattern_keys(live_track):
+                raise RuntimeError("Test fixture missing unusual pattern.")
+            review_rows = [{"key": remix_key, "label": "JRMX Club"},
+                           {"key": live_key, "label": "Unusual Club Mix"}]
+            categories = {
+                remix_key: {"kind": "remix", "label": "JRMX Club"},
+                live_key: {"kind": "live", "label": "Unusual Club Mix"},
+            }
+            _save_pattern_categories(categories)
+            reloaded = _load_pattern_categories()
+            if reloaded != categories or _unresolved_track_patterns(review_rows, [], reloaded):
+                raise RuntimeError("Persistent categorization did not bypass future review.")
+            release = Release(990022, "recycle", Path("Classified"), "Wow",
+                              tracks=[remix_track, live_track])
+            configure_exclusions([release], True, True, [], reloaded)
+            if (not remix_track.is_remix or not remix_track.exclude_from_coverage
+                or remix_track.remix_feature_exception or not live_track.is_live
+                or not live_track.exclude_from_coverage):
+                raise RuntimeError("Save Remixes/Live OFF ignored saved pattern categories.")
+            if (_unique_recording_root_family(remix_track) != "remix"
+                or _unique_recording_root_family(live_track) != "live"):
+                raise RuntimeError("Saved category lost semantic recording-root protection.")
+            configure_exclusions([release], False, False, [], reloaded)
+            if remix_track.exclude_from_coverage or live_track.exclude_from_coverage:
+                raise RuntimeError("Save Remixes/Live ON failed to include classified tracks.")
+            _save_pattern_categories({})
+            if (len(_unresolved_track_patterns(review_rows, [], _load_pattern_categories()))
+                != len(review_rows)):
+                raise RuntimeError("Forgetting a saved category did not restore review.")
+            # Wrong/unknown category data may never be silently applied.
+            if _normalize_pattern_categories({"bad": {"kind": "arbitrary"}}):
+                raise RuntimeError("Unsupported pattern category accepted.")
+    finally:
+        _state_dir = old_state_dir
+
+
 def _ui_contract_self_test() -> None:
+    _remembered_pattern_categories_regression_self_test()
     _reanalysis_regression_self_test()
     _coherent_duration_regression_self_test()
     _replaceable_version_coverage_regression_self_test()
@@ -14740,6 +14808,18 @@ def _ui_contract_self_test() -> None:
     )
     if _probe_names != ("getState", "browseFolder") or _probe_window.exposed != ["getState", "browseFolder"]:
         raise RuntimeError("Explicit WebView2 bridge exposure self-test failed.")
+
+    main_map_html = _webview_main_html()
+    if (
+        'value="remix">Remix (remember)' not in main_map_html
+        or 'value="live">Live (remember)' not in main_map_html
+        or 'value="skip">Skip this run' not in main_map_html
+        or 'value="keep">Keep (Personal Picks)' not in main_map_html
+        or 'localCategories' not in main_map_html
+        or 'renderCategoryRows()' not in main_map_html
+        or 'rules:localPicks,categories:localCategories' not in main_map_html
+    ):
+        raise RuntimeError("Persistent Remix/Live pattern-review UI controls missing.")
 
     if WEBVIEW_PRIVATE_MODE is not True:
         raise RuntimeError(
