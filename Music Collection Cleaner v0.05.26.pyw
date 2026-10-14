@@ -8167,7 +8167,7 @@ def build_release_decisions(
 
         if rel.rid in selected:
             if essential_tracks:
-                factors.append(f"{len(essential_tracks)} recording(s) are unique to this retained release within the final set.")
+                factors.append(f"{len(essential_tracks)} eligible recording(s) depend on this release in the retained set.")
             elif rel.release_type == "album":
                 factors.append(
                     f"Album representation requires a most-complete edition; this edition carries "
@@ -10980,7 +10980,7 @@ function changeReason(n,kind) {
   const pairs=replacementMap();
   if(kind==="added"){
     const unique=uniqueAddedTitles(n);
-    if(unique.length)return "Adds unique recording"+(unique.length===1?"":"s")+": "+unique.slice(0,3).join("; ")+(unique.length>3?"; +"+(unique.length-3)+" more":"");
+    if(unique.length)return "Adds needed recording"+(unique.length===1?"":"s")+": "+unique.slice(0,3).join("; ")+(unique.length>3?"; +"+(unique.length-3)+" more":"");
     return String(n.reason||"New addition from the NEW / update folder.");
   }
   if(kind==="upgraded"||kind==="replaced"){
@@ -11304,9 +11304,9 @@ function trackStatus(t,n) {
     return (t.coveredByAlternateVersion?"Covered by alternate version: ":"Sourced from: ")+t.replacementSource+(more?" (+"+more+" other retained cop"+(more===1?"y":"ies")+")":"");
   }
   if(t.orphaned) return "Only eligible source - removal would lose it";
-  if(t.isGem) return "Gem - no duplicates or other versions";
   if(t.unique && t.excludedCounterparts && t.excludedCounterparts.length)
     return "Only eligible copy; also listed on excluded edition: "+t.excludedCounterparts.slice(0,2).join("; ");
+  if(t.isGem) return "Gem - no duplicates or other versions";
   if(t.unique) return "Only eligible copy in retained releases";
   if(t.coveredBy && t.coveredBy.length) return (t.coveredByAlternateVersion?"Replaceable version on: ":"Also on: ")+t.coveredBy.slice(0,2).join("; ");
   if(t.excluded) return "Skipped by active options";
@@ -11440,7 +11440,7 @@ function openDetails(n) {
   sourceSummary+='</div>';
   inner.innerHTML='<div id="detailsHead"><button id="closeDetailsBtn" title="Close details" aria-label="Close details">×</button><div id="releaseName">'+esc(n.name)+'</div>'
     +'<div id="releaseMeta">'+esc(releaseMeta)
-    +' | '+n.uniqueCount+' unique | '+n.includedTracks+' included</div>'
+    +' | '+n.uniqueCount+' essential | '+n.includedTracks+' included</div>'
     +sourceSummary+ignoreNotice+((n.auditIssues||[]).length
       ? '<div class="auditNotice">⚠️ Audio integrity / release completeness:\n'+esc(n.auditIssues.join("\n"))+'</div>'
       : '')+'<div id="releaseActions">'+ignoreRelease+albumGroupActions+'</div><div id="pathRow">'
