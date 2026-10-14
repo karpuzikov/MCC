@@ -1,16 +1,16 @@
 # Music Collection Cleaner (MCC)
 
-**Version: 0.5.22 - Under construction ⚠️**
+**Version: 0.5.23 - Under construction ⚠️**
 
 Music Collection Cleaner compares existing music releases with new ones, finds the best combination of editions, and helps preserve every wanted unique recording while removing unnecessary redundancy.
 
 ## Download and run
 
-**[Music Collection Cleaner v0.05.22.pyw](Music%20Collection%20Cleaner%20v0.05.22.pyw)** - latest single-file Windows Python application. **Under construction ⚠️** until actual Windows WebView2 testing. Earlier source versions remain available.
+**[Music Collection Cleaner v0.05.23.pyw](Music%20Collection%20Cleaner%20v0.05.23.pyw)** - latest single-file Windows Python application. **Under construction ⚠️** until actual Windows WebView2 testing. Earlier source versions remain available.
 
-Open with Python 3 on Windows 11 (or run from a console with `python "Music Collection Cleaner v0.05.22.pyw"`). The application checks or installs supported dependencies. The GUI uses Microsoft Edge WebView2 through pywebview; it is not a terminal-based replacement.
+Open with Python 3 on Windows 11 (or run from a console with `python "Music Collection Cleaner v0.05.23.pyw"`). The application checks or installs supported dependencies. The GUI uses Microsoft Edge WebView2 through pywebview; it is not a terminal-based replacement.
 
-Source-level regression checks: `python "Music Collection Cleaner v0.05.22.pyw" --ui-self-test`. `--self-test` additionally requires a packaged standalone EXE.
+Source-level regression checks: `python "Music Collection Cleaner v0.05.23.pyw" --ui-self-test`. `--self-test` additionally requires a packaged standalone EXE.
 
 ## What it does
 
@@ -24,6 +24,15 @@ Source-level regression checks: `python "Music Collection Cleaner v0.05.22.pyw" 
 - Explicitly **Copy OLD + NEW** or **Move OLD + NEW** retained releases into the selected destination; Undo for supported completed moves.
 - Log comparisons, validate incomplete/corrupt inputs, choose I/O worker counts with drive awareness, and manage spawned subprocesses.
 
+
+## v0.5.23 - one-click unusual-pattern classification (Under construction ⚠️)
+
+- Replaced the user-rejected 4-item dropdown and duplicate bottom **Keep all / Skip all / Save choices & Continue** buttons with **four inline buttons per detected pattern: Remix, Live, Keep, Skip**. The primary requested categories Remix/Live are first. Each classification requires **one click, not a dropdown plus Save**. A detected pattern already collects related track variants, so this review is per *pattern*, not per individual song.
+- Remix/Live are remembered in the existing isolated persisted category file and respect Save Remixes / Save Live. Keep remains a persistent Personal Pick. Skip excludes the pattern only for the current scan. The existing backend validates all choices and saves them before resuming, without changing acoustic identity, selection logic, source files or Copy/Move/Undo.
+- All pattern rows are visible with short labels, descriptive tooltips, native keyboard-operable buttons, visible focus, `aria-pressed` feedback, wrap on narrow windows, and count feedback when more than one row is pending. One click per pattern; when the last is chosen, **automatically submit and continue**. Only **Cancel scan** remains in the footer. Escape now calls `cancelReview` for this modal instead of leaving the backend in review-pending state.
+- UI control contract: `patternChoice` four mutually exclusive per-pattern buttons (36px minimum height, selectable visual state; click, Enter, Space; no destructive file operations), `patternCancel` cancels pending scan without saving staged selections (click/keyboard/Escape); no other modal controls. The existing `Personal Picks` editor is retained for later changes and forgetting remembered Remix/Live.
+- **Validation:** GitHub published/read back v0.05.23 source; both extracted embedded JavaScript sections parse in V8; mocked 4-pattern button actions and automatic single-submit PASS, and source contract checks updated. **Python full compilation / `--ui-self-test`, actual Windows WebView2 UI/screenshots/keyboard interaction, settings round trip on Windows and Copy/Move/Undo NOT RUN.** Status remains `Under construction ⚠️`.
+- **Windows next action:** `python -m py_compile "Music Collection Cleaner v0.05.23.pyw"`, `python "Music Collection Cleaner v0.05.23.pyw" --ui-self-test`; run the original `Wow (JRMX Club)` scan, click **Remix** once and confirm analysis resumes without Save; repeat scan to verify no prompt; change to Live/Forget in Personal Picks and verify behavior. Capture screenshot and test multi-pattern and Escape cancellation.
 
 ## v0.5.22 - classification evidence and compilation test correction (Under construction ⚠️)
 
