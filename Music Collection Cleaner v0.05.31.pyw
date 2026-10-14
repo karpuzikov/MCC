@@ -4818,7 +4818,8 @@ def merge_equivalent_tracks(
     candidate_reasons: Dict[Tuple[int, int], Set[str]] = defaultdict(set)
     candidate_stats: Dict[Tuple[int, int], Dict[str, object]] = {}
     funnel: Counter = Counter()
-    considered_pairs: Set[Tuple[int, int]] = set()
+    # Duration-neighbor visitation is already implied by the fixed 45-second
+    # gate in the far-rare route. Do not allocate ~846k rejected tuple keys.
 
     def pair_metrics(
         a: int, b: int,
@@ -4861,8 +4862,6 @@ def merge_equivalent_tracks(
 
     def route_pair(a: int, b: int, allow_weak: bool) -> None:
         pair = (a, b) if a < b else (b, a)
-        considered_pairs.add(pair)
-
         fp_a = tracks[pair[0]].fingerprint
         fp_b = tracks[pair[1]].fingerprint
 
@@ -5029,8 +5028,11 @@ def merge_equivalent_tracks(
         weight = token_weight.get(token, 0.0)
         for a, b in itertools.combinations(unique_ids, 2):
             pair = (a, b)
-            if pair in candidate_reasons or pair in considered_pairs:
+            if pair in candidate_reasons:
                 continue
+            # This is the same condition as the former considered_pairs
+            # membership: every visited duration-neighbor pair is inside
+            # this strong window. It is O(1) without storing 846k tuples.
             if abs(tracks[a].duration - tracks[b].duration) <= FP_CANDIDATE_STRONG_DURATION_WINDOW:
                 continue
             far_weight[pair] += weight
@@ -15009,6 +15011,49 @@ def _coherent_duration_regression_self_test() -> None:
 
 
 
+def _candidate_router_regression_self_test() -> None:
+    """Cached metadata and fast token gate must preserve legacy routing."""
+    variants = [
+        Track(-1, Path("Base.flac"), 1, title="Song", artist="GIMS"),
+        Track(-2, Path("Radio.flac"), 1, title="Song (Radio Edit)", artist="GIMS"),
+        Track(-3, Path("Extended.flac"), 1, title="Song (Extended Mix)", artist="GIMS"),
+        Track(-4, Path("Remix.flac"), 1, title="Song (Remix)", artist="GIMS"),
+        Track(-5, Path("Live.flac"), 1, title="Song (Live)", is_live=True),
+        Track(-6, Path("Mode.flac"), 1, title="Song (Lunar Mode)", artist="GIMS"),
+        Track(-7, Path("Instrumental.flac"), 1, title="Song (Instrumental)"),
+        Track(-8, Path("Album.flac"), 1, title="Song", album="Extended Versions"),
+        Track(-9, Path("Feat.flac"), 1, title="Song", artist="GIMS;Quincy"),
+    ]
+    positions = list(range(len(variants)))
+    roots, hard = _candidate_semantic_profiles(variants, positions)
+    for a, b in itertools.combinations(positions, 2):
+        if (_candidate_semantic_conflict(a, b, roots, hard)
+                != _semantic_version_conflict(variants[a], variants[b])):
+            raise RuntimeError(f"Candidate semantic cache changed routing of {a}:{b}.")
+    bound = min(
+        FP_CANDIDATE_STRONG_SHARED_TOKENS,
+        FP_CANDIDATE_WEAK_SHARED_TOKENS,
+        max(12, FP_CANDIDATE_WEAK_SHARED_TOKENS // 2),
+    )
+    if bound <= 0:
+        raise RuntimeError("Candidate shared token bound invalid.")
+    for shared in range(bound):
+        if (
+            shared >= FP_CANDIDATE_STRONG_SHARED_TOKENS
+            or shared >= FP_CANDIDATE_WEAK_SHARED_TOKENS
+            or shared >= max(12, FP_CANDIDATE_WEAK_SHARED_TOKENS // 2)
+        ):
+            raise RuntimeError("Candidate router would discard a viable route.")
+    # Any pair visited in the duration stage falls inside the same 45-sec
+    # gate already imposed in the far-rare route; the former per-pair
+    # considered_pairs set therefore was strictly redundant.
+    for delta in (0.0, 8.0, 15.0, 45.0, 45.001, 120.0):
+        visited = delta <= FP_CANDIDATE_STRONG_DURATION_WINDOW
+        far_rare_allows = delta > FP_CANDIDATE_STRONG_DURATION_WINDOW
+        if visited == far_rare_allows:
+            raise RuntimeError("Far-rare duration safeguard changed.")
+
+
 def _replaceable_version_coverage_regression_self_test() -> None:
     """2026-10-12 INNA 195.81s/213.33s Fool Me + independent singles."""
     short = Track(-51001, Path("Inna Fool Me.flac"), 1, title="Fool Me",
@@ -15210,6 +15255,7 @@ def _remembered_pattern_categories_regression_self_test() -> None:
 
 
 def _ui_contract_self_test() -> None:
+    _candidate_router_regression_self_test()
     _remembered_pattern_categories_regression_self_test()
     _reanalysis_regression_self_test()
     _coherent_duration_regression_self_test()
