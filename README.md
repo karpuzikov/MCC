@@ -1,16 +1,16 @@
 # Music Collection Cleaner (MCC)
 
-**Version: 0.5.29 - Under construction ⚠️**
+**Version: 0.5.30 - Under construction ⚠️**
 
 Music Collection Cleaner compares existing music releases with new ones, finds the best combination of editions, and helps preserve every wanted unique recording while removing unnecessary redundancy.
 
 ## Download and run
 
-**[Music Collection Cleaner v0.05.29.pyw](Music%20Collection%20Cleaner%20v0.05.29.pyw)** - latest single-file Windows Python application. **Under construction ⚠️** until actual Windows WebView2 testing. Earlier source versions remain available.
+**[Music Collection Cleaner v0.05.30.pyw](Music%20Collection%20Cleaner%20v0.05.30.pyw)** - latest single-file Windows Python application. **Under construction ⚠️** until actual Windows WebView2 testing. Earlier source versions remain available.
 
-Open with Python 3 on Windows 11 (or run from a console with `python "Music Collection Cleaner v0.05.29.pyw"`). The application checks or installs supported dependencies. The GUI uses Microsoft Edge WebView2 through pywebview; it is not a terminal-based replacement.
+Open with Python 3 on Windows 11 (or run from a console with `python "Music Collection Cleaner v0.05.30.pyw"`). The application checks or installs supported dependencies. The GUI uses Microsoft Edge WebView2 through pywebview; it is not a terminal-based replacement.
 
-Source-level regression checks: `python "Music Collection Cleaner v0.05.29.pyw" --ui-self-test`. `--self-test` additionally requires a packaged standalone EXE.
+Source-level regression checks: `python "Music Collection Cleaner v0.05.30.pyw" --ui-self-test`. `--self-test` additionally requires a packaged standalone EXE.
 
 ## What it does
 
@@ -24,6 +24,15 @@ Source-level regression checks: `python "Music Collection Cleaner v0.05.29.pyw" 
 - Explicitly **Copy OLD + NEW** or **Move OLD + NEW** retained releases into the selected destination; Undo for supported completed moves.
 - Log comparisons, validate incomplete/corrupt inputs, choose I/O worker counts with drive awareness, and manage spawned subprocesses.
 
+
+## v0.5.30 - CD-first album anchor and featured-track preservation (Under construction ⚠️)
+
+- When an album family has a complete eligible CD (including a core CD whose missing bonus recordings are all independently available outside the family), the exact optimizer now requires a CD as the family's album representative **before** minimizing retained physical track count. WEB albums wholly acoustically covered by the CD no longer beat it solely because they have fewer files. All wanted acoustic groups and family representation remain mandatory.
+- If the CD and another album carry genuinely distinct recordings, the second complete release must remain unless every extra has a verified independent carrier elsewhere. **MCC does not automatically extract tracks, download audio, delete files or touch source folders.** A WEB Deluxe whose exclusive wanted bonus tracks have no independent sources still supersedes an incomplete CD.
+- Featured-artist additions in either TITLE or ARTIST are not interchangeable with the base track in the weak replaceable-Version acoustic coverage pathway. Real GIMS example: ordinary `Caméléon` (4:00) versus `Caméléon (feat. Quincy)` (3:27, sometimes feat only in ARTIST). They are separate wanted recordings.
+- CD-priority album selections now explain the CD anchor in Release Map details. Source and optimizer decisions preserve the v0.5.29 stable-overlay layout, v0.5.28 iTunes advisory mapping, E/C badges and per-track exclusion reasons.
+- **Validation:** GitHub source readback and focused code/logic inspection passed. Embedded self-tests now contain GIMS CD57/WEB55 + two independently wanted bonus recordings, both available/unavailable separately, Camo & Krooked incomplete CD, and featured credit in title/artist. A separate Python logic-only model of album-provider selection passed. Full Python compilation, embedded `--ui-self-test`, full Windows GIMS re-analysis and WebView2/Copy/Move/Undo integration **NOT RUN**. Keep construction status.
+- The previously deferred single-threaded "Finding audio candidates" performance issue remains open for a separately benchmarked optimizer update.
 
 ## v0.5.29 - stable Release Map layout (Under construction ⚠️)
 
@@ -51,7 +60,7 @@ Source-level regression checks: `python "Music Collection Cleaner v0.05.29.pyw" 
 - **Fix:** Build a display-only index of excluded physical tracks on retained releases. When an eligible selected track is essential to collection coverage, show **"Only eligible copy; also listed on excluded edition: [name]"** if another retained release contains an excluded metadata match (same normalized song title and normalized artist set, duration difference <= 1 second). Otherwise say **"Only eligible copy in retained releases"**, not a categorical physical uniqueness claim. The Release Map snapshot/UI state stores `excluded_counterparts` / `excludedCounterparts`. Disclose source edition name via the existing track status/tooltip, without new buttons, dialogs or clicks.
 - **Safety:** This index is explanatory only. Similar title, artists and duration **do not prove acoustic identity**. Never populate fingerprint groups or mark skipped audio as covered from metadata. Optimizer decisions, album constraints, Copy/Move/Undo, file contents and prior classifications unchanged. The exclusion's actual reason was not present in the older v0.5.24 log; v0.5.25+ logging adds it for subsequent scans.
 - **Tests:** Added embedded `--ui-self-test` synthetic paired-release fixture for the GIMS case: two selected albums, CD copy eligible, WEB copy excluded and un-fingerprinted, exact normalized performers. Tests ensure the map receives the excluded source and no acoustic match is invented. GitHub source published and read back, extracted status JS syntax and isolated status output **PASS**. Full Python compilation, embedded self-tests, actual Windows GUI/keyboard/screenshot, rescanning the real GIMS collection and filesystem Copy/Move/Undo **NOT RUN**. Keep construction status.
-- **Next:** On Windows run `python -m py_compile "Music Collection Cleaner v0.05.29.pyw"`, `python "Music Collection Cleaner v0.05.29.pyw" --ui-self-test`, then rescan the same GIMS releases with logging. Confirm CD `La même` explicitly points to the excluded WEB edition without declaring a proven fingerprint duplicate. Validate retained-set optimization and Copy/Move/Undo on disposable files.
+- **Next:** On Windows run `python -m py_compile "Music Collection Cleaner v0.05.30.pyw"`, `python "Music Collection Cleaner v0.05.30.pyw" --ui-self-test`, then rescan the same GIMS releases with logging. Confirm CD `La même` explicitly points to the excluded WEB edition without declaring a proven fingerprint duplicate. Validate retained-set optimization and Copy/Move/Undo on disposable files.
 
 ## v0.5.25 - full GIMS comparison log audit and one-track Remix correction (Under construction ⚠️)
 
