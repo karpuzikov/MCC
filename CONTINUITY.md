@@ -1,8 +1,18 @@
 # Music Collection Cleaner - Continuity Handoff
 
 Last updated: 2026-10-14
-Status: **v0.5.27 - Under construction ⚠️** (not Windows-verified)
-Canonical file: `Music Collection Cleaner v0.05.27.pyw` on `karpuzikov/MCC/main`. Earlier v0.5.26, v0.5.19 and user-tested v0.5.18 retained.
+Status: **v0.5.29 - Under construction ⚠️** (not Windows-verified)
+Canonical file: `Music Collection Cleaner v0.05.29.pyw` on `karpuzikov/MCC/main`. Earlier v0.5.28, v0.5.27, v0.5.26, v0.5.19 and user-tested v0.5.18 retained.
+
+## Latest checkpoint - 2026-10-14, v0.5.29: fixed Release Map details reflow
+
+- **User complaint:** First screenshot shows map in normal full width; after clicking a release its details sidebar shrinks the map and causes all columns to reflow. Clicking same release closes panel and map shifts again, losing scroll context.
+- **Root cause confirmed:** `#main` is a flex row: `#boardViewport` is flex:1, and `#details.open` expanded from `width:0` to `width:min(720px,52vw)`. This dropped board width across a `@container release-map-viewport (max-width:1750px)` breakpoint, changing multi-column grid to a single column.
+- **v0.5.29 source created and verified on GitHub:** `Music Collection Cleaner v0.05.29.pyw`. The drawer is absolute-positioned within `#main`, overlays instead of resizing map, uses left/right docking to reduce overlap with the selected release row and allows independent panel scrolling. Selected release remains highlighted, row re-click no longer dismisses panel; existing Close button or Escape dismiss. Reduced motion and narrower viewport media behavior included, with no new controls, no clicks added and no changes to audio/optimizer/file operations.
+- **Checks passed:** extracted full map JavaScript syntax; mock rectangle docking at 1920px for right and left release rows; GitHub source readback matched. **NOT RUN:** Windows WebView2 actual visual/accessibility/interaction resize and real-workflow tests; Python compile/self-tests and Copy/Move/Undo.
+- **V0.5.28 changes preserved:** iTunes advisory `0=Unknown`, `1=Explicit`, `2=Clean`; `EXPLICIT=0` not a Clean signal; E/C badges for classified tracks; per-track exclusion reason with `Explicit > Clean - excluded before audio comparison`, no vague "Skipped by active options" and no "Only eligible copy" status; raw `explicit_advisory_tags` added to JSONL for subsequent scans. Confirmed against synthetic JavaScript status smoke tests; Python self-tests not yet run.
+- **User-provided actual v0.5.27 log `Music Collection Cleaner Comparison 2026-10-14-22-39-22(1).jsonl` (40 MiB):** 1604 tracks; 96 pre-excluded, including 86 `Explicit>Clean`. `La même`: 19 copies, 1 explicit, 17 clean, 1 unknown; all 17 clean excluded. `Caméléon`: 21 copies; 5 explicit, 15 clean, 1 unknown; 13 excluded as Explicit>Clean. `Corazón`: 20 copies; 3 explicit, 17 clean; 13 excluded. `Christophe`: 15 copies; 3 explicit, 11 clean, 1 unknown; 11 excluded. `Miami Vice`: 18 copies; 1 explicit, 16 clean, 1 unknown; 16 excluded. This is metadata-only classification; raw advisory fields weren't logged in v0.5.27 so their exact source remains unknown. Investigate after fresh v0.5.29 scan. The pre-fingerprint `Explicit>Clean` P0 issue remains unresolved.
+- **Next actions:** actually run `python "Music Collection Cleaner v0.05.29.pyw" --ui-self-test` and `py_compile` on Windows; verify actual layout opening/closing several releases at multiple window sizes and keyboard/mouse use; rescan actual GIMS files, review `explicit_advisory_tags` and exclusion reasons, confirm no wrong exclusions; test Copy/Move/Undo, maintain Under construction ⚠️. Also retain user-deferred single-threaded candidate routing optimization backlog below.
 
 ## Next-update backlog - 2026-10-14: "Finding audio candidates" performance bottleneck
 
