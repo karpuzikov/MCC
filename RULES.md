@@ -5,6 +5,14 @@ Last updated: 2026-10-05
 This file is the project-specific rulebook for the Discography Builder and Duplicate / Edition Analyzer.
 The account-wide `SOFTWARE_RULES.md` baseline always applies. This file may add stricter project-specific requirements but must never weaken or override a newer global rule or a newer explicit user instruction. When project rules conflict with the global baseline, the stricter/newer requirement wins.
 
+## MCC 2026-10-15 - candidate router performance parity
+
+- Do not recompute expensive per-track acoustic version metadata on every one of hundreds of thousands of candidate pairs. Precompute immutable title/root/version evidence once, then use exactly equivalent cached semantic conflicts.
+- Candidate routing optimization must preserve the exact-fingerprint bypass, same-base-title and same-album-slot safety nets, far-duration rare-token recovery, deterministic shadow validation, duration-version veto and all acoustic confidence thresholds. Early negative token rejection is valid only when shared token count cannot satisfy ANY strong, weighted or weak route, and must never intercept the title/slot/exact recovery paths.
+- Do not store per-pair diagnostic dictionaries and visited tuple sets for rejected duration-neighbor candidates when their eligibility can be established without such allocations. The far-rare branch's strong duration-window veto already serves as the duration visitation exclusion.
+- Record actual candidate-routing wall time and candidate diagnostic cache size in JSONL. Real Windows scan plus exact baseline candidate/reason/group parity and file safety must be validated before a performance success or stable status is claimed. The 28-worker I/O selector does not imply multiprocessing of this Python router.
+- No change to audio content, existing source media, album optimization, CD priority or UI is authorized by this performance-only update.
+
 ## MCC 2026-10-14 - definitive advisory values and transparent status (v0.5.28)
 
 - **ITUNESADVISORY / RTNG / ADVISORY:** numerical `1 = Explicit`; `2 = Clean`; `0 = Unknown/no information`. Zero must not create an Explicit OR Clean classification. Missing/misleading flags must not manufacture a separate recording. `EXPLICIT=0` is a false Boolean flag, not proof of an intentionally edited Clean recording.
