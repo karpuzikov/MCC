@@ -5,6 +5,14 @@ Last updated: 2026-10-05
 This file is the project-specific rulebook for the Discography Builder and Duplicate / Edition Analyzer.
 The account-wide `SOFTWARE_RULES.md` baseline always applies. This file may add stricter project-specific requirements but must never weaken or override a newer global rule or a newer explicit user instruction. When project rules conflict with the global baseline, the stricter/newer requirement wins.
 
+## MCC 2026-10-14 - correct compilation classification using complete artist credits
+
+- Release classification must account for **full physical track-artist diversity before remixes, live recordings, user patterns and exclusion checkboxes**. A coherent long-form release of many independently credited performers must be classified **Compilation** even when `RELEASETYPE=Album`, `ALBUMARTIST`, or parent folder suggests one performer. Use conservative, demonstrable multi-artist evidence rather than inventing unsupported metadata.
+- Explicitly titled/primary-tagged **EP** or **Single** releases must not become a compilation based only on an inherited/inaccurate general-purpose `COMPILATION=1` or `Various Artists` tag when the credits don't support independence. Clearly named compilations and demonstrably diverse compilations remain compilations, including multi-artist EPs when evidence is strong.
+- Regression pair from actual 2026-10-14 MCC Datsik JSONL: `2015-05-18 - Disciple 02_ The Second Coming [3614592021540]` (22 tracks, many independent acts) = Compilation; `2009-01-14 - Texx Mars EP [190374272483]` (2 recordings including Datsik both times) = EP. Do not misclassify Datsik regular albums with collaborators/featured artists. Preserve long-form BT Ima duration case, Trilogy/Highlights compilation cases, audio fingerprints and artist identity safeguards.
+- Compilation must not force an ordinary album representative. It is a **last-resort wanted-recording carrier**, retained only when the user would otherwise lose distinct wanted music. Never silently delete such music merely because a release is a compilation.
+- No changes to UI control inventory, file operations or destructive behavior are authorized by this classifier fix. Keep `v0.5.21 - Under construction ⚠️` until real Windows and self-test acceptance; never claim unexecuted tests have passed.
+
 ## MCC 2026-10-14 - persistent unknown-pattern Remix/Live decisions
 
 - The Unusual track pattern review must let the user choose for each new canonical pattern: **Skip this run** (temporary exclusion), **Keep / Personal Picks** (positive persisted keep), **Remix** (remember category), or **Live** (remember category). Do not require repeat confirmation for saved positive or category decisions.
