@@ -14731,26 +14731,20 @@ def _remembered_pattern_categories_regression_self_test() -> None:
                 title="Wow (JRMX Club)", artist="INNA;JRMX",
             )
             live_track = Track(
-                990021, Path("01 Wow (Unusual Club Edit).flac"), 2,
-                title="Wow (Unusual Club Edit)", artist="INNA",
+                990021, Path("01 Wow (Suggested Callout Research Hook).flac"), 2,
+                title="Wow (Suggested Callout Research Hook)", artist="INNA",
             )
             remix_key = canonical_track_pattern("JRMX Club")
-            live_key = canonical_track_pattern("Unusual Club Edit")
+            live_key = canonical_track_pattern("Suggested Callout Research Hook")
             if remix_key not in track_pattern_keys(remix_track):
                 raise RuntimeError("JRMX Club cannot be classified from the reviewed track.")
-            # Live fixture is deliberately formed from a track pattern in the
-            # parser's unresolved descriptor family.
             if live_key not in track_pattern_keys(live_track):
-                live_track.title = "Wow (Unusual Club Mix)"
-                live_track.path = Path("01 Wow (Unusual Club Mix).flac")
-                live_key = canonical_track_pattern("Unusual Club Mix")
-            if live_key not in track_pattern_keys(live_track):
-                raise RuntimeError("Test fixture missing unusual pattern.")
+                raise RuntimeError("Test fixture missing unusual callout-hook pattern.")
             review_rows = [{"key": remix_key, "label": "JRMX Club"},
-                           {"key": live_key, "label": "Unusual Club Mix"}]
+                           {"key": live_key, "label": "Suggested Callout Research Hook"}]
             categories = {
                 remix_key: {"kind": "remix", "label": "JRMX Club"},
-                live_key: {"kind": "live", "label": "Unusual Club Mix"},
+                live_key: {"kind": "live", "label": "Suggested Callout Research Hook"},
             }
             _save_pattern_categories(categories)
             reloaded = _load_pattern_categories()
