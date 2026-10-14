@@ -24,6 +24,18 @@ Before ANY UI modification, record a control contract for the affected workflows
 | Error, cancellation, persistence, restart, recovery | NOT RUN |
 | Real host/OS end-to-end workflow and final acceptance | NOT RUN |
 
+## MCC v0.5.20 - unusual pattern review classification controls
+
+| Control | Purpose / interaction / state / persistence | Acceptance |
+| --- | --- | --- |
+| `patternAction` for each review item | Explicit choice of Skip this run, Keep, Remix (remember), Live (remember). Semantic select with label bound to pattern title, pointer and Tab/arrow support, visible focus. Skip is temporary, other selections persist; no files moved. | Source inspected; Windows UI/keyboard NOT RUN |
+| `patternsAll` / `patternsNone` | Select Keep for all / Skip this run for all, no hidden side effect until Save choices & Continue. | Static check PASS; Windows interaction NOT RUN |
+| `patternContinue` | Save explicit classifications atomically and resume preflight analysis. Error on persistence failure; avoid falsely claiming saved choice. | Static check PASS; persistence on Windows NOT RUN |
+| `categoryKind` / `categoryRemove` in Personal Picks | Existing modal's Saved Remix / Live classifications list. Change category or Forget to re-enable later review; Save commits, Cancel discards; accessible control names, responsive rows. | Static check PASS; Windows interaction NOT RUN |
+| Save Remixes / Save Live toggles | Existing global switches control inclusion for newly classified patterns before fingerprint and optimization; no track file mutation or acoustic re-identification. | Source check PASS; real files NOT RUN |
+
+**On-device test requirement:** Compare v0.5.19 screenshot of repeated `JRMX Club` prompt with v0.5.20; confirm dropdown, no clipping at 880px and larger, Tab/arrows/Enter/Escape, Save/Cancel, persistence through restart and second scan, editing/Forgetting, category toggle behavior and safe error. All actual Windows screenshot/interaction acceptance remains **NOT RUN**, so v0.5.20 stays **Under construction ⚠️**.
+
 ## MCC v0.5.19 - Album/EP group control contract, 2026-10-14
 
 Affected view: dark WebView2 Release Map, selected release detail panel and full map. No new duplicate controls; existing buttons/select reused.
