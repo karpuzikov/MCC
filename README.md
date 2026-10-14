@@ -1,16 +1,16 @@
 # Music Collection Cleaner (MCC)
 
-**Version: 0.5.23 - Under construction ⚠️**
+**Version: 0.5.24 - Under construction ⚠️**
 
 Music Collection Cleaner compares existing music releases with new ones, finds the best combination of editions, and helps preserve every wanted unique recording while removing unnecessary redundancy.
 
 ## Download and run
 
-**[Music Collection Cleaner v0.05.23.pyw](Music%20Collection%20Cleaner%20v0.05.23.pyw)** - latest single-file Windows Python application. **Under construction ⚠️** until actual Windows WebView2 testing. Earlier source versions remain available.
+**[Music Collection Cleaner v0.05.24.pyw](Music%20Collection%20Cleaner%20v0.05.24.pyw)** - latest single-file Windows Python application. **Under construction ⚠️** until actual Windows WebView2 testing. Earlier source versions remain available.
 
-Open with Python 3 on Windows 11 (or run from a console with `python "Music Collection Cleaner v0.05.23.pyw"`). The application checks or installs supported dependencies. The GUI uses Microsoft Edge WebView2 through pywebview; it is not a terminal-based replacement.
+Open with Python 3 on Windows 11 (or run from a console with `python "Music Collection Cleaner v0.05.24.pyw"`). The application checks or installs supported dependencies. The GUI uses Microsoft Edge WebView2 through pywebview; it is not a terminal-based replacement.
 
-Source-level regression checks: `python "Music Collection Cleaner v0.05.23.pyw" --ui-self-test`. `--self-test` additionally requires a packaged standalone EXE.
+Source-level regression checks: `python "Music Collection Cleaner v0.05.24.pyw" --ui-self-test`. `--self-test` additionally requires a packaged standalone EXE.
 
 ## What it does
 
@@ -24,6 +24,16 @@ Source-level regression checks: `python "Music Collection Cleaner v0.05.23.pyw" 
 - Explicitly **Copy OLD + NEW** or **Move OLD + NEW** retained releases into the selected destination; Undo for supported completed moves.
 - Log comparisons, validate incomplete/corrupt inputs, choose I/O worker counts with drive awareness, and manage spawned subprocesses.
 
+
+## v0.5.24 - mandatory radical simplicity UI pass (Under construction ⚠️)
+
+- **Rules verified:** On 2026-10-14, both `SOFTWARE_RULES.md` and `UI_UX_RULES.md` in MCC match the newer canonical versions from `karpuzikov/userscripts` exactly. Their newly explicit acceptance gate requires minimum clicks, direct frequent actions, no obvious instructional prose, no duplicate controls, and full function/accessibility/safety retention. The user's personalization instructions reiterate these requirements.
+- Removed the duplicate in-page **Music Collection Cleaner / version** header. The Windows title bar remains the canonical, visible application name/version/status. Removed static "Analysis is read-only" tutorial, "Match: Chromaprint (audio only)", and the Activity area's redundant "Working" label. Retained actual progress/status, live activity log and progress percentage.
+- Reduced unusual-pattern review to **Classify patterns** plus each distinct context example (no repeated "Variants"/"Examples" labels or repeated variant equal to its heading). Default modal subtitle is empty; failures show an actionable error and multiple unresolved patterns show concise completion count. Existing direct-action **Remix / Live / Keep / Skip**, instant commit after last selection, Escape cancellation, category persistence and keyboard accessibility unchanged.
+- **Copy/Move result:** Removed the duplicate **Open destination** footer button while keeping the existing folder button immediately next to the destination path. The distinct actions **Undo move**, **Release Map**, and **Close** are preserved, as are source-file safety messages. Removed a repeated sentence stating the same file-side-effect notice twice.
+- Preserved OLD/NEW source selectors, folder-open icons and distinct Browse actions, worker selector, Save Remixes/Live, persistent Personal Picks, logging, Undo, Release Map and all processing/optimizer behavior. No GitHub Actions modifications and no original music was accessed or modified.
+- **Validation:** Full GitHub source readback, two embedded JavaScript syntax parses in V8, mock review with examples/auto-submit, and source checks for eliminated duplicates **PASS**. Complete Python compilation, `--ui-self-test`, actual Windows WebView2 UI screenshots/hover/keyboard/resize, persistence/Copy/Move/Undo **NOT RUN**. Remains **Under construction ⚠️**.
+- **Next:** On Windows run `python -m py_compile "Music Collection Cleaner v0.05.24.pyw"`, then `python "Music Collection Cleaner v0.05.24.pyw" --ui-self-test`; visually compare against the user's v0.5.21 screenshot at native DPI and different widths; verify JRMX Club choice with one click and no repeat after restart; exercise destination folder button and Undo on disposable data.
 
 ## v0.5.23 - one-click unusual-pattern classification (Under construction ⚠️)
 
