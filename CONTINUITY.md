@@ -4,6 +4,13 @@ Last updated: 2026-10-14
 Status: **v0.5.20 - Under construction ⚠️** (not Windows-verified)
 Canonical file: `Music Collection Cleaner v0.5.20.pyw` on `karpuzikov/MCC/main`. Earlier v0.5.19 and user-tested v0.5.18 retained.
 
+## 2026-10-14 - GitHub-wide lexicographic version filename policy
+
+- User requested **permanent numerical order for all software versions in GitHub file listings**, not just MCC. Canonical `karpuzikov/userscripts/SOFTWARE_RULES.md` now mandates fixed three-digit padding of **filename-only** numeric version components for newly published downloadable artifacts (e.g. `Music Collection Cleaner v000.005.020.pyw`), while keeping semantic `APP_VERSION=0.5.20`, package versions, installer/updater comparisons and the displayed UI version unchanged. This rule is mirrored across reachable software repositories; no user-facing program behavior/version was changed in this checkpoint.
+- **Historical root files remain unsorted**: `Music Collection Cleaner v0.5.0.pyw` through `v0.5.20.pyw` still use unpadded historic names and therefore sort lexically. Renaming/deleting old files would break historical GitHub raw/download links and possibly automation. The global rule explicitly prohibits disruptive bulk migration without checking references. Do not claim this historical issue is already fixed.
+- **Open decision:** To make the **existing MCC root file list** numerically ordered, user must choose between renaming existing historical paths (breaking previously shared file URLs) and preserving legacy URLs while offering a new sorted artifacts directory/version index. Until that compatibility trade-off is resolved, do not rename historical versions. Current canonical source remains v0.5.20 - Under construction ⚠️; the previously requested Texx Mars compilation classification bug is separately unresolved.
+- No GitHub Actions changes. Source code/UI, raw user files and existing downloads remain untouched. Validation limited to GitHub source/mirror readback; Windows GUI acceptance NOT RUN.
+
 ## Latest checkpoint - 2026-10-14, v0.5.20 persistent unusual-pattern categories
 
 - User's screenshot of v0.5.19 scanning `C:\\!deemix Music\\INNA` shows an `Unusual track pattern review` modal on **JRMX Club (1)**, `Wow (JRMX Club)`. Previously the only choices were a checkbox that, if checked, persisted a positive Personal Pick, or an unchecked temporary exclusion that was forgotten, causing unwanted prompts on every run.
