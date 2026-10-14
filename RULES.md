@@ -5,6 +5,13 @@ Last updated: 2026-10-05
 This file is the project-specific rulebook for the Discography Builder and Duplicate / Edition Analyzer.
 The account-wide `SOFTWARE_RULES.md` baseline always applies. This file may add stricter project-specific requirements but must never weaken or override a newer global rule or a newer explicit user instruction. When project rules conflict with the global baseline, the stricter/newer requirement wins.
 
+## MCC 2026-10-14 - full-scan evidence takes priority over plan-only uniqueness (v0.5.27)
+
+- A track essential to the optimizer's *retained plan* must not be called physically or acoustically unique when matching physical copies occur in discarded/excluded editions. The user identified this as a recent Release Map status regression.
+- Show full-library cross-edition evidence using verified identical acoustic group ID for "Audio match on N other editions". For title/performer/duration-consistent files that were excluded before fingerprinting, or have no verified acoustic match, say "Also listed on N editions (audio unverified)". Never claim those untested files are identical; never let a metadata-only match alter the optimizer or recording groups.
+- Actual v0.5.26 GIMS JSONL from 2026-10-14 09:22:38: La même 19 copies (CD+single verified MATCH; 17 pre-excluded as Explicit>Clean), Laissez-moi tranquille 13 copies (12 MATCH other editions). A genuine explicit audio variant is **NOT proven**; one single has explicit metadata, not confirmed explicit content.
+- Status changes must not add new controls or required clicks; preserve full audio safety and all version/album constraints. This newest wording rule supersedes any older text prescribing "Only eligible copy". v0.5.27 remains Under construction ⚠️. The upstream premature Explicit>Clean exclusion stays a P0 blocker.
+
 ## MCC 2026-10-14 - unresolved La même Explicit/Clean classification: no invented Explicit edition
 
 - The user states that **no Explicit recording/version of "La même" exists**. Do NOT contradict this by inventing an Explicit edition or claim the supplied v0.5.24 JSONL established one. It did NOT log the per-track `explicit_state`, `excluded_by_pattern`, raw `ITUNESADVISORY`/`RTNG`/`EXPLICIT` tags, or matching Explicit counterpart identities.
