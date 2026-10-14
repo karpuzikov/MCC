@@ -13192,7 +13192,9 @@ function patternReview(data){
           +'</div>':"")+'</div>';
   });
   openModal("pattern","Unusual track pattern review",
-    "Choose once: Remix or Live is remembered and follows Save Remixes / Save Live. Keep is stored in Personal Picks. Skip this run will be asked again.",
+    data.saveError
+      ? "SAVE FAILED: "+String(data.saveError)+" - choices were not saved. Please retry."
+      : "Choose once: Remix or Live is remembered and follows Save Remixes / Save Live. Keep is stored in Personal Picks. Skip this run will be asked again.",
     rows||'<div class="empty">No unusual patterns</div>',
     '<button class="btn" id="patternsAll">Keep all</button><button class="btn" id="patternsNone">Skip all this run</button>'
     +'<div class="modalSpacer"></div><button class="btn" id="patternCancel">Cancel</button>'
@@ -13896,7 +13898,7 @@ def _webview_main_app() -> int:
             except Exception as exc:
                 self._error(str(exc))
     
-        def _show_pattern_review_or_continue(self) -> None:
+        def _show_pattern_review_or_continue(self, save_error: str = "") -> None:
             ctx = self._pending_analysis or {}
             all_patterns = list(ctx.get("patterns", []) or [])
             patterns = _unresolved_track_patterns(
@@ -13925,7 +13927,8 @@ def _webview_main_app() -> int:
                         "keep": False,
                         "existing": False,
                     })
-                self._event({"type": "patternReview", "patterns": rows})
+                self._event({"type": "patternReview", "patterns": rows,
+                             "saveError": save_error})
                 return
 
             if all_patterns:
@@ -13961,9 +13964,8 @@ def _webview_main_app() -> int:
                 if choice in {"skip", "keep", "remix", "live"}:
                     selections[key] = choice
             if set(selections) != set(visible):
-                self._event({"type": "error", "title": APP_NAME,
-                             "message": "Pattern review was incomplete. Reopen the review and select every pattern."})
-                self._show_pattern_review_or_continue()
+                self._append_activity("Pattern review invalid or incomplete; no classification was saved")
+                self._show_pattern_review_or_continue("Incomplete pattern choices")
                 return
             updated_categories = dict(self.pattern_categories)
             updated_picks = [dict(item) for item in self.personal_keep_rules]
@@ -13986,9 +13988,8 @@ def _webview_main_app() -> int:
                 try:
                     _save_pattern_categories(updated_categories)
                 except Exception as exc:
-                    self._event({"type": "error", "title": APP_NAME,
-                                 "message": f"Could not remember Remix/Live choices: {exc}"})
-                    self._show_pattern_review_or_continue()
+                    self._append_activity(f"ERROR: Could not save Remix/Live choices: {exc}")
+                    self._show_pattern_review_or_continue(str(exc))
                     return
             self.pattern_categories = updated_categories
             self.personal_keep_rules = updated_picks
