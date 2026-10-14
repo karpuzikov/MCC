@@ -5,13 +5,20 @@ Last updated: 2026-10-05
 This file is the project-specific rulebook for the Discography Builder and Duplicate / Edition Analyzer.
 The account-wide `SOFTWARE_RULES.md` baseline always applies. This file may add stricter project-specific requirements but must never weaken or override a newer global rule or a newer explicit user instruction. When project rules conflict with the global baseline, the stricter/newer requirement wins.
 
+## MCC 2026-10-14 - single-click unusual-pattern classification UI
+
+- User explicitly rejected the nested four-item dropdown, redundant Keep all / Skip all controls, and separate Save choices & Continue. The review displays **exactly four inline per-pattern actions: Remix, Live, Keep, Skip**. Classify with one mouse click or keyboard activation per unresolved pattern; Remix/Live appear first. The final choice must automatically submit the full validated set and resume analysis, without an extra save/confirm control.
+- Keep persists in Personal Picks; Remix/Live persist and follow the two Save category switches; Skip excludes only for this run. A displayed pattern represents its aggregated variants, **never require reviewing each song individually**. Saved decisions suppress future identical prompts. Preserve the existing reversible Personal Picks settings and never touch audio files during classification.
+- **Cancel scan** is the only review footer action; Escape must also cancel the backend pending review, without silently committing staged answers or leaving the scan hung. For multiple patterns show selection feedback and permit changing a staged answer until the final selection. Expose all choices as labeled, keyboard-operable buttons with visible focus and responsive layout. Any persistence failure must be reported and allow retry.
+- Do not introduce dropdowns, batch controls, extra confirmation buttons, or duplicate actions for this workflow unless the user explicitly requests them. Keep the dark compact WebView2 design and all existing optimizer/file safety behavior; actual Windows UI acceptance remains mandatory and construction status stays until verified.
+
 ## MCC 2026-10-14 - correct compilation classification using complete artist credits
 
 - Release classification must account for **full physical track-artist diversity before remixes, live recordings, user patterns and exclusion checkboxes**. A coherent long-form release of many independently credited performers must be classified **Compilation** even when `RELEASETYPE=Album`, `ALBUMARTIST`, or parent folder suggests one performer. Use conservative, demonstrable multi-artist evidence rather than inventing unsupported metadata.
 - Explicitly titled/primary-tagged **EP** or **Single** releases must not become a compilation based only on an inherited/inaccurate general-purpose `COMPILATION=1` or `Various Artists` tag when the credits don't support independence. Clearly named compilations and demonstrably diverse compilations remain compilations, including multi-artist EPs when evidence is strong.
 - Regression pair from actual 2026-10-14 MCC Datsik JSONL: `2015-05-18 - Disciple 02_ The Second Coming [3614592021540]` (22 tracks, many independent acts) = Compilation; `2009-01-14 - Texx Mars EP [190374272483]` (2 recordings including Datsik both times) = EP. Do not misclassify Datsik regular albums with collaborators/featured artists. Preserve long-form BT Ima duration case, Trilogy/Highlights compilation cases, audio fingerprints and artist identity safeguards.
 - Compilation must not force an ordinary album representative. It is a **last-resort wanted-recording carrier**, retained only when the user would otherwise lose distinct wanted music. Never silently delete such music merely because a release is a compilation.
-- No changes to UI control inventory, file operations or destructive behavior are authorized by this classifier fix. Keep `v0.5.21 - Under construction ⚠️` until real Windows and self-test acceptance; never claim unexecuted tests have passed.
+- No changes to UI control inventory, file operations or destructive behavior are authorized by this classifier fix. Keep the active version `Under construction ⚠️` until real Windows and self-test acceptance; never claim unexecuted tests have passed.
 
 ## MCC 2026-10-14 - persistent unknown-pattern Remix/Live decisions
 
@@ -20,7 +27,7 @@ The account-wide `SOFTWARE_RULES.md` baseline always applies. This file may add 
 - A previously classified Remix must not survive Save Remixes OFF merely because a remixer/producer appears as a secondary ARTIST; keep only the project's tightly proven added-feature exception. Save Remixes/Live ON must include the category normally. Separate semantic recording roots remain protected.
 - Allow reassigning Remix ↔ Live and forgetting a category from the existing Personal Picks modal, without damaging existing Personal Picks entries or audio files. Forget restores review eligibility. Errors saving a classification must be shown, never silently reported as saved.
 - Regression example: `Wow (JRMX Club)`, a repeatedly prompted unusual pattern, can be marked Remix once. The next scan must start without this review prompt, while other genuinely unresolved patterns still prompt.
-- Reuse the compact dark WebView2 modal/select/button design and implement accessible keyboard controls, labels and visible focus. Keep v0.5.19 Album/EP and all optimizer, copy/move/undo behavior unchanged.
+- Reuse the compact dark WebView2 modal/button design, not the rejected select/dropdown, and implement accessible keyboard controls, labels and visible focus. Keep v0.5.19 Album/EP and all optimizer, copy/move/undo behavior unchanged.
 
 ## MCC 2026-10-14 - Album/EP edition families and manual reassignment
 
