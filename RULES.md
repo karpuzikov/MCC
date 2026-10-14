@@ -5,6 +5,15 @@ Last updated: 2026-10-05
 This file is the project-specific rulebook for the Discography Builder and Duplicate / Edition Analyzer.
 The account-wide `SOFTWARE_RULES.md` baseline always applies. This file may add stricter project-specific requirements but must never weaken or override a newer global rule or a newer explicit user instruction. When project rules conflict with the global baseline, the stricter/newer requirement wins.
 
+## MCC 2026-10-15 - Ignore recording EVERYWHERE vs Ignore release ONLY (v0.5.32)
+
+- **Track Ignore:** excludes every acoustically confirmed copy of THAT recording from all editions; use current-scan `track.group_id` (NOT the replaceable-edit `coverage_group_id`). The optimizer must not source another copy of the ignored recording from a different release.
+- **Release Ignore:** excludes only the selected release, leaving the same recording eligible from other releases. Track Ignore must not invoke release Ignore or implicitly block whole albums.
+- Verified counterexample: GIMS Caméléon feat. Quincy 03:27 (log index 1173) acoustically MATCHES editions 312 and 1134, so all three must be ignored together. The separate original Caméléon 04:00 (log index 59) is REJECT and must remain eligible, as must unrelated versions with the same title. Do not infer recording identity from text or guest credits alone.
+- Save group-scoped Ignore persistently using exact known fingerprint hashes plus duration and original instance identifiers; resolve saved evidence to the new scan's acoustic groups after comparison. The old instance-specific rules may expand to the new verified group if their source instance still exists. Never promote unrelated versions merely by matching name.
+- Restore from any member reverses all overlapping saved rules for that recording, while preserving unrelated rules and pre-existing exclusion options. Pending Ignore/Restore and action labels must update for all copies without closing, scrolling or reflowing the Release Map. Keep Restore possible after Re-Analyze has made a track excluded.
+- No new controls; test source, UI, reanalysis, persistence and Copy/Move/Undo. Keep Under construction ⚠️ until Windows testing passes.
+
 ## MCC 2026-10-15 - candidate router performance parity
 
 - Do not recompute expensive per-track acoustic version metadata on every one of hundreds of thousands of candidate pairs. Precompute immutable title/root/version evidence once, then use exactly equivalent cached semantic conflicts.
