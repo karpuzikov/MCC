@@ -1,3 +1,9 @@
+## MCC v0.5.21 - release-type evidence in existing Release Map (2026-10-14)
+
+- No new controls. Existing Albums / EPs / Singles / Compilations category labels and release details must reflect **Disciple 02 = Compilation**, **Texx Mars = EP** following reanalysis; do not change keyboard, pointer, scroll, focus and highlight rules.
+- Compilation remains a last-resort selected release only when otherwise unique wanted recordings need a carrier; no disappearing tracks or hidden album-family mandate. Existing Copy/Move integrity gates unchanged.
+- On Windows verify full 22-track Disciple 02 (8 excluded remixes), both Texx versions, prior INNA Album/EP manual pairing, and normal Datsik album collaboration cases. **Windows GUI/full regression NOT RUN** and version is `0.5.21 - Under construction ⚠️`.
+
 # UI/UX Acceptance Register
 
 **Policy:** [UI_UX_RULES.md](UI_UX_RULES.md) and [SOFTWARE_RULES.md](SOFTWARE_RULES.md) are mandatory for every user-facing screen, panel, modal, widget, context menu, installer, browser toolbar, and interactive console prompt in this repository.
