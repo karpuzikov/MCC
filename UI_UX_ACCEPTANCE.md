@@ -1,3 +1,11 @@
+## MCC v0.5.27 - full-scan edition status regression (2026-10-14)
+
+- **Affected control:** existing Release Map per-track status text only (including its existing tooltip); no additional button, panel, menu or click. Existing keyboard and pointer semantics unchanged.
+- **Verified data source:** user's attached `Music Collection Cleaner Comparison 2026-10-14-09-22-38.jsonl` produced by v0.5.26: 19 La même tracks, 17 excluded as `Explicit>Clean` before fingerprinting; CD 61 and Single 280 have acoustic MATCH; WEB 1147 was excluded. Laissez-moi tranquille has 13 eligible copies and 12 confirmed MATCH comparisons from CD 64.
+- **Behavior:** count other scanned release IDs on equal normalized track title/performer and duration within 1 second. Promote an edition into "Audio match" only when both tracks are eligible and share actual acoustic `group_id`; show excluded/different-group metadata references as "audio unverified". Read counts across ALL releases, not just selected. Track's status no longer asserts "Only eligible copy" because its optimizer coverage is essential. Do not change `unique_to_release` calculations or the optimizer.
+- **Regression fixtures authored:** selected CD and selected excluded WEB, plus unselected same-acoustic-group version, assert one unverified and one audio-confirmed other edition; prevent excluded audio from acquiring a group; assert data propagates to Release Map. Separate analysis against supplied v0.5.26 JSONL PASS (La même: 1 verified + 17 unverified; Laissez-moi tranquille: 12 verified + 0 unverified).
+- **Not run:** embedded `--ui-self-test`, complete Python `py_compile`, Windows WebView2 visual and keyboard testing, real fresh GIMS scan, persistence, Copy/Move/Undo. These remain release gates. Explicit>Clean false exclusions are still a separate P0 problem. **v0.5.27 - Under construction ⚠️**.
+
 ## MCC v0.5.26 - closeout BLOCKER: La même Explicit/Clean cannot be assumed (2026-10-14)
 
 - **User correction:** "there is no La même explicit version in existance". Earlier assistant attribution to a real Explicit `La même` was unsupported; retract it. The attached v0.5.24 comparison log does not contain per-track `explicit_state`, `excluded_by_pattern`, or raw advisory tag values to prove the cause. Do not claim an actual Explicit version exists.
