@@ -6830,36 +6830,48 @@ def _album_requirement_provider_ids(
         if rel.release_type == "album" and not rel.excluded_only and rel.groups
     }
 
-    # CD-first album anchor: restrict the album-family provider requirement
-    # to eligible full CDs. A CD is complete when every maximal edition's
-    # additional acoustic group is independently available outside this
-    # album family. An incomplete CD without those providers is NOT forced;
-    # a unique WEB Deluxe may still replace it. Every group (including
-    # features carried only by smaller editions) remains globally mandatory.
+    # CD-first album anchor: a CD can supersede the largest WEB album
+    # when fingerprint groups prove that it is fully covered, even if the
+    # CD physically carries more tracks. Alternatively a smaller CD is a
+    # valid anchor only when every larger edition's missing wanted group
+    # has an independent eligible carrier OUTSIDE the album family.
+    # An unrelated larger Japanese CD with different album-only material
+    # is not a mandatory anchor merely because it has the most songs.
     album_ids = {rel.rid for rel in cluster}
     maximal = [rel for rel in cluster if rel.rid in complete_ids]
+    web_editions = [
+        rel for rel in cluster
+        if rel.rid in providers and source_rank(rel) < 2
+    ]
+    largest_web_count = max((len(rel.groups) for rel in web_editions), default=0)
+    major_web_editions = [
+        rel for rel in web_editions if len(rel.groups) == largest_web_count
+    ]
     qualified_cds: Set[int] = set()
     for cd in cluster:
-        if (
-            cd.rid not in providers
-            or source_rank(cd) < 2
-            or not cd.groups
-        ):
+        if cd.rid not in providers or source_rank(cd) < 2 or not cd.groups:
             continue
-        if all(
-            _release_covers(full, cd)
+        covers_largest_web = any(
+            _release_covers(cd, web) for web in major_web_editions
+        )
+        can_source_all_deluxe_extras = (
+            cd.rid not in complete_ids
             and all(
-                any(
-                    other.rid not in album_ids
-                    and other.release_type in {"album", "ep", "single"}
-                    and not other.excluded_only
-                    and gid in other.groups
-                    for other in releases
+                _release_covers(full, cd)
+                and all(
+                    any(
+                        other.rid not in album_ids
+                        and other.release_type in {"album", "ep", "single"}
+                        and not other.excluded_only
+                        and gid in other.groups
+                        for other in releases
+                    )
+                    for gid in full.groups - cd.groups
                 )
-                for gid in full.groups - cd.groups
+                for full in maximal
             )
-            for full in maximal
-        ):
+        )
+        if covers_largest_web or can_source_all_deluxe_extras:
             qualified_cds.add(cd.rid)
     if qualified_cds:
         providers = qualified_cds
@@ -16884,8 +16896,11 @@ def _ui_contract_self_test() -> None:
                                [14, 15, 16, 17, 18], "WEB", "ep")
     album_family = [club_web, club_cd, club_japan]
     choices = _album_requirement_provider_ids(album_family, album_family + [other_issued])
-    if not {club_web.rid, club_cd.rid, club_japan.rid} <= choices:
-        raise RuntimeError("Minimum ONE album rule incorrectly mandates the Japanese CD.")
+    if choices != {club_web.rid, club_cd.rid, club_japan.rid}:
+        raise RuntimeError(
+            "Unrelated Japanese CD incorrectly forced despite not covering the "
+            f"largest WEB edition: {sorted(choices)}"
+        )
     if len(_album_clusters(album_family)) != 1:
         raise RuntimeError("Club Rocker alternate albums split into different families.")
     proposed = optimize_collection(album_family + [other_issued], {})
