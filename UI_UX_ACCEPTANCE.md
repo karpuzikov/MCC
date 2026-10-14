@@ -1,3 +1,20 @@
+## MCC v0.5.23 - one-click unusual pattern review (2026-10-14)
+
+Reference: actual user-supplied v0.5.21 screenshot (1287x1055) with one JRMX Club dropdown and redundant Keep all, Skip all, Cancel, Save choices & Continue. UI requirement: classify each **pattern** with ONE click and remember Remix/Live, no redundant actions. UXDT efficiency/clarity and Fluent 2 button/keyboard/accessibility consulted.
+
+| Control | Unique action / saved effect | Pointer / keyboard / visual & error behavior | Validation |
+| --- | --- | --- | --- |
+| `patternChoice[data-choice=remix]` | Remember the aggregate pattern as Remix; respects Save Remixes. | One click or focused Enter/Space; visible `aria-pressed` selection, 36px height, responsive; staged until all rows chosen, then validated backend saves. | Source check + mocked action PASS; Windows NOT RUN |
+| `patternChoice[data-choice=live]` | Remember as Live; respects Save Live recordings. | Same accessible direct choice; mutually exclusive with other row choices, selected styling. | Source check + mocked action PASS; Windows NOT RUN |
+| `patternChoice[data-choice=keep]` | Save canonical pattern in Personal Picks. | Direct action, same focus/feedback; can later delete via existing Personal Picks screen. | Source check + mocked action PASS; Windows NOT RUN |
+| `patternChoice[data-choice=skip]` | Exclude for this scan only; future scans may ask again. | Direct action, no persistent rule, same focus/feedback. | Source check + mocked action PASS; Windows NOT RUN |
+| `patternCancel` / Escape | Cancel pending scan without committing staged answers. | Click, keyboard activation or Escape; closes modal and calls backend `cancelReview`. | Source check PASS; Windows NOT RUN |
+| Automatic final-selection submit | Last selection sends all exact keys to existing validating bridge and resumes scan. | No separate Save/Continue or bulk actions. If persistence fails, backend reopens modal with error. | Four-pattern V8 mock PASS; real persistence NOT RUN |
+
+**Removed:** per-pattern dropdown `patternAction`, Keep all, Skip all, Save choices & Continue. Retained existing Personal Picks editor for correction/Forget (no modification to its controls). No changes to audio operations.
+
+**Test results:** GitHub published/readback PASS, both embedded HTML script bodies parse in V8 PASS, isolated 4-row event/auto-submit mock PASS. **NOT RUN:** Python compilation, built-in UI self-test, real Windows WebView2 screenshots compared to reference, hover/focus/Tab/Enter/Space/Escape, small/large window DPI, persisted category after restart, cancellation recovery, end-to-end copy/move/undo. Status: **v0.5.23 - Under construction ⚠️**.
+
 ## MCC v0.5.22 - release classification evidence (2026-10-14)
 
 - No GUI controls, icons, layout, interaction routes or persistent settings were changed. Existing Release Map classification labels and optimizer explanations now have richer JSONL diagnostic evidence only.
