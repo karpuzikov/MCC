@@ -1,3 +1,17 @@
+## MCC v0.5.29 - stable map geometry on details open/close (2026-10-14)
+
+- **User evidence:** in normal Release Map the release columns occupy the whole board, but opening the old 52vw flex sibling narrowed board viewport, triggering `@container release-map-viewport (max-width:1750px)` and reflowing columns; closing or clicking same release again reversed the reflow and lost visual context.
+- **UI correction:** details now position:absolute overlay in the `#main` relative viewport; `#boardViewport` remains flex:1 at constant width. The drawer docks away from the selected release row based on current bounds and drawer width. Repeated click on selected release does not close panel; Close × / Escape remain functional. Existing selected row remains highlighted. No new controls, clicks, workflows or data changes.
+- **Automated checks executed:** complete extracted Release Map JS syntax parsed (PASS); mocked 1920px board confirms right-side release -> left-docked drawer and left-side release -> right drawer (PASS); GitHub source file readback matches (PASS).
+- **Release blockers NOT RUN:** real Windows WebView2 rendered screenshots, interactive resize/hover/focus/keyboard/scroll/retained selection checks, Python compilation, embedded `--ui-self-test`, genuine audio scan, Copy/Move/Undo. Under construction ⚠️.
+
+## MCC v0.5.28 - advisory correction and explicit reasons (2026-10-14)
+
+- Mapping: `ITUNESADVISORY`/RTNG/ADVISORY `0=Unknown`, `1=Explicit`, `2=Clean`; `EXPLICIT=0` also not proof of Clean. Positive content and explicit descriptors may still positively classify. E/C markers are placed beside track titles, Unknown has no marker; accessible title and ARIA label indicate classification based on metadata.
+- Exclusion status now reveals `Explicit > Clean - excluded before audio comparison` rather than "Skipped by active options". Other cases identify Remix, Live or stored pattern. Replaced "Only eligible copy" / "Only eligible source" prose with accurate source/coverage distinctions.
+- Added embedded classification, no-info vs confirmed Clean, explicit rule and front-end contract tests. JavaScript smoke test passed for status mapping; embedded Python `--ui-self-test` and actual Windows UI are pending. Old comparison log contains final classification but not raw field value; new log adds `explicit_advisory_tags`.
+- Crucially `Explicit>Clean` is still applied pre-fingerprint for positively classified records. Its separate false-positive P0 investigation has NOT been declared solved.
+
 ## MCC v0.5.27 - full-scan edition status regression (2026-10-14)
 
 - **Affected control:** existing Release Map per-track status text only (including its existing tooltip); no additional button, panel, menu or click. Existing keyboard and pointer semantics unchanged.
