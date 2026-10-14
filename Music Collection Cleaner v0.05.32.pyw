@@ -15304,6 +15304,104 @@ def _replaceable_version_coverage_regression_self_test() -> None:
             "and complete independent single coverage."
         )
 
+def _recording_ignore_regression_self_test() -> None:
+    """Ignore track = matched recording everywhere; release Ignore unchanged.
+
+    Regression: GIMS Caméléon 03:27 (feat. Quincy) versus the unrelated
+    ordinary 04:00 recording, with acoustic copies on other releases.
+    """
+    original_dir = globals()["_state_dir"]
+    original_migrate = globals()["_migrate_legacy_app_data"]
+    try:
+        with tempfile.TemporaryDirectory(prefix="mcc-ignore-recording-") as root:
+            globals()["_state_dir"] = lambda: Path(root) / "state"
+            globals()["_migrate_legacy_app_data"] = lambda: None
+
+            def make(rid, name, gid, duration, fp_value, artist):
+                return Track(
+                    rid, Path(root) / name, rid,
+                    title="Caméléon", artist=artist,
+                    duration=duration, group_id=gid,
+                    fingerprint=tuple([fp_value] * 96),
+                    base_excluded_from_coverage=False,
+                )
+            cd = make(300, "CD Caméléon.flac", 700, 239.866667, 111, "GIMS")
+            guest_a = make(301, "Bonus Caméléon feat Quincy.flac", 701, 207.04, 222, "GIMS;Quincy")
+            guest_b = make(302, "Album Caméléon feat Quincy.flac", 701, 207.04, 333, "GIMS;Quincy")
+            guest_c = make(303, "WEB Caméléon feat Quincy.flac", 701, 207.04, 222, "GIMS;Quincy")
+            extended = make(304, "Caméléon extended.flac", 702, 255.0, 444, "GIMS")
+            tracks = [cd, guest_a, guest_b, guest_c, extended]
+
+            # Existing saved v2 exact-file rule now expands to verified
+            # acoustic copies but MUST NOT use the same song title broadly.
+            _save_manual_track_skip_rules([{
+                "id": "legacy-instance-only",
+                "schema": 2,
+                "instance_keys": [_track_instance_key(guest_a)],
+            }])
+            if apply_persistent_track_skips(tracks) != 3:
+                raise RuntimeError("Legacy instance Ignore did not expand to its acoustic group.")
+            if any(item.manual_skip_rule for item in (cd, extended)):
+                raise RuntimeError("Legacy Ignore excluded a different Caméléon recording.")
+            remove_persistent_track_skip("legacy-instance-only", tracks)
+            if any(item.manual_skip_rule for item in tracks):
+                raise RuntimeError("Legacy recording Restore left orphaned skips.")
+
+            # Fresh click anywhere in group is one persistent recording rule.
+            add_persistent_track_skip(guest_c, tracks)
+            if apply_persistent_track_skips(tracks) != 3:
+                raise RuntimeError("Ignoring a 03:27 copy did not Ignore every matching edition.")
+            if any(item.manual_skip_rule for item in (cd, extended)):
+                raise RuntimeError("Ignore feat. Quincy also excluded original/Extended Version.")
+            rules = _load_manual_track_skip_rules()
+            if (
+                len(rules) != 1
+                or rules[0].get("scope") != "recording"
+                or len(rules[0].get("fingerprint_evidence", [])) < 2
+            ):
+                raise RuntimeError("Cross-edition Ignore persistence evidence is incomplete.")
+
+            # Next scan: source path, group ID and first selected copy changed.
+            rescanned_guest = make(
+                991, "New folder/Caméléon feat Quincy.flac",
+                9901, 207.04, 333, "GIMS;Quincy",
+            )
+            rescanned_original = make(
+                992, "New folder/Caméléon original.flac",
+                9902, 239.866667, 111, "GIMS",
+            )
+            same_fp_long_version = make(
+                993, "New folder/Caméléon 04.10.flac",
+                9903, 250.0, 333, "GIMS;Quincy",
+            )
+            renewed = [rescanned_guest, rescanned_original, same_fp_long_version]
+            if apply_persistent_track_skips(renewed) != 1:
+                raise RuntimeError("Recorded Ignore was lost after rescan/rename/new group IDs.")
+            if (not rescanned_guest.manual_skip_rule
+                    or rescanned_original.manual_skip_rule
+                    or same_fp_long_version.manual_skip_rule):
+                raise RuntimeError("Saved Ignore confused a different-length or original Version.")
+            remove_persistent_track_skip(rescanned_guest.manual_skip_rule, renewed)
+            if any(item.manual_skip_rule for item in renewed) or _load_manual_track_skip_rules():
+                raise RuntimeError("Restore from another edition failed to clear saved Ignore.")
+            if any(item.exclude_from_coverage for item in renewed):
+                raise RuntimeError("Restoring a recording did not restore its eligible copies.")
+
+            # Previously separate persisted rules for individual group copies
+            # must all clear when any one is restored.
+            _save_manual_track_skip_rules([
+                {"id": "old-a", "schema": 2, "instance_keys": [_track_instance_key(guest_a)]},
+                {"id": "old-b", "schema": 2, "instance_keys": [_track_instance_key(guest_b)]},
+            ])
+            apply_persistent_track_skips(tracks)
+            remove_persistent_track_skip(guest_b.manual_skip_rule, tracks)
+            if _load_manual_track_skip_rules() or any(item.manual_skip_rule for item in tracks):
+                raise RuntimeError("Restore retained a second overlapping Ignore rule.")
+    finally:
+        globals()["_state_dir"] = original_dir
+        globals()["_migrate_legacy_app_data"] = original_migrate
+
+
 def _reanalysis_regression_self_test() -> None:
     """Filesystem-isolated Ignore persistence and truthful planning audit."""
     previous_state_dir = globals()["_state_dir"]
@@ -15397,6 +15495,7 @@ def _remembered_pattern_categories_regression_self_test() -> None:
 
 
 def _ui_contract_self_test() -> None:
+    _recording_ignore_regression_self_test()
     _candidate_router_regression_self_test()
     _remembered_pattern_categories_regression_self_test()
     _reanalysis_regression_self_test()
