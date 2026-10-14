@@ -1,8 +1,17 @@
 # Music Collection Cleaner - Continuity Handoff
 
 Last updated: 2026-10-15
-Status: **v0.5.31 - Under construction ⚠️** (not Windows-verified)
-Canonical file: `Music Collection Cleaner v0.05.31.pyw` on `karpuzikov/MCC/main`. Earlier v0.5.30, v0.5.29, v0.5.28, v0.5.27, v0.5.26, v0.5.19 and user-tested v0.5.18 retained.
+Status: **v0.5.32 - Under construction ⚠️** (not Windows-verified)
+Canonical file: `Music Collection Cleaner v0.05.32.pyw` on `karpuzikov/MCC/main`. Earlier v0.5.31, v0.5.30, v0.5.29, v0.5.28, v0.5.27, v0.5.26, v0.5.19 and user-tested v0.5.18 retained.
+
+## Latest checkpoint - 2026-10-15, MCC v0.5.32 acoustic-wide Ignore
+
+- User: clicked Caméléon 03:27 track Ignore in `Ceinture noire [3616401604548]` expecting every matching recording in any release to be ignored. MCC instead reused another copy, because v0.5.31 only saved one source-instance key.
+- Actual user-uploaded `Music Collection Cleaner Comparison 2026-10-15-00-52-44.jsonl` (v0.5.30) has 1,604 tracks and proves Caméléon feat Quincy 207.04s index 1173 acoustic MATCH exact with index 312 and 1134. Original GIMS Caméléon 239.866667s index 59 is REJECT vs index 1173 (32.826667-second difference). No `reanalysis` row appears in upload; action diagnosis is source-grounded plus user report.
+- Latest GitHub version: `Music Collection Cleaner v0.05.32.pyw`. `_manual_track_group_members` matches exactly verified group IDs; a track Ignore marks all their copies globally rather than blocking an entire release. Schema-3 persistent evidence includes every group member's exact fingerprint hash, duration and path instance ID. Reanalysis and next scans first resolve identity against current fingerprints and then expand to that scan's acoustic groups; no title-only matches. V2 legacy instance rules expand to acoustic peers only when original instance still exists. Restore removes all related overlapping rules and re-applies base exclusions correctly.
+- Release Map bridge `toggleTrack` patches state of every impacted track, not just clicked index. `receiveTrackToggle` patches all release rows and visible DOM in place without remounting/scroll loss. Ignored tracks remain restorable after Re-Analyze. `toggleRelease` continues to change only `blocked_release_ids`, so other releases are available as sources when ignoring a RELEASE.
+- Added embedded `_recording_ignore_regression_self_test` (fresh+legacy saved rules, guest feature vs original/extended, 3 copies across albums, future rescan changed paths and group ID, duration guard, restore). This is hooked into `--ui-self-test`. **Not yet executed**: full Python compile/self-test, Windows WebView2, GIMS rescan and Copy/Move/Undo. v0.5.32 - Under construction ⚠️.
+- NEXT: run Windows `py -m py_compile "Music Collection Cleaner v0.05.32.pyw"` and `py "Music Collection Cleaner v0.05.32.pyw" --ui-self-test`. Open GIMS 3616401604548 and Ignore Caméléon 03:27; confirm indices 312/1134/1173 all pending, original 04:00 untouched; Re-Analyze should leave zero guest recording sources selected; Restore from ANY guest edition should restore all three. Confirm Release Ignore retains alternate sources; verify full GUI interaction and Copy/Move/Undo. Preserve CD-first logic, candidate routing perf patch, Explicit/Clean tag policy.
 
 ## Latest checkpoint - 2026-10-15, MCC v0.5.31 candidate router acceleration
 
