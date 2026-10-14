@@ -1,3 +1,19 @@
+## MCC v0.5.24 - radical simplicity acceptance (2026-10-14)
+
+**Policy check:** Current `SOFTWARE_RULES.md` and `UI_UX_RULES.md` in MCC exactly match canonical `karpuzikov/userscripts` at 2026-10-14. Personalization also requires minimum-click, compact, no redundant helper text. Reassessed affected main window, review dialog, and post-Copy/Move result against [UXDT efficiency](https://www.uxdt.nic.in/guidelines/understanding-ux/efficiency-and-intuitiveness/) and [Fluent 2 layout](https://fluent2.microsoft.design/layout).
+
+| Affected workflow/control | Minimal UI requirement / function retained | Desktop acceptance |
+| --- | --- | --- |
+| Main app chrome | Native Windows titlebar owns name, version and construction status; redundant 58px in-page title/header removed; leave native close and app Close action. | Source check PASS; Windows visual NOT RUN |
+| Source folders | Existing and New paths, labels, open-folder icons, Browse, Clear retain distinct purposes. Removed long introductory tutorial and obsolete matcher text. No extra clicks. | Source check PASS; real pick/open NOT RUN |
+| Progress / Activity | Keep progress status, percentage, detail, accessible live log; remove only redundant `Working` hint. | Source check PASS; running UI NOT RUN |
+| Pattern review | Direct Remix/Live/Keep/Skip per aggregate pattern, 1 click each; single click auto-submits when only one; no save footer, dropdown or new controls. Remove visible instructional paragraph and redundant variant metadata; retain track examples, descriptive accessible button names, focus/pressed states, cancel/Escape and save error recovery. | JS parse/mock PASS; Windows keyboard/hover/error NOT RUN |
+| Completed Copy/Move | Keep destination path with adjacent functional folder icon, Undo/Release Map/Close; remove duplicate Open destination footer action and repeated success description. Preserve safety summary. | Source check PASS; destination open & Undo NOT RUN |
+
+**Measured action budget:** One classification click per unresolved aggregate pattern; no additional Save/Continue. One destination-folder click rather than two alternative identical destination open controls. Distinct open-path and Browse remain separate and uncollapsed because they perform different operations. No previously requested functionality removed.
+
+**Verification matrix:** GitHub source readback PASS; two extracted embedded WebView2 JavaScript sections parse via V8 PASS; mocked two-pattern selection and submit PASS; static duplicate-control scan PASS. **Python compile NOT RUN; built-in --ui-self-test NOT RUN; actual Windows WebView2 launch/screenshots/default-small-large DPI NOT RUN; focus/hover/Tab/Enter/Space/Escape NOT RUN; persistence roundtrip NOT RUN; real Copy/Move/Undo NOT RUN.** No Windows screenshots were generated and no real visual acceptance can be claimed. Status remains **v0.5.24 - Under construction ⚠️**.
+
 ## MCC v0.5.23 - one-click unusual pattern review (2026-10-14)
 
 Reference: actual user-supplied v0.5.21 screenshot (1287x1055) with one JRMX Club dropdown and redundant Keep all, Skip all, Cancel, Save choices & Continue. UI requirement: classify each **pattern** with ONE click and remember Remix/Live, no redundant actions. UXDT efficiency/clarity and Fluent 2 button/keyboard/accessibility consulted.
