@@ -1,16 +1,16 @@
 # Music Collection Cleaner (MCC)
 
-**Version: 0.5.19 - Under construction ⚠️**
+**Version: 0.5.20 - Under construction ⚠️**
 
 Music Collection Cleaner compares existing music releases with new ones, finds the best combination of editions, and helps preserve every wanted unique recording while removing unnecessary redundancy.
 
 ## Download and run
 
-**[Music Collection Cleaner v0.5.19.pyw](Music%20Collection%20Cleaner%20v0.5.19.pyw)** - latest single-file Windows Python application. **Under construction ⚠️** until actual Windows WebView2 testing. Previously user-tested v0.5.18 remains available unchanged.
+**[Music Collection Cleaner v0.5.20.pyw](Music%20Collection%20Cleaner%20v0.5.20.pyw)** - latest single-file Windows Python application. **Under construction ⚠️** until actual Windows WebView2 testing. Earlier v0.5.18 and v0.5.19 remain available unchanged.
 
-Open with Python 3 on Windows 11 (or run from a console with `python "Music Collection Cleaner v0.5.19.pyw"`). The application checks or installs supported dependencies. The GUI uses Microsoft Edge WebView2 through pywebview; it is not a terminal-based replacement.
+Open with Python 3 on Windows 11 (or run from a console with `python "Music Collection Cleaner v0.5.20.pyw"`). The application checks or installs supported dependencies. The GUI uses Microsoft Edge WebView2 through pywebview; it is not a terminal-based replacement.
 
-Source-level regression checks: `python "Music Collection Cleaner v0.5.19.pyw" --ui-self-test`.
+Source-level regression checks: `python "Music Collection Cleaner v0.5.20.pyw" --ui-self-test`.
 
 ## What it does
 
@@ -24,6 +24,15 @@ Source-level regression checks: `python "Music Collection Cleaner v0.5.19.pyw" -
 - Explicitly **Copy OLD + NEW** or **Move OLD + NEW** retained releases into the selected destination; Undo for supported completed moves.
 - Log comparisons, validate incomplete/corrupt inputs, choose I/O worker counts with drive awareness, and manage spawned subprocesses.
 
+
+## v0.5.20 - remembered Remix/Live unusual patterns (Under construction ⚠️)
+
+- **Fix:** In `Unusual track pattern review`, replace the old keep-only checkbox with a compact per-pattern selector: **Skip this run**, **Keep (Personal Picks)**, **Remix (remember)**, and **Live (remember)**.
+- Explicit Remix/Live choices persist by normalized pattern key in `Documents\\Karpuzikov Tools\\Music Collection Cleaner\\state\\unusual_pattern_categories.json`. They are omitted from future unresolved-pattern dialogs. The complete pre-analysis classification applies these selections before fingerprinting and optimizer decisions; **Save Remixes / Save Live recordings** determine whether matched files remain eligible. The existing special safeguard for a truly added featured artist on a remix remains; a producer credit alone does not rescue a classified remix.
+- **Manage/reverse:** `Personal Picks...` now also contains **Saved Remix / Live classifications**, with category switching and a **Forget** action; forgetting makes an encountered pattern reviewable again. The original positive Personal Picks are preserved independently. **Skip this run** is deliberately not remembered.
+- Example: `Wow (JRMX Club)` can be marked Remix once. Subsequent scans skip the prompt for this pattern and apply the Save Remixes setting. An unusual hook may instead be marked Live, if that is the correct user classification.
+- A built-in source regression covers both choices, persisted reload, re-prompt after Forget, category-based exclusion and inclusion, producer credit prevention, and separate semantic recording roots. UI control-contract assertions were added.
+- **Testing:** GitHub source write/readback and source assertions performed; complete Python `--ui-self-test`/`--self-test`, Windows WebView2 interaction screenshots, actual INNA rescan and Copy/Move/Undo **NOT RUN**. Keep **Under construction ⚠️** until real Windows acceptance. No GitHub Actions changes.
 
 ## v0.5.19 - cross-type Album/EP release families (Under construction ⚠️)
 
