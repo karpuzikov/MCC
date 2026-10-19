@@ -9357,6 +9357,7 @@ def build_decision_snapshot(
                 "outcome": outcome,
                 "reason": decision.reason,
                 "audit_issues": audit_issues,
+                "type_warning": _compilation_warning(rel),
                 "release_type": rel.release_type,
                 "family": rel.family,
                 "source": _release_source_description(rel),
@@ -11392,6 +11393,8 @@ function drawConnections() {
 function releaseColumnKind(n) {
   // A proven mixed Album/EP family shares one column; original type is unchanged.
   const t=String(n.displayGroupKind||n.releaseType||"").toLowerCase();
+  if(t==="compilation") return "compilation";
+  if(t==="anthology") return "anthology";
   if(t==="ep") return "ep";
   if(t==="single") return "single";
   // Compilations/unknown long-form releases stay visible instead of disappearing.
@@ -11693,7 +11696,9 @@ function renderFullBoard(nodes) {
   const defs=[
     {key:"album",label:"Albums"},
     {key:"ep",label:"EPs"},
-    {key:"single",label:"Singles"}
+    {key:"single",label:"Singles"},
+    {key:"anthology",label:"Anthologies"},
+    {key:"compilation",label:"Compilations"}
   ].map(function(def){
     return {key:def.key,label:def.label,typed:nodes.filter(function(n){return releaseColumnKind(n)===def.key;})};
   }).filter(function(def){return def.typed.length;});
@@ -11735,8 +11740,7 @@ function renderFullBoard(nodes) {
       const titleText=document.createElement("span");titleText.className="groupTitleText";
       const mixedAlbumEp=items.some(function(n){return n.releaseType==="album";})
         &&items.some(function(n){return n.releaseType==="ep";});
-      titleText.textContent=items.some(function(n){return String(n.releaseType||"")==="compilation";})
-        ?base+" · Compilation":(mixedAlbumEp?base+" · Album / EP":base);
+      titleText.textContent=mixedAlbumEp?base+" · Album / EP":base;
       title.appendChild(titleText);group.appendChild(title);
       items.forEach(function(n){appendReleaseRow(group,n);});
       flow.appendChild(group);
@@ -12019,7 +12023,8 @@ function openDetails(n) {
   inner.innerHTML='<div id="detailsHead"><button id="closeDetailsBtn" title="Close details" aria-label="Close details">×</button><div id="releaseName">'+esc(n.name)+'</div>'
     +'<div id="releaseMeta">'+esc(releaseMeta)
     +' | '+n.uniqueCount+' essential | '+n.includedTracks+' included</div>'
-    +sourceSummary+ignoreNotice+((n.auditIssues||[]).length
+    +sourceSummary+(n.typeWarning?'<div class="auditNotice">⚠️ '+esc(n.typeWarning)+'</div>':"")
+    +ignoreNotice+((n.auditIssues||[]).length
       ? '<div class="auditNotice">⚠️ Audio integrity / release completeness:\n'+esc(n.auditIssues.join("\n"))+'</div>'
       : '')+'<div id="releaseActions">'+keepRelease+ignoreRelease+albumGroupActions+'</div><div id="pathRow">'
     +'<button class="btn pathOpenBtn" id="openFolderBtn" title="Open release folder" aria-label="Open release folder">📁</button>'
