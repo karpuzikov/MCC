@@ -5,6 +5,14 @@ Last updated: 2026-10-19
 This file is the project-specific rulebook for the Discography Builder and Duplicate / Edition Analyzer.
 The account-wide `SOFTWARE_RULES.md` baseline always applies. This file may add stricter project-specific requirements but must never weaken or override a newer global rule or a newer explicit user instruction. When project rules conflict with the global baseline, the stricter/newer requirement wins.
 
+## MCC v0.5.41 - Screenshot audit and same-volume Move policy (2026-10-19)
+
+- User supplied 12 screenshots of v0.5.40 (Main Window, Personal Picks, Classify patterns, Release Map Changes/Full map and track details). Address native visual defects: compact idle Activity, readable removed releases/status descriptions, selected-only connection lines by default and optional all-links toggle, adaptive Changes results, distinct Copy/Move, searchable/grouped/editable Personal Picks and single pending-pattern review. Preserve R/L/Ignore track actions.
+- **P0 file safety invariant:** Move OLD+NEW must rename folders on the **same filesystem only**, journaling each attempted rename durably *before* changing originals. Rollback reads all journal entries, including a renamed folder whose call raised before appending to completed. Cross-volume preflight/EXDEV/WinError17 must fail closed; NEVER use copytree then rmtree(original) as an implicit cross-volume Move fallback. Offer non-destructive Copy for other drives. Block occupied/overlapping targets.
+- Copy is green and leaves sources untouched; Move is amber and states same-drive restriction and relocates originals. These controls must remain distinct even when their destinations match.
+- **UI control contract:** A single Review pending (N) action opens review of all unresolved patterns, not misleading row-specific Classify duplicates; saved category Forget/promote remain individual. Personal Picks search is nonmutating; local edits only persist with Save, never change Pattern keys. Full map defaults to selected-release links only, all connections are opt-in. Full track descriptions must wrap without obscuring the hover/focus action grid.
+- Native Windows v0.5.40 Python --ui-self-test PASS. v0.5.40 Playwright failed on a stale selector that expected releaseRow in Changes view; the app rendered changeRow. v0.5.41 runner covers both. GitHub readback/JavaScript parser do NOT replace Python compile, full self-test, native WebView2 screenshots/keyboard/zoom and disposable Copy/Move/Undo tests. Until passed, version 0.5.41 is Under construction ⚠️. Do not modify GitHub Actions.
+
 ## MCC v0.5.40 - Personal Picks and negative-fixture isolation
 
 - **Personal Picks have explicit positive precedence** over Save Remixes/Save Live OFF for tracks whose saved rules match; an unchecked Remix/Live setting does not prohibit user-requested songs. A user-authored Pick must never be silently ignored just to make older negative-only tests pass.
