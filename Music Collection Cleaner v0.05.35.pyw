@@ -6597,6 +6597,31 @@ def _save_manual_ignored_release_paths(paths: Set[str]) -> None:
     )
 
 
+def _manual_kept_releases_path() -> Path:
+    return _state_dir() / "manual_kept_releases.json"
+
+
+def _load_manual_kept_release_paths() -> Set[str]:
+    try:
+        data = json.loads(_manual_kept_releases_path().read_text(encoding="utf-8"))
+        return {str(p).casefold() for p in data.get("paths", []) if isinstance(p, str) and p}
+    except (OSError, ValueError, TypeError, AttributeError):
+        return set()
+
+
+def _save_manual_kept_release_paths(paths: Set[str]) -> None:
+    _atomic_write_json(_manual_kept_releases_path(), {
+        "schema_version": 1, "paths": sorted(str(p).casefold() for p in paths if p),
+    })
+
+
+def _committed_kept_paths_for_plan(releases: List[Release], kept_ids: Set[int]) -> Set[str]:
+    known = {_manual_album_group_path_key(rel.path) for rel in releases}
+    other = _load_manual_kept_release_paths() - known
+    return other | {_manual_album_group_path_key(rel.path) for rel in releases
+                    if rel.rid in kept_ids}
+
+
 def _committed_ignore_paths_for_plan(
     releases: List[Release], blocked_ids: Set[int]
 ) -> Set[str]:
@@ -7633,6 +7658,7 @@ def optimize_collection(
     progress_cb=None,
     comparison_log_path: Optional[Path] = None,
     errors: Optional[List[str]] = None,
+    forced_release_ids: Optional[Set[int]] = None,
 ) -> Set[int]:
     """Optimize the retained set with exact whole-collection coverage.
 
@@ -7646,6 +7672,15 @@ def optimize_collection(
     and log quality are late tie-breaks.
     """
     blocked = set(blocked_release_ids or set())
+    if forced_release_ids is None:
+        pinned_paths = _load_manual_kept_release_paths()
+        forced = {rel.rid for rel in releases
+                  if _manual_album_group_path_key(rel.path) in pinned_paths}
+    else:
+        forced = set(forced_release_ids)
+    forced &= {rel.rid for rel in releases}
+    if forced & blocked:
+        raise ValueError("A release cannot be both kept and ignored.")
     eligible = [r for r in releases if r.rid not in blocked]
 
     dominated = find_dominated_releases(eligible)
@@ -7700,6 +7735,7 @@ def optimize_collection(
         blocked,
     )
 
+    selected |= forced
     selected -= blocked
 
     # Late equivalence preferences cannot override the exact solver's
@@ -8236,7 +8272,7 @@ def build_release_decisions(
         # A release containing only tracks excluded by the active checkboxes is
         # automatically removed/skipped. Mixed releases can still be retained for
         # unique included audio.
-        if rel.excluded_only:
+        if rel.excluded_only and rel.rid not in selected:
             action = "REMOVE" if rel.root_kind == "existing" else "SKIP"
             kinds = []
             if any(t.is_remix for t in rel.tracks):
@@ -12436,6 +12472,7 @@ def _release_map_state_for_ui(
     initial_plan_counts: Optional[Dict[str, int]] = None,
     result: Optional[Dict[str, object]] = None,
     releases: Optional[List[Release]] = None,
+    pinned_release_ids: Optional[Set[int]] = None,
 ) -> Dict[str, object]:
     # Full Map includes every analyzed release. Previously a lack of wanted
     # acoustic groups hid correctly removed remix-only OLD releases from both
@@ -12873,6 +12910,11 @@ def launch_webview_release_map(session: Dict[str, object]) -> Dict[str, object]:
                 for index, track in enumerate(self.tracks or [])
             }
             self.initial_blocked_release_ids = set(self.blocked_release_ids)
+            stored_kept = _load_manual_kept_release_paths()
+            self.pinned_release_ids = {rel.rid for rel in (self.releases or [])
+                if _manual_album_group_path_key(rel.path) in stored_kept}
+            self.initial_pinned_release_ids = set(self.pinned_release_ids)
+            self.requires_fresh_scan = False
             self.initial_manual_album_group_links = _manual_album_group_links()
             supplied_initial = session.get("initial_plan_counts")
             if isinstance(supplied_initial, dict):
@@ -12899,6 +12941,7 @@ def launch_webview_release_map(session: Dict[str, object]) -> Dict[str, object]:
                 self.initial_plan_counts,
                 self.result,
                 self.releases if isinstance(self.releases, list) else None,
+                self.pinned_release_ids,
             )
             new_root = session.get("recycle")
             if not new_root:
@@ -12924,6 +12967,7 @@ def launch_webview_release_map(session: Dict[str, object]) -> Dict[str, object]:
             self._ui_state["dirty"] = bool(self.dirty)
             self._ui_state["applyEnabled"] = bool(self.apply_enabled and not self.integrity_blockers)
             self._ui_state["applyHighlighted"] = bool(self.apply_highlighted)
+            self._ui_state["requiresFreshScan"] = bool(self.requires_fresh_scan)
             self._ui_state["result"] = self.result
     
         def _state(self) -> str:
@@ -12941,10 +12985,12 @@ def launch_webview_release_map(session: Dict[str, object]) -> Dict[str, object]:
         def _refresh_pending_state(self) -> None:
             has_pending = bool(
                 self.pending_track_indices or self.pending_release_ids
+                or self.pinned_release_ids != self.initial_pinned_release_ids
+                or self.requires_fresh_scan
                 or _manual_album_group_links() != self.initial_manual_album_group_links
             )
             self.dirty = has_pending
-            self.apply_enabled = bool(self.editable and not has_pending)
+            self.apply_enabled = bool(self.editable and not has_pending and not self.requires_fresh_scan)
             self.apply_highlighted = False
             if not has_pending:
                 self.pending_causes.clear()
@@ -13055,6 +13101,24 @@ def launch_webview_release_map(session: Dict[str, object]) -> Dict[str, object]:
             }
             return _json_ui_dumps(payload)
     
+        def toggleReleaseKeep(self, release_id: int):
+            if not self.editable:
+                return self._state()
+            rel = next((row for row in self.releases if row.rid == release_id), None)
+            if rel is None:
+                return self._state()
+            if release_id in self.pinned_release_ids:
+                self.pinned_release_ids.remove(release_id)
+                note = f'Keep reverted to automatic: "{rel.path.name}"'
+            else:
+                self.blocked_release_ids.discard(release_id)
+                self.pinned_release_ids.add(release_id)
+                note = f'Keep release: "{rel.path.name}"'
+            self._mark_dirty(note)
+            self._refresh_pending_state()
+            self._rebuild_ui_state()
+            return self._state()
+
         def toggleRelease(self, release_id: int):
             if not self.editable:
                 return self._state()
@@ -13066,6 +13130,7 @@ def launch_webview_release_map(session: Dict[str, object]) -> Dict[str, object]:
                 self.blocked_release_ids.remove(release_id)
                 self._mark_dirty(f'IF release: "{release.path.name}" restored')
             else:
+                self.pinned_release_ids.discard(release_id)
                 self.blocked_release_ids.add(release_id)
                 self._mark_dirty(f'IF release: "{release.path.name}" ignored')
     
@@ -13143,11 +13208,14 @@ def launch_webview_release_map(session: Dict[str, object]) -> Dict[str, object]:
             apply_persistent_track_skips(self.tracks)
             # Reuse verified acoustic groups; recalculate the entire selection
             # against the current Ignore/Restore and album-family constraints.
+            if self.requires_fresh_scan:
+                raise RuntimeError("Pattern classifications changed. Close Release Map and run Analyze again.")
             new_selected = optimize_collection(
                 self.releases,
                 self.groups,
                 self.blocked_release_ids,
                 comparison_log_path=self.comparison_log_path,
+                forced_release_ids=self.pinned_release_ids,
             )
             if new_selected & self.blocked_release_ids:
                 raise RuntimeError("Re-Analyze retained an explicitly ignored release.")
@@ -13223,10 +13291,12 @@ def launch_webview_release_map(session: Dict[str, object]) -> Dict[str, object]:
             # Commit Ignore choices only after a successful re-optimization;
             # a pending Ignore never silently becomes permanent.
             _save_manual_ignored_release_paths(
-                _committed_ignore_paths_for_plan(
-                    self.releases, self.blocked_release_ids
-                )
+                _committed_ignore_paths_for_plan(self.releases, self.blocked_release_ids)
             )
+            _save_manual_kept_release_paths(
+                _committed_kept_paths_for_plan(self.releases, self.pinned_release_ids)
+            )
+            self.initial_pinned_release_ids = set(self.pinned_release_ids)
             _save_decision_snapshot(new_snapshots)
             audit_path = _write_reanalysis_audit(audit, self.comparison_log_path)
             self.selected = new_selected
@@ -13357,6 +13427,7 @@ def launch_webview_release_map(session: Dict[str, object]) -> Dict[str, object]:
             "getState",
             "toggleTrack",
             "toggleRelease",
+            "toggleReleaseKeep",
             "setAlbumGroup",
             "reanalyze",
             "openFolder",
