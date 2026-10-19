@@ -1,16 +1,16 @@
 # Music Collection Cleaner (MCC)
 
-**Version: 0.5.36 - Under construction ⚠️**
+**Version: 0.5.37 - Under construction ⚠️**
 
 Music Collection Cleaner compares existing music releases with new ones, finds the best combination of editions, and helps preserve every wanted unique recording while removing unnecessary redundancy.
 
 ## Download and run
 
-**[Music Collection Cleaner v0.05.36.pyw](Music%20Collection%20Cleaner%20v0.05.36.pyw)** - latest single-file Windows Python application. **Under construction ⚠️** until actual Windows WebView2 testing. Earlier source versions remain available.
+**[Music Collection Cleaner v0.05.37.pyw](Music%20Collection%20Cleaner%20v0.05.37.pyw)** - latest single-file Windows Python application. **Under construction ⚠️** until actual Windows WebView2 testing. Earlier source versions remain available.
 
-Open with Python 3 on Windows 11 (or run from a console with `python "Music Collection Cleaner v0.05.36.pyw"`). The application checks or installs supported dependencies. The GUI uses Microsoft Edge WebView2 through pywebview; it is not a terminal-based replacement.
+Open with Python 3 on Windows 11 (or run from a console with `python "Music Collection Cleaner v0.05.37.pyw"`). The application checks or installs supported dependencies. The GUI uses Microsoft Edge WebView2 through pywebview; it is not a terminal-based replacement.
 
-Source-level regression checks: `python "Music Collection Cleaner v0.05.36.pyw" --ui-self-test`. `--self-test` additionally requires a packaged standalone EXE.
+Source-level regression checks: `python "Music Collection Cleaner v0.05.37.pyw" --ui-self-test`. `--self-test` additionally requires a packaged standalone EXE.
 
 ## What it does
 
@@ -24,6 +24,14 @@ Source-level regression checks: `python "Music Collection Cleaner v0.05.36.pyw" 
 - Explicitly **Copy OLD + NEW** or **Move OLD + NEW** retained releases into the selected destination; Undo for supported completed moves.
 - Log comparisons, validate incomplete/corrupt inputs, choose I/O worker counts with drive awareness, and manage spawned subprocesses.
 
+
+## v0.5.37 - Fail-fast decoding and Windows Job compatibility (Under construction ⚠️)
+
+- A supplied Noisia v0.5.36 log shows **720/720** audio files failed full decode with `[WinError 5] Access is denied`, **0** usable fingerprints, **0** acoustic comparisons and an invalid Release Map.
+- Under compatible Windows Job restrictions, external tools now start with `CREATE_BREAKAWAY_FROM_JOB` and are assigned to MCC's own kill-on-close Job. If subprocess launch or safe Job assignment is denied, the application stops with an actionable error rather than misclassifying audio.
+- Before reading media, FFmpeg/FFprobe must both start and return success. A scan where **every physical file** fails full decoding stops before creating false unique-recording decisions.
+- Regression fixtures cover WinError 5 preflight refusal and total decoder failure. **NOT RUN:** full Python compile/`--ui-self-test`, native Windows WebView2, real files or disposable Copy/Move/Undo.
+- **Next:** On Windows run `py -m py_compile "Music Collection Cleaner v0.05.37.pyw"` and `py "Music Collection Cleaner v0.05.37.pyw" --ui-self-test`, then re-analyze the same Noisia files. **Do not Copy/Move** until decoding and fingerprints work and other file-safety blockers are cleared. Cross-volume Move remains separately unsafe.
 
 ## v0.5.36 - Correct first-click pattern classification (Under construction ⚠️)
 
