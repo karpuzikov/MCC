@@ -12789,6 +12789,7 @@ def _release_map_state_for_ui(
             if base_key and group_id >= 0 and not row_is_remix and not row_is_live:
                 all_version_groups_by_base[base_key].add(group_id)
     saved_pattern_kinds = _load_pattern_categories()
+    personal_pattern_keys = _personal_pattern_keys(_load_personal_keep_rules(_load_app_settings()))
     nodes: List[Dict[str, object]] = []
     for item in visible:
         rid = int(item.get("release_id", -1))
@@ -12850,7 +12851,9 @@ def _release_map_state_for_ui(
                         pattern_kind = saved_pattern_kinds[key]["kind"]
                         pattern_key = key
                         break
-                if not pattern_kind:
+                if not pattern_kind and not current_track.personal_keep_rule and not (
+                    track_pattern_keys(current_track) & personal_pattern_keys
+                ):
                     if current_track.is_live:
                         pattern_kind = "live"
                     elif current_track.is_remix:
@@ -13311,6 +13314,22 @@ def launch_webview_release_map(session: Dict[str, object]) -> Dict[str, object]:
                 if key not in _personal_pattern_keys(_load_personal_keep_rules(_load_app_settings())):
                     raise OSError("Could not persist Personal Picks; classification not changed.")
             else:
+                # Categories and explicit pattern Keeps are mutually exclusive.
+                settings = _load_app_settings()
+                picks = _load_personal_keep_rules(settings)
+                filtered = [item for item in picks if _personal_pattern_key(item) != key]
+                if len(filtered) != len(picks):
+                    _save_app_settings(
+                        str(settings.get("existing_discography", "") or ""),
+                        str(settings.get("recycle_update_folder", "") or ""),
+                        bool(settings.get("save_remixes", False)),
+                        bool(settings.get("save_live", False)),
+                        bool(settings.get("logging_enabled", False)),
+                        personal_keep_rules=filtered,
+                        io_workers=str(settings.get("io_workers", "auto") or "auto"),
+                    )
+                    if key in _personal_pattern_keys(_load_personal_keep_rules(_load_app_settings())):
+                        raise OSError("Could not clear conflicting Personal Pick.")
                 categories[key] = {"kind": kind, "label": label}
             _save_pattern_categories(categories)
             # A new inclusion choice may need fingerprints that an earlier scan
