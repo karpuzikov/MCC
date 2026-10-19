@@ -1,3 +1,17 @@
+## MCC v0.5.40 - Windows self-test contradiction: Dirty Vibe / Personal Picks (2026-10-19)
+
+**User test evidence:** Windows PowerShell 7.6.7 in `S:\test\MCC`, Python 3.14, fresh Git checkout, `git pull` up to date, `py -m py_compile "Music Collection Cleaner v0.05.39.pyw"` PASS. `py "Music Collection Cleaner v0.05.39.pyw" --ui-self-test` **FAIL** at source line 18248: `RuntimeError: Dirty Vibe remix self-test failed: remix-only audio kept.`. The `py tests\visual_qa.py --browser edge` command was issued, but its output was NOT PROVIDED. Therefore browser visual QA result is **UNKNOWN/NOT VERIFIED**, not PASS or FAIL for that later run.
+
+**Root cause:** The legacy Dirty Vibe *negative* test explicitly supplied `personal_keep_rules=[{"mode":"contains","value":"Jack Beats"}]` then asserted every remix excluded, violating the user-requested Personal Picks positive override. Another negative test supplied `Example Remix` Personal Picks and asserted those same titles excluded. Production `configure_exclusions` appropriately allows Personal Picks to override Save Remixes/Live OFF.
+
+**v0.5.40 correction:** Remove explicit Personal Picks from *negative* remix-only tests (all tracks excluded, remix-only OLD removed and NEW skipped, no release selected). Add separate *positive* tests: Jack Beats two Re-work tracks included while six nonmatching remixes excluded; unrelated albums are not rescued; removal of the preference re-excludes tracks. For generic Remix/Live tests, ensure expected default exclusions and remix-added vocalist exception without Personal Picks, then assert explicitly picked Remix and Live/Remix tracks are kept (not the unrelated live-only track) and revert when preferences are cleared. The production classification algorithm, Release Map UI, audio and file operations were not altered.
+
+**Visual QA runner:** `tests/visual_qa.py` now automatically selects the latest versioned `.pyw` file in a cloned checkout; browser tests do not silently stay on older source versions. Browser runner screenshot/geometry code is unchanged.
+
+**Verification status:** GitHub source and test-file checks only. **NOT RUN** in this environment: full Windows `py_compile`, `--ui-self-test`, latest Playwright runner, screenshot comparison and native WebView2 acceptance. Old Windows test failure remains documented, with v0.5.40 retest pending. `Under construction ⚠️` remains active.
+
+**Required Windows commands:** `git pull`; `py -m py_compile "Music Collection Cleaner v0.05.40.pyw"`; `py "Music Collection Cleaner v0.05.40.pyw" --ui-self-test`; `py tests\visual_qa.py --browser edge`. Report first unexpected FAIL and include `report.json` and images if browser test fails. Do not Copy/Move source music until other known safety blockers are cleared.
+
 ## MCC v0.5.39 - Windows test failures and QA harness repair (2026-10-19)
 
 **Actual Windows test supplied by user:** Windows PowerShell at `S:\test\MCC`, Python 3.14, Playwright 1.64.0. `git clone` PASS, `py -m pip install playwright` satisfied, `py -m py_compile "Music Collection Cleaner v0.05.38.pyw"` PASS. `py "Music Collection Cleaner v0.05.38.pyw" --ui-self-test` **FAIL** at line 17677 with `RuntimeError: Release Map UPDATED default/Move confirmation UI regression.`. `py tests\visual_qa.py --browser edge` **FAIL** with `TimeoutError: Page.wait_for_function: Timeout 30000ms exceeded`. Neither visual render nor native WebView2 was proven accepted.
