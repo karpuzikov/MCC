@@ -11852,6 +11852,9 @@ function openDetails(n) {
     tracks+=addAlternativePanel(live,"live");
   });
   let ignoreRelease="";
+  const keepRelease=state.editable
+    ?'<button class="btn'+(n.forceKeep?' primary':'')+'" id="keepReleaseBtn">'+
+      (n.forceKeep?"Unkeep release":"Keep release")+'</button>':"";
   if(state.editable && (n.kind==="retained" || n.manualRemoved || n.pendingReleaseChange)){
     const label=n.releaseBlocked?"Restore release":"Ignore release";
     const cls=n.releaseBlocked?"btn restore":"btn";
@@ -11919,7 +11922,7 @@ function openDetails(n) {
     +' | '+n.uniqueCount+' essential | '+n.includedTracks+' included</div>'
     +sourceSummary+ignoreNotice+((n.auditIssues||[]).length
       ? '<div class="auditNotice">⚠️ Audio integrity / release completeness:\n'+esc(n.auditIssues.join("\n"))+'</div>'
-      : '')+'<div id="releaseActions">'+ignoreRelease+albumGroupActions+'</div><div id="pathRow">'
+      : '')+'<div id="releaseActions">'+keepRelease+ignoreRelease+albumGroupActions+'</div><div id="pathRow">'
     +'<button class="btn pathOpenBtn" id="openFolderBtn" title="Open release folder" aria-label="Open release folder">📁</button>'
     +'<div id="releasePath">'+esc(n.path)+'</div><button class="btn" id="copyPathBtn">Copy path</button></div>'
     +'<div id="reason">'+esc(
@@ -11943,6 +11946,8 @@ function openDetails(n) {
     if(!Number.isFinite(dest))return;
     bridge.setAlbumGroup(Number(n.id),dest,receiveState);
   };
+  const keepBtn=document.getElementById("keepReleaseBtn");
+  if(keepBtn)keepBtn.onclick=function(){bridge.toggleReleaseKeep(Number(n.id),receiveState);};
   const groupReset=document.getElementById("resetAlbumGroupBtn");
   if(groupReset)groupReset.onclick=function(){bridge.setAlbumGroup(Number(n.id),-1,receiveState);};
   inner.querySelectorAll(".track").forEach(function(el){
@@ -12638,6 +12643,7 @@ def _release_map_state_for_ui(
                 all_release_carriers_by_group[group_id].add(source_rid)
             if base_key and group_id >= 0 and not row_is_remix and not row_is_live:
                 all_version_groups_by_base[base_key].add(group_id)
+    saved_pattern_kinds = _load_pattern_categories()
     nodes: List[Dict[str, object]] = []
     for item in visible:
         rid = int(item.get("release_id", -1))
@@ -12690,8 +12696,29 @@ def _release_map_state_for_ui(
                 if title and title not in gem_titles:
                     gem_titles.append(title)
 
+            pattern_kind = ""
+            pattern_key = ""
+            if tracks is not None and 0 <= track_index < len(tracks):
+                current_track = tracks[track_index]
+                for key in sorted(track_pattern_keys(current_track)):
+                    if key in saved_pattern_kinds:
+                        pattern_kind = saved_pattern_kinds[key]["kind"]
+                        pattern_key = key
+                        break
+                if not pattern_kind:
+                    if current_track.is_live:
+                        pattern_kind = "live"
+                    elif current_track.is_remix:
+                        pattern_kind = "remix"
+                    elif current_track.excluded_by_pattern:
+                        pattern_kind = "skip"
+                    patterns = _track_classification_patterns(current_track)
+                    if patterns:
+                        pattern_key = patterns[0][0]
             ui_tracks.append(
                 {
+                    "patternKind": pattern_kind,
+                    "patternKey": pattern_key,
                     "index": track_index,
                     "number": row.get("number", ""),
                     "title": str(row.get("title", "")),
@@ -12734,6 +12761,7 @@ def _release_map_state_for_ui(
                 "outcome": str(item.get("outcome", "")),
                 "manualRemoved": manual_removed,
                 "releaseBlocked": release_blocked,
+                "forceKeep": rid in (pinned_release_ids or set()),
                 "pendingReleaseChange": pending_release_change,
                 "pendingReleaseIgnore": bool(pending_release_change and release_blocked),
                 "pendingReleaseRestore": bool(pending_release_change and not release_blocked),
