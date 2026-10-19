@@ -1,6 +1,6 @@
 # Music Collection Cleaner (MCC)
 
-**Version: 0.5.40 - Under construction ⚠️**
+**Version: 0.5.41 - Under construction ⚠️**
 
 Music Collection Cleaner compares existing music releases with new ones, finds the best combination of editions, and helps preserve every wanted unique recording while removing unnecessary redundancy.
 
@@ -21,11 +21,11 @@ On other platforms, install Playwright Chromium or use `--browser system` for an
 
 ## Download and run
 
-**[Music Collection Cleaner v0.05.40.pyw](Music%20Collection%20Cleaner%20v0.05.40.pyw)** - latest single-file Windows Python application. **Under construction ⚠️** until actual Windows WebView2 testing. Earlier source versions remain available.
+**[Music Collection Cleaner v0.05.41.pyw](Music%20Collection%20Cleaner%20v0.05.41.pyw)** - latest single-file Windows Python application. **Under construction ⚠️** until actual Windows WebView2 testing. Earlier source versions remain available.
 
-Open with Python 3 on Windows 11 (or run from a console with `python "Music Collection Cleaner v0.05.40.pyw"`). The application checks or installs supported dependencies. The GUI uses Microsoft Edge WebView2 through pywebview; it is not a terminal-based replacement.
+Open with Python 3 on Windows 11 (or run from a console with `python "Music Collection Cleaner v0.05.41.pyw"`). The application checks or installs supported dependencies. The GUI uses Microsoft Edge WebView2 through pywebview; it is not a terminal-based replacement.
 
-Source-level regression checks: `python "Music Collection Cleaner v0.05.40.pyw" --ui-self-test`. `--self-test` additionally requires a packaged standalone EXE.
+Source-level regression checks: `python "Music Collection Cleaner v0.05.41.pyw" --ui-self-test`. `--self-test` additionally requires a packaged standalone EXE.
 
 ## What it does
 
@@ -39,6 +39,18 @@ Source-level regression checks: `python "Music Collection Cleaner v0.05.40.pyw" 
 - Explicitly **Copy OLD + NEW** or **Move OLD + NEW** retained releases into the selected destination; Undo for supported completed moves.
 - Log comparisons, validate incomplete/corrupt inputs, choose I/O worker counts with drive awareness, and manage spawned subprocesses.
 
+
+## v0.5.41 - UI audit corrections / safer Move (Under construction ⚠️)
+
+- **Safety:** Move OLD+NEW uses same-volume atomic renames only; cross-volume Move is explicitly rejected before modifying sources, with Copy OLD+NEW offered instead. Write-ahead Undo manifest is persisted **before** each rename. Rollback uses all journaled entries, including a move that succeeded just before raising. Includes synthetic EXDEV and post-rename failure regression fixtures; real Windows fault-injection and Move/Undo acceptance remain pending.
+- **Copy vs Move:** Preserve separate actions but make Move amber, with same-volume restriction stated in the interface and confirmation. Copy remains non-destructive and green.
+- **Release Map:** Text of track statuses wraps instead of truncating; improve contrast for removed releases; reduce overwhelming amber backgrounds; add Full-map-only **Show all links** toggle, defaulting to connections for the selected release; Changes results adapt to wide windows rather than sitting in a narrow strip.
+- **Main window:** The empty Activity card disappears when idle, retaining its full progress log during analysis and afterward.
+- **Classify patterns:** Replace multiple identical Pending -> Classify buttons with one **Review pending (N)**, without removing the persistent Remix/Live/Skip/Personal Picks controls.
+- **Personal Picks:** Search, grouped Phrase/Exact/Pattern sections, and inline editing for phrase/exact picks. Pattern rules retain stable keys; to change their category use Classify patterns.
+- **Browser QA runner:** Recognizes native Changes view rows `.changeRow`, captures Changes/Full-map states, and continues into hovered release details. Earlier `v0.5.40` Windows `--ui-self-test` was **PASS**; Playwright failed at an obsolete startup selector despite successful rendering.
+- **Checks:** GitHub source readback and JavaScript V8 syntax parse PASS. Python compilation, updated `--ui-self-test`, browser screenshots/geometry, real native Windows WebView2 screenshots and actual Copy/Move/Undo remain **NOT RUN** for v0.5.41. No GitHub Actions changes. Never use valuable originals as test inputs.
+- **Test on Windows (fresh checkout):** `git clone https://github.com/karpuzikov/MCC.git`, `cd MCC`, `py -m py_compile "Music Collection Cleaner v0.05.41.pyw"`, `py "Music Collection Cleaner v0.05.41.pyw" --ui-self-test`, `py tests/visual_qa.py --browser edge`. Also send new native WebView2 screenshots for comparison.
 
 ## v0.5.40 - Correct contradictory Dirty Vibe and Remix/Live test fixtures (Under construction ⚠️)
 
