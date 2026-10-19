@@ -1,3 +1,28 @@
+## MCC v0.5.38 - Release Map track/details visual contract (2026-10-19)
+
+**Reference:** User screenshot `image(20261019-092934).png` (1486×913, native Windows WebView2, version 0.5.37): 2017-06-09 `Outer Edges (Noisia Remixes) [VSN030]`, OLD Noisia. Visible problems: all-caps `DUPLICATE / REMOVE`, repeated OLD root plus full release path, redundant Copy path, repetitive Remix badges/Exclusion text, wrapped badge on its own line, and absolutely placed hover actions covering status text. Large Album/EP family chooser obscures track context.
+
+**Purpose/state/control contract (all Release Map details controls; pointer, keyboard and recoverability preserved):**
+
+| Control / region | Unique action and state | Layout, keyboard and safety acceptance |
+| --- | --- | --- |
+| Release title, status, source | Show release identity and useful plan reason once; compact `Removed · Duplicate`, `OLD · WEB` with no repeated source root | No all-caps status wall, zero-count noise or redundant explanatory labels; title wraps without clipping |
+| Keep / Unkeep release | Persist complete-release override; alternate between keep/unkeep | One click; visible focus; triggers dirty plan and forces Re-Analyze before export |
+| Ignore / Restore release | Persistent source-release exclusion without affecting other acoustic copies | Separate from Keep; click/Tab/Enter/Space; no plan applied until Re-Analyze |
+| Album group disclosure (summary) | Reveal infrequent reassignment action; retains select, Move to group and Restore automatic | Collapsed by default, Enter/Space toggles; selection and reset preserve previous behavior; no direct audio identity change |
+| Folder opener and path | Open the release directory; path is selectable without an extra Copy path control | Readable wrapped selectable text, keyboard focus and Ctrl+A/Ctrl+C; folder icon remains distinct and functional |
+| Track row | Inspect/highlight verified acoustic group across editions | Row title, duration, versions, status and actions in fixed columns; Enter/Space selects; 100%/125% zoom and long names cannot overlap |
+| Saved Remix / Live / Skip badge | Persisted label and direct promotion into Personal Picks | One aligned 24px badge outside wrapping title; focus/Enter/Space; title-independent baseline; badge re-click promotes |
+| Hover/focus classification actions | Remix, Live and Skip; replaces different saved category | Direct buttons with min 28px visual footprint, consistent centering, reserved non-overlay action column; if category saved, no duplicate hover action for same category; hover/focus visible; aria-label, click and keyboard |
+| Recording-wide Ignore / Restore | Ignore verified acoustic group or restore it, independently of classification | Shares dedicated actions column without collision, labels and source-safe dirty/Re-Analyze guards preserved |
+| Versions / Remixes / Live links | Expand alternatives for the specific track | Individual focusable buttons; wrapped within their own reserved column; alternatives and connections unchanged |
+| Track status | Explain exceptions and acoustic replacement; default exclusions do not repeat saved badge meaning | Visible status never covered by hover icons; complete reason available in title/tooltip, no loss of warnings |
+| Close details, Escape | Close overlay without moving map columns or resetting board scroll | Keyboard and pointer; no reflow or shifted geometry; focus and active states still work |
+
+**Source checks:** The two embedded HTML/JS scripts parse in V8. Static UI contract added to `--ui-self-test` to reject old Copy path, all-caps duplicate prefix, absolute action overlap, missing badge title cell and missing album group disclosure. No acoustic, optimizer, persistent state or file-operation source logic changed.
+
+**NOT RUN / release blocking:** `py_compile` and full `--ui-self-test`; real Windows WebView2 at 100%, 125%, smaller 1050×680 and larger 1500×920 windows, hover/focus/Tab/Enter/Space/Escape, review long multiline titles, path selection/copy, category first/repeated clicks, Ignore/Restore and group reassignment, dark UI screenshots, Copy/Move/Undo disposable. Compare directly with supplied v0.5.37 screenshot. Status **v0.5.38 - Under construction ⚠️**, not accepted.
+
 ## MCC v0.5.37 - Decoder startup failure and invalid-map prevention (2026-10-19)
 
 - **Reproduction:** On user's Windows Noisia scan of v0.5.36, all 720 tracks had `[WinError 5] Access is denied`, 0 durations, 0 fingerprints and 0 acoustic comparisons, yet Release Map displayed 87 optimizer-retained releases with thousands of characters of repeated diagnostic text. A plan produced without proven recording identity is invalid and cannot be offered for Copy/Move.
