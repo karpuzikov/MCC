@@ -13647,6 +13647,7 @@ def launch_webview_release_map(session: Dict[str, object]) -> Dict[str, object]:
                 "decisions": self.decisions,
                 "blocked_release_ids": self.blocked_release_ids,
                 "initial_plan_counts": self.initial_plan_counts,
+                "requires_fresh_scan": bool(self.requires_fresh_scan),
             }
             self.done_event.set()
             if self.window is not None:
@@ -13693,6 +13694,7 @@ def launch_webview_release_map(session: Dict[str, object]) -> Dict[str, object]:
                 "decisions": bridge.decisions,
                 "blocked_release_ids": bridge.blocked_release_ids,
                 "initial_plan_counts": bridge.initial_plan_counts,
+                "requires_fresh_scan": bool(bridge.requires_fresh_scan),
             }
         bridge.done_event.set()
 
@@ -15518,6 +15520,12 @@ def _webview_main_app() -> int:
         ) -> None:
             self._update_live_release_map_session(session, map_result)
             self.map_open = False
+            if map_result.get("requires_fresh_scan"):
+                session["allow_apply"] = False
+                self.status = "Classifications changed - Analyze again"
+                self._append_activity("Saved classifications require a fresh fingerprint scan before Copy/Move.")
+                self._emit_state()
+                return
             action = str(map_result.get("action", "") or "")
             if action not in {"copy_all", "move_all"}:
                 self.status = "Analysis complete - no copy performed."
