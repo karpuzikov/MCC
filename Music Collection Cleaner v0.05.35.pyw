@@ -1464,6 +1464,7 @@ def refresh_heuristic_release_types(releases: List["Release"]) -> None:
             first_tags,
             sum(max(0.0, float(track.duration or 0.0)) for track in included_tracks),
             [track.artist for track in rel.tracks],
+            _discography_artist_from_release(rel),
         )
 
 
@@ -2502,6 +2503,10 @@ def configure_exclusions(
     rules = list(personal_keep_rules or [])
     categories = _normalize_pattern_categories(pattern_categories)
     contextual_remix_ids = _contextual_remix_track_ids(releases)
+    main_artist_by_track = {
+        id(track): _discography_artist_from_release(rel)
+        for rel in releases for track in rel.tracks
+    }
     user_named_remix_ids: Set[int] = set()
 
     # Pass 1: classify every track before deciding the featured-remix exception.
@@ -2592,6 +2597,7 @@ def configure_exclusions(
             exclude_remixes
             and track.is_remix
             and not track.remix_feature_exception
+            and not _main_artist_remix(track, main_artist_by_track.get(id(track), ""))
         )
         live_eliminated = bool(exclude_live and track.is_live)
 
@@ -2689,6 +2695,63 @@ def album_family(title: str) -> str:
     return normalize_title(s)
 
 
+def _discography_artist_from_release(rel: "Release") -> str:
+    """Resolve only explicitly named source roots, not a guess from popular tracks."""
+    root = Path(rel.scan_root) if rel.scan_root else None
+    if not root:
+        return ""
+    generic = {"deemix", "music", "downloads", "download", "flac", "alac", "mp3", "lossless"}
+    name = root.name
+    if normalize_title(name) in generic:
+        name = root.parent.name
+    else:
+        name = re.sub(r"(?i)(?:[ _-]+(?:deemix|music|downloads|flac|alac|mp3|lossless))+$", "", name).strip()
+    return normalize_artist(name) if name and normalize_title(name) not in generic else ""
+
+
+def _main_artist_remix(track: "Track", artist: str) -> bool:
+    if not artist or not track.is_remix:
+        return False
+    for text in (track.display_title, strip_track_number(track.path.stem)):
+        for part in _descriptor_parts(text):
+            if _remix_credit_key_from_explicit_descriptor(part) == artist:
+                return True
+    return False
+
+
+def _other_artist_majority(artists: Optional[Sequence[str]], artist: str) -> bool:
+    if not artists or not artist:
+        return False
+    other = 0
+    for value in artists:
+        source = re.split(r";|,|&|\band\b|\bx\b|\bfeat(?:uring)?\.?\b|\bft\.?\b",
+                          ascii_punctuation(str(value or "")), maxsplit=1, flags=re.I)[0]
+        primary = normalize_artist(source)
+        if primary and primary not in {"variousartists", "va"} and primary != artist:
+            other += 1
+    return other * 2 > len(artists)
+
+
+def _single_artist_collection(artists: Optional[Sequence[str]]) -> bool:
+    if not artists or len(artists) < 3:
+        return False
+    keys = []
+    for value in artists:
+        source = re.split(r";|,|&|\band\b|\bx\b|\bfeat(?:uring)?\.?\b|\bft\.?\b",
+                          ascii_punctuation(str(value or "")), maxsplit=1, flags=re.I)[0]
+        key = normalize_artist(source)
+        if key: keys.append(key)
+    return len(keys) == len(artists) and len(set(keys)) == 1
+
+
+def _compilation_warning(rel: "Release") -> str:
+    if rel.type_source == "majority-other-artist":
+        artist = _discography_artist_from_release(rel)
+        return ("More than half the tracks credit other artists than " +
+                (artist or "the discography artist") + ". Review as Compilation.")
+    return ""
+
+
 def _has_various_primary_performers(track_artists: Optional[Sequence[str]]) -> bool:
     """Strong multi-performer evidence independent of a misleading ALBUMARTIST.
 
@@ -2728,6 +2791,7 @@ def infer_release_type(
     tags: Dict[str, str],
     total_duration_seconds: float = 0.0,
     track_artists: Optional[Sequence[str]] = None,
+    discography_artist: str = "",
 ) -> Tuple[str, str]:
     raw = tag_lookup(
         tags,
@@ -2748,12 +2812,24 @@ def infer_release_type(
         or (track_count >= 12 and re.search(r"\bthe highlights\b", name_text, re.I))
     )
     diverse_artists = _has_various_primary_performers(track_artists)
+    outside_majority = _other_artist_majority(track_artists, discography_artist)
+    same_artist_collection = _single_artist_collection(track_artists) and bool(
+        re.search(r"\b(?:greatest hits|best of|anthology|collection|the highlights|trilogy)\b",
+                  name_text, re.I)
+        or "compilation" in raw
+        or "compilation" in secondary
+        or compilation_tag in {"1", "yes", "true", "compilation"}
+    )
 
     # All tracks participate, including remix/live exclusions. The 22-track
     # Disciple 02 anthology has multiple independent acts even when its first
     # file incorrectly supplies the album/albumartist tag of one performer.
+    if outside_majority:
+        return "compilation", "majority-other-artist"
     if diverse_artists:
         return "compilation", "track-artists"
+    if same_artist_collection:
+        return "anthology", "track-artists"
     if explicit_compilation_title:
         return "compilation", "name"
 
@@ -5722,6 +5798,7 @@ def finalize_release_metadata(releases: List[Release]) -> None:
             first_tags,
             sum(max(0.0, float(track.duration or 0.0)) for track in rel.tracks),
             [track.artist for track in rel.tracks],
+            _discography_artist_from_release(rel),
         )
         rel.family = album_family(rel.title)
         rel.explicit = release_explicit_state(rel)
@@ -7805,6 +7882,7 @@ def optimize_collection(
                     "root_kind": rel.root_kind,
                     "release_type": rel.release_type,
                     "release_type_source": rel.type_source,
+                    "type_warning": _compilation_warning(rel),
                     "source_medium": rel.source_medium,
                     "source_rank": source_rank(rel),
                     "cd_rip_quality_class": cd_rip_quality_class(rel),
@@ -12817,6 +12895,7 @@ def _release_map_state_for_ui(
                 "kind": "retained" if retained else "duplicate",
                 "outcome": str(item.get("outcome", "")),
                 "manualRemoved": manual_removed,
+                "typeWarning": str(item.get("type_warning", "") or ""),
                 "releaseBlocked": release_blocked,
                 "forceKeep": rid in (pinned_release_ids or set()),
                 "pendingReleaseChange": pending_release_change,
