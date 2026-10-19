@@ -10654,7 +10654,9 @@ button,input { font:inherit; }
   #columns.fullMapColumns .releaseColumn:last-child:nth-child(odd){grid-column:auto;}
 }
 #columns.changesMode { display:block; padding:12px 14px 24px; }
-#changeList { width:min(1180px,100%); margin:0 auto; }
+#changeList { width:min(1560px,100%); margin:0 auto;
+  display:grid; grid-template-columns:repeat(auto-fit,minmax(min(540px,100%),1fr)); gap:12px; align-items:start; }
+#changeList .changeSection { margin:0; }
 .changeSection { margin:0 0 14px; border:1px solid #27303a; border-radius:9px; background:rgba(16,20,26,.58); overflow:hidden; }
 .changeSectionHead {
   display:flex; align-items:center; gap:8px; min-height:34px; padding:7px 10px;
@@ -10734,10 +10736,10 @@ button,input { font:inherit; }
 .releaseRow:hover { background:#171c23; border-color:#343d49; }
 .releaseRow:focus-visible { outline:2px solid #8cc8ff; outline-offset:2px; }
 .releaseRow.selected { opacity:1 !important; background:#18283a; border-color:#68a9f5; box-shadow:0 0 0 1px rgba(104,169,245,.18); }
-.releaseRow.duplicate { height:25px; opacity:.18; color:#727b88; background:transparent; }
-.releaseRow.duplicate:hover { opacity:.52; background:#13171d; }
-.releaseRow.duplicate .releaseName { color:#7b8491; font-weight:400; }
-.releaseRow.duplicate .folderIcon { filter:grayscale(1); opacity:.42; }
+.releaseRow.duplicate { height:28px; opacity:.72; color:#a3adba; background:transparent; }
+.releaseRow.duplicate:hover { opacity:1; background:#1b222b; }
+.releaseRow.duplicate .releaseName { color:#acb7c5; font-weight:450; }
+.releaseRow.duplicate .folderIcon { filter:grayscale(1); opacity:.70; }
 .releaseRow.retained.originOld .folderIcon { background:#6f8eae; }
 .releaseRow.retained.originOld .folderIcon:before { background:#8dabc9; }
 .releaseRow.retained.originNew .folderIcon { background:#4fa986; }
@@ -10757,8 +10759,8 @@ button,input { font:inherit; }
 }
 .releaseRow.carrier { border-color:#54d6ff; background:#102934; color:#e8fbff; box-shadow:0 0 0 1px rgba(84,214,255,.24); }
 .releaseRow.searchMatch { opacity:1 !important; border-color:#f3c969; background:#2a2413; box-shadow:0 0 0 1px rgba(243,201,105,.22); }
-.releaseRow.searchDimmed { opacity:.08 !important; }
-.releaseRow.dimmed { opacity:.08 !important; }
+.releaseRow.searchDimmed { opacity:.34 !important; }
+.releaseRow.dimmed { opacity:.36 !important; }
 .releaseRow.carrier { opacity:1 !important; }
 /* Transient Re-Analyze change markers (color + symbol). No animation. */
 .releaseRow.reanalysisAdded,.changeRow.reanalysisAdded {
@@ -10822,6 +10824,8 @@ button,input { font:inherit; }
 }
 .exportCopyBtn { font-weight:780; border-color:#2f7d4b; background:#12301d; color:#b8f7c9; }
 .exportCopyBtn:hover:not(:disabled) { background:#19472a; border-color:#4bb96c; }
+.exportMoveBtn { font-weight:750; border-color:#b37a39; background:#362817; color:#ffdea6; }
+.exportMoveBtn:hover:not(:disabled) { background:#51351b; border-color:#ecae57; color:#fff0cb; }
 @media (max-width:1250px) {
   #sourceLegend { display:none; }
   #exportBar.open { grid-template-columns:1fr; }
@@ -11044,6 +11048,7 @@ button:focus-visible,input:focus-visible { outline:2px solid #8cc8ff; outline-of
 <div id="changeBar" aria-label="Release views and change-category filters">
   <button class="viewBtn active" id="changesViewBtn" aria-pressed="true">Changes</button>
   <button class="viewBtn" id="fullViewBtn" aria-pressed="false">Full map</button>
+  <button class="viewBtn" id="connectionsBtn" aria-pressed="false" title="Show every release connection">Show all links</button>
   <button class="changeChip added" id="changesAddedBtn" data-filter="added">+ Added</button>
   <button class="changeChip upgraded" id="changesUpgradedBtn" data-filter="upgraded">⬆️ Upgraded</button>
   <button class="changeChip" id="changesReplacedBtn" data-filter="replaced">↔ Replaced</button>
@@ -11070,11 +11075,11 @@ button:focus-visible,input:focus-visible { outline:2px solid #8cc8ff; outline-of
     <button class="btn exportCopyBtn" id="copyAllBtn" disabled>Copy old + new</button>
   </div>
   <div class="exportChoice">
-    <div class="exportLabel"><b>Move old + new releases into:</b><span>Move retained OLD + NEW folders to the updated collection. Originals will be relocated; Undo available.</span></div>
+    <div class="exportLabel"><b>Move old + new releases into:</b><span>Originals relocated. Same-drive only; Undo available.</span></div>
     <button class="btn pathOpenBtn" id="openNewDestination" disabled title="Open destination" aria-label="Open move destination">📁</button>
     <div class="exportPath" id="newDestination" title="">Choose destination...</div>
     <button class="btn" id="chooseNewDestination">Browse...</button>
-    <button class="btn exportCopyBtn" id="copyNewBtn" disabled>Move old + new</button>
+    <button class="btn exportMoveBtn" id="copyNewBtn" disabled>Move old + new</button>
   </div>
 </div>
 <script type="module">
@@ -11086,6 +11091,7 @@ let rowEls = new Map();
 let resizeTimer = null;
 let viewMode="changes";
 let changeFilter="all";
+let showAllConnections=false;
 const exportDestinations={all:"",new:""};
 const REANALYZE_HIGHLIGHT_MS=15000;
 let lastReanalyzeToken="";
@@ -11419,12 +11425,12 @@ function drawConnections() {
     if(touch) dupTouch+=segment; else dupNormal+=segment;
   });
   if(activeTrack){
-    addCurveBatch(svg,dupNormal+dupTouch,"#758296",1.55,0.055);
+    if(showAllConnections)addCurveBatch(svg,dupNormal+dupTouch,"#758296",1.45,0.10);
   } else if(selected==null){
-    addCurveBatch(svg,dupNormal,"#758296",1.65,0.30);
+    if(showAllConnections)addCurveBatch(svg,dupNormal,"#758296",1.45,0.27);
   } else {
-    addCurveBatch(svg,dupNormal,"#758296",1.45,0.10);
-    addCurveBatch(svg,dupTouch,"#758296",2.8,0.78);
+    if(showAllConnections)addCurveBatch(svg,dupNormal,"#758296",1.3,0.12);
+    addCurveBatch(svg,dupTouch,"#91b7e6",2.8,0.84);
   }
 
   if(selected!=null && !activeTrack){
@@ -12324,8 +12330,9 @@ function copyPlan(mode){
     ? "Copy retained OLD + NEW releases into:\n\n"+path+"\n\n"+summary+"\n\n"
       +"This is non-destructive: the existing and new/update source folders will not be moved, deleted, or modified."
     : "MOVE retained OLD + NEW releases into:\n\n"+path+"\n\n"+summary+"\n\n"
-      +"This WILL remove each retained release folder from its original OLD or NEW location and place it in the destination. "
-      +"Skipped/removed releases stay where they are. No destination folders will be overwritten. "
+      +"This renames original OLD/NEW release folders into the destination. "
+      +"Same-volume Move only; cross-volume transfers are blocked. "
+      +"Skipped releases stay where they are. Nothing is overwritten. "
       +"Undo Last Run can restore moved folders.";
   if(window.confirm(message))bridge.copyPlan(mode,path);
 }
@@ -12336,6 +12343,12 @@ document.getElementById("openNewDestination").onclick=function(){const path=sele
 document.getElementById("copyAllBtn").onclick=function(){copyPlan("all");};
 document.getElementById("copyNewBtn").onclick=function(){copyPlan("new");};
 document.getElementById("closeBtn").onclick=function(){bridge.closeMap();};
+document.getElementById("connectionsBtn").onclick=function(){
+  showAllConnections=!showAllConnections;
+  this.setAttribute("aria-pressed",String(showAllConnections));
+  this.textContent=showAllConnections?"Show selected links":"Show all links";
+  scheduleConnections();
+};
 document.addEventListener("keydown",function(e){
   if(e.key==="Escape" && document.getElementById("details").classList.contains("open")){
     e.preventDefault();
