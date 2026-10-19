@@ -1,6 +1,23 @@
 # Music Collection Cleaner - Continuity Handoff
 
-## Current checkpoint - 2026-10-19, MCC v0.5.36 - Under construction ⚠️
+## Current checkpoint - 2026-10-19, MCC v0.5.37 - Under construction ⚠️
+
+**Canonical source:** `Music Collection Cleaner v0.05.37.pyw` on `karpuzikov/MCC/main`, created in commit `8f41102bf0b0b14519513aaac2c9593037d2b30f`; v0.5.36 remains intact. This is a source-only corrective test version, **not Windows accepted or stable**.
+
+**New concrete evidence (user uploads):** `Music Collection Cleaner Comparison 2026-10-19-11-46-50.jsonl` and `image(20261019-085823).png` from the Noisia discography, 2026-10-19. Complete JSONL parsed successfully: 725 rows = 720 physical tracks plus run/grouping/summary/DR/optimizer rows. **All 720 tracks** report `Full decode failed: [WinError 5] Access is denied.`, all have 0.0-second duration and 0 fingerprint frames; 449 eligible recordings have zero fingerprints; 271 are excluded up-front (243 remix, 28 live). `possible_pairs` and `candidate_pairs` are 0. Optimizer incorrectly produced 87 retained releases / 475 physical tracks without acoustic comparison. The screenshot shows full-map cards crowded with repeated full-decode errors. These optimizer decisions **must not be used for Copy or Move**. The log cannot on its own prove whether Windows denied process creation or Job assignment.
+
+**Likely environment failure:** Existing `run_hidden` spawned external processes into an inherited Windows Job and immediately called `AssignProcessToJobObject` on MCC's own kill-on-close Job. Windows can return `ERROR_ACCESS_DENIED` for incompatible nested Job membership / non-breakaway parents; see Microsoft `AssignProcessToJobObject` and Nested Jobs documentation. Native reproduction of the exact failing OS call is still **NOT RUN**.
+
+**Code changes for v0.5.37:**
+- `run_hidden` requests `CREATE_BREAKAWAY_FROM_JOB` on Windows before attaching a child to MCC's own kill-on-close cleanup Job. When the parent Job allows it, this avoids inherited Job membership incompatible with assignment; where it is prohibited or executable launch is denied, the process fails with a clear executable/permissions/launcher diagnostic rather than continuing. It never intentionally launches unmanaged fallback subprocesses.
+- `prepare_analysis` executes an FFmpeg/FFprobe `-version` preflight using the same supervised subprocess route **before** scanning source folders. Windows Access denied then aborts at dependency verification, with no fabricated map or audio results.
+- `verify_audio_integrity` fails closed when all distinct physical audio files fail decoding, even if the executable works for `-version` but cannot access actual inputs. Existing partial-file-integrity report behavior remains.
+- New `_external_audio_preflight_regression_self_test`, called by `--ui-self-test`, checks simulated `OSError(5, "Access is denied")` abort and synthetic 100% decode failure. Source/embedded JS readback inspected; **Python compilation and execution of this added fixture are NOT RUN**.
+- README points at v0.5.37. No changes to release planning, classifier, Save Remix/Live, copy/move/undo implementation, preserved user data, GitHub Actions or v0.5.36 source.
+
+**Exact next action:** On the user's Windows machine run `py -m py_compile "Music Collection Cleaner v0.05.37.pyw"` and `py "Music Collection Cleaner v0.05.37.pyw" --ui-self-test`. If both pass, launch v0.5.37 *directly from Explorer* and analyze the identical Noisia source folders. Success requires real FFprobe tags/durations, successful FFmpeg integrity verification, `tracks_with_fingerprints > 0`, meaningful acoustic candidates when comparable recordings exist, and no all-error warnings. If external execution still fails, retain exact new error message, dependency executable paths and application run log, and investigate local Windows Job restrictions/permissions without changing the music files. Check first 🇷 / second 🇷 behavior for `Asteroids (Noisia Remix)`, persistent Callout hook Skip, Keep/Unkeep, Compilation/Anthology, performance and acoustic parity only after decoding works. **Do not perform Copy/Move on primary media.** Independently known cross-volume Move pre-journaling flaw, release taxonomy Soundtrack/DJ Mix, unique crash logs and real Windows acceptance remain release blockers.
+
+## Prior checkpoint - 2026-10-19, MCC v0.5.36 - Under construction ⚠️
 
 ### Additional 2026-10-19 source audit - unresolved release blockers (no source modification)
 
