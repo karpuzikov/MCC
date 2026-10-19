@@ -1,16 +1,16 @@
 # Music Collection Cleaner (MCC)
 
-**Version: 0.5.32 - Under construction ⚠️**
+**Version: 0.5.33 - Under construction ⚠️**
 
 Music Collection Cleaner compares existing music releases with new ones, finds the best combination of editions, and helps preserve every wanted unique recording while removing unnecessary redundancy.
 
 ## Download and run
 
-**[Music Collection Cleaner v0.05.32.pyw](Music%20Collection%20Cleaner%20v0.05.32.pyw)** - latest single-file Windows Python application. **Under construction ⚠️** until actual Windows WebView2 testing. Earlier source versions remain available.
+**[Music Collection Cleaner v0.05.33.pyw](Music%20Collection%20Cleaner%20v0.05.33.pyw)** - latest single-file Windows Python application. **Under construction ⚠️** until actual Windows WebView2 testing. Earlier source versions remain available.
 
-Open with Python 3 on Windows 11 (or run from a console with `python "Music Collection Cleaner v0.05.32.pyw"`). The application checks or installs supported dependencies. The GUI uses Microsoft Edge WebView2 through pywebview; it is not a terminal-based replacement.
+Open with Python 3 on Windows 11 (or run from a console with `python "Music Collection Cleaner v0.05.33.pyw"`). The application checks or installs supported dependencies. The GUI uses Microsoft Edge WebView2 through pywebview; it is not a terminal-based replacement.
 
-Source-level regression checks: `python "Music Collection Cleaner v0.05.32.pyw" --ui-self-test`. `--self-test` additionally requires a packaged standalone EXE.
+Source-level regression checks: `python "Music Collection Cleaner v0.05.33.pyw" --ui-self-test`. `--self-test` additionally requires a packaged standalone EXE.
 
 ## What it does
 
@@ -24,6 +24,13 @@ Source-level regression checks: `python "Music Collection Cleaner v0.05.32.pyw" 
 - Explicitly **Copy OLD + NEW** or **Move OLD + NEW** retained releases into the selected destination; Undo for supported completed moves.
 - Log comparisons, validate incomplete/corrupt inputs, choose I/O worker counts with drive awareness, and manage spawned subprocesses.
 
+
+## v0.5.33 - Classify unusual patterns later (Under construction ⚠️)
+
+- Pattern review now has **Later**: preserves unresolved patterns in app state, includes unclassified tracks in the continuing scan, and does not cancel analysis. Escape is equivalent to Later; Cancel scan stays explicit.
+- After scan or restart, **Classify patterns (N)** reopens the saved list without rescanning media. Partial classifications may be saved; remembered Remix/Live/Keep choices apply to future analyses and are not retroactively applied to an already-computed Release Map.
+- Pending entries are not re-prompted during later scans. Per-pattern Skip still excludes only that one scan; deferred Skip dismisses the pending reminder until a future scan.
+- Embedded regression fixture and JavaScript syntax checks added. Full Python tests and Windows WebView2/scan/filesystem acceptance **NOT RUN**. Remains Under construction ⚠️.
 
 ## v0.5.32 - Ignore this recording everywhere (Under construction ⚠️)
 
@@ -76,7 +83,7 @@ Source-level regression checks: `python "Music Collection Cleaner v0.05.32.pyw" 
 - **Fix:** Build a display-only index of excluded physical tracks on retained releases. When an eligible selected track is essential to collection coverage, show **"Only eligible copy; also listed on excluded edition: [name]"** if another retained release contains an excluded metadata match (same normalized song title and normalized artist set, duration difference <= 1 second). Otherwise say **"Only eligible copy in retained releases"**, not a categorical physical uniqueness claim. The Release Map snapshot/UI state stores `excluded_counterparts` / `excludedCounterparts`. Disclose source edition name via the existing track status/tooltip, without new buttons, dialogs or clicks.
 - **Safety:** This index is explanatory only. Similar title, artists and duration **do not prove acoustic identity**. Never populate fingerprint groups or mark skipped audio as covered from metadata. Optimizer decisions, album constraints, Copy/Move/Undo, file contents and prior classifications unchanged. The exclusion's actual reason was not present in the older v0.5.24 log; v0.5.25+ logging adds it for subsequent scans.
 - **Tests:** Added embedded `--ui-self-test` synthetic paired-release fixture for the GIMS case: two selected albums, CD copy eligible, WEB copy excluded and un-fingerprinted, exact normalized performers. Tests ensure the map receives the excluded source and no acoustic match is invented. GitHub source published and read back, extracted status JS syntax and isolated status output **PASS**. Full Python compilation, embedded self-tests, actual Windows GUI/keyboard/screenshot, rescanning the real GIMS collection and filesystem Copy/Move/Undo **NOT RUN**. Keep construction status.
-- **Next:** On Windows run `python -m py_compile "Music Collection Cleaner v0.05.32.pyw"`, `python "Music Collection Cleaner v0.05.32.pyw" --ui-self-test`, then rescan the same GIMS releases with logging. Confirm CD `La même` explicitly points to the excluded WEB edition without declaring a proven fingerprint duplicate. Validate retained-set optimization and Copy/Move/Undo on disposable files.
+- **Next:** On Windows run `python -m py_compile "Music Collection Cleaner v0.05.33.pyw"`, `python "Music Collection Cleaner v0.05.33.pyw" --ui-self-test`, then rescan the same GIMS releases with logging. Confirm CD `La même` explicitly points to the excluded WEB edition without declaring a proven fingerprint duplicate. Validate retained-set optimization and Copy/Move/Undo on disposable files.
 
 ## v0.5.25 - full GIMS comparison log audit and one-track Remix correction (Under construction ⚠️)
 
