@@ -5,6 +5,13 @@ Last updated: 2026-10-19
 This file is the project-specific rulebook for the Discography Builder and Duplicate / Edition Analyzer.
 The account-wide `SOFTWARE_RULES.md` baseline always applies. This file may add stricter project-specific requirements but must never weaken or override a newer global rule or a newer explicit user instruction. When project rules conflict with the global baseline, the stricter/newer requirement wins.
 
+## MCC 2026-10-19 - Release Map Changes vs All changes (v0.5.34)
+
+- **Changes** and the old **All changes** chip produced identical visible results. Remove the redundant chip and all references to its UI ID. Keep **Changes (N)** as the single one-click action that displays all change categories and resets any active change-category filter.
+- Preserve **Full map** as a distinct view of every analyzed release including unchanged releases. Preserve direct filters Added, Upgraded, Replaced, Removed and Ignored; clicking any category switches to Changes and shows only that category.
+- Derived change counts, keyboard/pointer activation, focus, hover, aria-pressed and disabled states must truthfully reflect the current view/filter. Avoid explanatory interface text for obvious views.
+- No audio analysis, release selection, historical saved preferences, source files, Copy/Move/Undo or acceptance status may be altered by this UI-only fix. Windows WebView2 acceptance remains mandatory.
+
 ## MCC 2026-10-19 - postpone unusual-pattern classification (v0.5.33)
 
 - Pre-analysis unusual-pattern review has a distinct **Later** action. Clicking Later (or Escape) must preserve undecided patterns as pending **before** audio comparison continues. It must not implicitly classify or exclude undecided recordings; unlike per-pattern Skip, undecided audio remains included. Explicit partial Remix/Live/Keep/Skip choices must retain their established meanings.
