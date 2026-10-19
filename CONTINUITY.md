@@ -2,6 +2,16 @@
 
 ## Current checkpoint - 2026-10-19, MCC v0.5.41 - Under construction ⚠️
 
+### New P0 acoustic-first regression - 2026-10-19 (reported after v0.5.41 handoff)
+
+- **User's explicit priority:** Audio fingerprints are the authoritative backbone. Track titles, filenames and metadata are optional/incorrect hints and must not suppress acoustic comparison or trump high-confidence audio identity. Full persistent implementation requirements are now in `RULES.md` under `MCC acoustic fingerprints are authoritative`; follow the newest instruction over older metadata-veto/early-exclusion policies.
+- **Specific files to test:** `2008-01-01 - 808s & Heartbreak [602557134230]` / `Pinocchio Story` and `2008-11-21 - 808s & Heartbreak [JP - UICD-9058]` / `Pinocchio Story (Freestyle Live from Singapore)`. User reports they are the same audio. Independent raw-file AcoustID/Chromaprint measurements have **NOT RUN**, so this is not yet an empirically certified recording identity.
+- **Verified v0.5.41 bug path:** `_unique_recording_root_family` returns `""` for unqualified `Pinocchio Story` and `"live"` for the titled live version; `_candidate_semantic_conflict` rejects non-byte-identical fingerprint candidates in the duration router and same-base-title router. A later exact-fingerprint index can rescue only byte-identical fingerprint vectors; sufficiently similar cross-mastered versions can be lost. With Save Live OFF, `configure_exclusions` marks the latter excluded and clears its fingerprint before fingerprinting/merging; `analysis_indices` selects only nonexcluded tracks, so no acoustic comparison happens at all. Other metadata/title gates exist in replaceable-version logic. Current fixed test fixture does not cover this mismatch.
+- **Required fix:** Separate *acoustic identification* from *user inclusion/exclusion choices*. Verify full fingerprints for both files; build efficient metadata-independent fingerprint candidate discovery; compare irrespective of asymmetric Live label (even under Save Live OFF, for cross-release identity); make audio evidence decisive while preserving acoustic-duration/version and false-positive guards. Add synthetic audio/metadata fixture covering conflicting/missing titles, semantically different labels and excluded-vs-included tracks, plus real-file fingerprint comparison using the exact two user releases. Never infer equality from a shared name or ID alone. Check Copy/Move plans using disposable folders after the fix.
+- **Verification so far:** Static GitHub source analysis and MusicBrainz release catalogue inspection only. No v0.5.42 source changes or audio comparison test completed; v0.5.41 remains **Under construction ⚠️** and all previously unrun Windows Visual QA/Move gates remain unrun. GitHub Actions unchanged.
+
+
+
 ## User-requested chat closeout - 2026-10-19 (native screenshot audit)
 
 - **Trigger:** The user said "this chat is done", requiring this GitHub closeout and a copy-paste handoff rather than an acknowledgment. Canonical repo `karpuzikov/MCC`, branch `main`. Latest verified main source `Music Collection Cleaner v0.05.41.pyw` (blob `e148524b2a2a4eb64755267a4ba9a0b4eaaf3557`); `tests/visual_qa.py` blob `a10996bd232a694257366ff2a6131dc537340e19`. Do not hand off v0.5.40 as the current build.
