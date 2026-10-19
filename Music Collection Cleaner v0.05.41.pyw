@@ -11626,6 +11626,7 @@ function renderChangeSummary() {
   fullBtn.classList.toggle("active",viewMode==="full");
   changesBtn.setAttribute("aria-pressed",String(viewMode==="changes"));
   fullBtn.setAttribute("aria-pressed",String(viewMode==="full"));
+  document.getElementById("connectionsBtn").hidden=viewMode!=="full";
 }
 function setViewMode(mode,filter) {
   viewMode=mode==="full"?"full":"changes";
@@ -13986,6 +13987,7 @@ button:focus-visible,input:focus-visible{
 .picksList{border:1px solid #29313c;border-radius:8px;overflow:hidden}
 .picksList .categoryHeading{margin:0;padding:9px 10px;background:#1a222c;border-bottom:1px solid #29313c}
 .picksList .pickRow{grid-template-columns:68px minmax(0,1fr) auto auto}
+.picksList .pickRemove{grid-column:4}
 .pickFilter{width:100%;margin-bottom:9px}
 .pickEditInput{min-width:0;height:30px}
 .pickRow{display:grid;grid-template-columns:90px minmax(0,1fr) auto;gap:9px;align-items:center;padding:8px 10px;
@@ -17632,6 +17634,28 @@ def _ui_contract_self_test() -> None:
             restored, conflicts = undo_last_run()
             if restored != 2 or conflicts or not old_release.exists() or not new_release.exists():
                 raise RuntimeError("Move Undo contract failed.")
+            # Simulate rename succeeded but the caller raised before recording
+            # success. The pre-journaled entry must support full rollback.
+            from unittest import mock
+            original_safe_move = _verified_release_directory_move
+            failure_fired = [False]
+            def injected_after_rename(src, dst):
+                original_safe_move(src, dst)
+                if Path(src) == old_release and not failure_fired[0]:
+                    failure_fired[0] = True
+                    raise RuntimeError("Injected failure after rename")
+            with mock.patch.dict(globals(), {"_verified_release_directory_move": injected_after_rename}):
+                try:
+                    move_retained_plan(old_root, new_root, output, sample_releases, decisions)
+                except RuntimeError as exc:
+                    if "Injected failure" not in str(exc):
+                        raise
+                else:
+                    raise RuntimeError("Injected post-rename failure was not reported.")
+            if not failure_fired[0] or not old_release.is_dir() or not new_release.is_dir():
+                raise RuntimeError("Write-ahead Move rollback did not restore source releases.")
+            if (output / "Albums" / "Edition A").exists() or test_manifest.exists():
+                raise RuntimeError("Write-ahead Move rollback left an unjournaled moved release.")
             # Simulate EXDEV, even on same-volume CI. It must fail closed;
             # the source stays intact and no target is published.
             from unittest import mock
