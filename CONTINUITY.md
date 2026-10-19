@@ -2,6 +2,20 @@
 
 ## Current checkpoint - 2026-10-19, MCC v0.5.38 - Under construction ⚠️
 
+### Visual QA Gate implemented 2026-10-19 (global rule + MCC, no app-version change)
+
+**User requirement:** Prevent repeated novice UI mistakes by enforcing actual visual QA rather than trusting CSS/JS source checks. Mandatory stages: control contract, minimal design, automated layout/hover/keyboard tests using the real rendered HTML, screenshot comparison, and native Windows WebView2 functional and visual acceptance, with honest FAIL/NOT RUN reporting. Applies to all future `karpuzikov` UI projects.
+
+**Saved durably in GitHub:** canonical `karpuzikov/userscripts/SOFTWARE_RULES.md` and `UI_UX_RULES.md` updated; both exact mirrors synchronized in `karpuzikov/MCC`. MCC-specific `RULES.md`, `UI_UX_ACCEPTANCE.md` and README document the requirement. The user's ChatGPT account memory cannot be synchronously changed from this tool; GitHub documentation is the definitive persistent instruction.
+
+**MCC test harness added:** `tests/visual_qa.py` (developer-only, no extra GUI controls or production runtime dependency). Install `py -m pip install playwright`; run `py tests/visual_qa.py --browser edge` on Windows, or `--browser system` for existing Linux Chromium. Loads the **actual embedded MCC Release Map HTML/JS** from `Music Collection Cleaner v0.05.38.pyw`, injects synthetic Noisia releases with long titles and saved/unsaved classifications, and uses a mocked bridge to verify layout and interactions without touching source files. Geometry assertions check button containment, column/status overlaps, clickable saved badges, focus/hover actions, keyboard Ctrl+A on the path, collapsed/expanded Album group, Escape, and duplicated controls. Captures normal/minimum/large/125%-CSS-zoom screenshots and a machine-readable report under isolated Documents/Karpuzikov Tools/Music Collection Cleaner/testing/visual-qa-<timestamp>.
+
+**Status:** Global canonical rule and MCC mirror writes verified, test-runner source exists on main. Browser visual-runner execution against the real 0.5.38 source **NOT RUN** here (GitHub source was accessed by connector but not mounted in the container runtime). Python runtime `--ui-self-test` and real Windows native WebView2 acceptance **NOT RUN**, screenshot human comparison **NOT RUN**, Copy/Move/Undo **NOT RUN**. CLI developer test may need Playwright installed. The browser test uses a mocked bridge and CSS zoom; neither can prove Windows host behavior or actual display scaling. Software stays **v0.5.38 - Under construction ⚠️**, with other blockers unchanged.
+
+**Exact next action:** Run Playwright visual QA on Windows using the above command and review all generated screenshots, compare Noisia's `Outer Edges (Noisia Remixes)` against the user reference, fix any layout regressions in a new versioned source. Then perform native WebView2 hover/click/Tab/Enter/Space/Escape, real window resizing/125% scaling, persistence and acoustic/Copy/Move/Undo acceptance. Do not call the UI fixed without that native test evidence. Do not modify GitHub Actions workflows without explicit approval.
+
+
+
 **Canonical source:** `Music Collection Cleaner v0.05.38.pyw` on `karpuzikov/MCC/main`. Created `0224a8b85d0feda4309a73466a18f41fa1e4cc2a`, refined `00d8a8850f004b0d567bdd8e31367c61118e8eca`. Previous v0.5.37 remains available, with its decoder preflight/all-failed-media fixes unchanged.
 
 **User report (actual Windows screenshot):** `image(20261019-092934).png`, Release Map Noisia `2017-06-09 - Outer Edges (Noisia Remixes) [VSN030]`, 1486×913. v0.5.37 now visibly runs, with 50 releases/290 tracks reported in the UI. User flagged repeated root and release paths, pointless Copy path button, all-caps `DUPLICATE / REMOVE`, excess explanatory text and source panels, inline Remix badge wrapped into second row, repeated hover Remix button, misaligned Regional Indicator R glyph, and R/L/Stop controls absolutely overlapping `Excluded: Remix`. Screenshot is a user-provided reference, **not successful native acceptance of v0.5.38**.
