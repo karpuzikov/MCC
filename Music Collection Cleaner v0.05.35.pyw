@@ -10849,8 +10849,15 @@ button,input { font:inherit; }
 .altVersion .altState.retained { color:#8ee7a7; }
 .altVersion .altState.available { color:#f3d17a; }
 .altVersion .altReleases { color:#7f8c9d; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.trackActionGroup{position:absolute;right:8px;top:4px;display:flex;align-items:center;gap:4px;z-index:2;
+  opacity:0;pointer-events:none;transition:opacity .1s}
+.track:hover .trackActionGroup,.track:focus-within .trackActionGroup{opacity:1;pointer-events:auto}
+.patternMark,.patternBadge{height:28px;min-width:29px;border-radius:6px;border:1px solid #455261;
+  padding:0 4px;background:#19212b;color:#f1f5fa;cursor:pointer;font-size:15px}
+.patternMark:hover,.patternBadge:hover{background:#2b4057;border-color:#89b9e7}
+.patternBadge{height:22px;min-width:23px;margin-left:5px;font-size:12px;vertical-align:middle}
 .ignoreTrack {
-  position:absolute; right:8px; top:5px; height:30px; opacity:0; pointer-events:none;
+  position:static; height:28px; opacity:1; pointer-events:auto;
   border:1px solid #a33b44; border-radius:7px; background:#5b2026; color:#ffe8ea; padding:0 11px;
   font-weight:700; transition:.10s ease; cursor:pointer; box-shadow:0 2px 8px rgba(0,0,0,.35);
 }
@@ -11816,6 +11823,18 @@ function openDetails(n) {
     if(remixes.length) altButtons+='<button class="remixesTrack" data-track="'+t.index+'">Remixes '+remixes.length+'</button>';
     if(live.length) altButtons+='<button class="liveTrack" data-track="'+t.index+'">Live '+live.length+'</button>';
     const versionsCell='<div class="versionsCell">'+altButtons+'</div>';
+    const symbols={remix:"🇷",live:"🇱",skip:"🛑"};
+    const names={remix:"Remix",live:"Live",skip:"Ignored"};
+    const badge=t.patternKind?
+      '<button class="patternBadge" data-track="'+t.index+'" title="Move to Personal Picks" aria-label="Move '+esc(names[t.patternKind]||"pattern")+' to Personal Picks">'+
+      (symbols[t.patternKind]||"")+'</button>':"";
+    const actions=state.editable?
+      '<span class="trackActionGroup">'+["remix","live","skip"].map(function(kind){
+        const active=t.patternKind===kind;
+        const label=active?"Move to Personal Picks":"Mark as "+names[kind];
+        return '<button class="patternMark" data-track="'+t.index+'" data-kind="'+kind
+          +'" title="'+label+'" aria-label="'+label+'">'+symbols[kind]+'</button>';
+      }).join("")+action+'</span>':"";
     const statusText=trackStatus(t,n);
     const advisory=String(t.explicitState||"unknown").toLowerCase();
     const indicator=advisory==="explicit"?"E":(advisory==="clean"?"C":"");
@@ -11827,10 +11846,10 @@ function openDetails(n) {
       ?((t.orphaned||!t.replacementSource)?"status missing":"status replacement")
       :"status";
     tracks+='<div class="'+cls.join(" ")+'" role="button" tabindex="0" aria-label="Inspect track '+esc(t.title)+(advisoryName?' - '+advisoryName+' metadata':'')+'" data-group="'+t.groupId+'" data-index="'+t.index+'" title="'+esc(statusText)+'">'
-      +'<div class="num">'+esc(t.number)+'</div><div class="titleText" title="'+esc(t.title)+'">'+esc(t.title)+advisoryBadge+'</div>'
+      +'<div class="num">'+esc(t.number)+'</div><div class="titleText" title="'+esc(t.title)+'">'+esc(t.title)+advisoryBadge+badge+'</div>'
       +'<div class="dur'+(nearestDelta!==null?' differentLength':'')+'" title="'+esc(nearestDelta!==null?'Different-length version: '+lengthDeltaText(nearestDelta)+' compared with another edition':'Length: '+t.duration)+'">'+esc(t.duration)
       +(nearestDelta!==null?'<span class="lengthDelta">'+lengthDeltaText(nearestDelta)+'</span>':'')+'</div>'
-      +versionsCell+'<div class="'+statusClass+'">'+esc(statusText)+'</div>'+action+'</div>';
+      +versionsCell+'<div class="'+statusClass+'">'+esc(statusText)+'</div>'+actions+'</div>';
     function addAlternativePanel(items,kind){
       if(!items.length) return "";
       let rows="";
@@ -11958,6 +11977,8 @@ function openDetails(n) {
       const activateTrack=function(ev){
         if(ev.target && (
           ev.target.classList.contains("ignoreTrack")
+          || ev.target.classList.contains("patternMark")
+          || ev.target.classList.contains("patternBadge")
           || ev.target.classList.contains("versionsTrack")
           || ev.target.classList.contains("remixesTrack")
           || ev.target.classList.contains("liveTrack")
@@ -11969,6 +11990,18 @@ function openDetails(n) {
         if(ev.key==="Enter"||ev.key===" "){ev.preventDefault();activateTrack(ev);}
       };
     }
+  });
+  inner.querySelectorAll(".patternMark").forEach(function(btn){
+    btn.onclick=function(ev){
+      ev.stopPropagation();
+      bridge.markTrackPattern(Number(btn.dataset.track),btn.dataset.kind||"",receivePatternClassification);
+    };
+  });
+  inner.querySelectorAll(".patternBadge").forEach(function(btn){
+    btn.onclick=function(ev){
+      ev.stopPropagation();
+      bridge.markTrackPattern(Number(btn.dataset.track),"keep",receivePatternClassification);
+    };
   });
   inner.querySelectorAll(".ignoreTrack").forEach(function(btn){
     btn.onclick=function(ev){ev.stopPropagation();bridge.toggleTrack(Number(btn.dataset.track),receiveTrackToggle);};
@@ -12024,6 +12057,27 @@ function applyRootPatch(p) {
   state.applyHighlighted=!!p.applyHighlighted;
   if(p.result) state.result=p.result;
   renderPlanCounts(); updateButtons();
+}
+function receivePatternClassification(raw){
+  const update=JSON.parse(raw);
+  if(!update||update.kind!=="patternToggle"){receiveState(raw);return;}
+  const current=selectedId==null?null:getNode(selectedId);
+  const details=document.getElementById("details");
+  const scroll=details.scrollTop;
+  const patches=new Map((update.tracks||[]).map(p=>[Number(p.index),p]));
+  (state.nodes||[]).forEach(n=>(n.tracks||[]).forEach(t=>{
+    const p=patches.get(Number(t.index));
+    if(p){t.patternKind=p.patternKind;t.patternKey=p.patternKey;}
+  }));
+  state.requiresFreshScan=!!update.requiresFreshScan;
+  state.applyEnabled=false;
+  state.dirty=true;
+  updateButtons();
+  document.getElementById("modeText").textContent="Classification saved - run Analyze again";
+  if(current){
+    openDetails(current);
+    details.scrollTop=scroll;
+  }
 }
 function receiveTrackToggle(raw) {
   replacementCache=null;
@@ -12082,7 +12136,8 @@ function receiveReleaseToggle(raw) {
 }
 function updateButtons() {
   const r=document.getElementById("reanalyzeBtn");
-  r.disabled=!state.editable||!state.dirty; r.classList.toggle("dirty",!!state.dirty);
+  r.disabled=!state.editable||!state.dirty||!!state.requiresFreshScan;
+  r.classList.toggle("dirty",!!state.dirty&&!state.requiresFreshScan);
   updateExportControls();
 }
 document.getElementById("changesViewBtn").onclick=function(){setViewMode("changes","all");};
