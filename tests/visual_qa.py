@@ -162,7 +162,7 @@ window.__qaEvents=[];window.pywebview={api:{
                     page.goto("http://mcc-visual.test/release-map", wait_until="load")
                     try:
                         page.wait_for_function(
-                            "!!window.__visualQa && !!document.querySelector('.releaseRow')",
+                            "!!window.__visualQa && !!document.querySelector('.changeRow[data-id=\"1\"],.releaseRow[data-id=\"1\"]')",
                             timeout=15000)
                     except Exception:
                         # Keep actionable diagnostic artifacts even if init fails.
@@ -175,7 +175,26 @@ window.__qaEvents=[];window.pywebview={api:{
                         raise
                     if zoom!=1:
                         page.evaluate("(z)=>document.body.style.zoom=String(z)",zoom)
+                    # The app opens in Changes, whose rows are .changeRow,
+                    # not .releaseRow. Exercise both actual release views.
+                    if not page.locator('.changeRow[data-id="1"]').count():
+                        raise AssertionError("Changes view did not render the removed release")
+                    screenshot=name+"-changes.png"
+                    page.screenshot(path=str(output/screenshot))
+                    report["screenshots"].append(screenshot)
+                    page.locator('.changeRow[data-id="1"]').click()
+                    page.wait_for_function("document.querySelector('#details').classList.contains('open')")
+                    screenshot=name+"-changes-details.png"
+                    page.screenshot(path=str(output/screenshot))
+                    report["screenshots"].append(screenshot)
+                    page.keyboard.press("Escape")
+                    page.locator("#fullViewBtn").click()
+                    page.wait_for_function("!!document.querySelector('.releaseRow[data-id=\"1\"]')")
+                    screenshot=name+"-full-map.png"
+                    page.screenshot(path=str(output/screenshot))
+                    report["screenshots"].append(screenshot)
                     page.locator('.releaseRow[data-id="1"]').click()
+                    page.wait_for_function("document.querySelector('#details').classList.contains('open')")
                     page.locator('#tracks .track').first.hover()
                     screenshot=name+"-hover.png"
                     page.screenshot(path=str(output/screenshot))
