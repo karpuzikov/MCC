@@ -16133,7 +16133,68 @@ def _deferred_patterns_regression_self_test() -> None:
         globals()["_state_dir"] = original_state
 
 
+def _classification_and_release_keep_regression_self_test() -> None:
+    """Persistent Skip, Personal Picks, main-artist remix, release type and pin rules."""
+    original_state = globals()["_state_dir"]
+    try:
+        with tempfile.TemporaryDirectory(prefix="mcc-classification-") as root:
+            globals()["_state_dir"] = lambda: Path(root) / "state"
+            track = Track(
+                -9301, Path("01 Asteroids (Noisia Remix).flac"), 1,
+                title="Asteroids (Noisia Remix)", artist="Other Artist", is_remix=True,
+            )
+            release = Release(
+                -9301, "recycle", Path(root) / "Asteroids", "Asteroids",
+                tracks=[track], scan_root=Path(root) / "Noisia" / "Noisia ALAC",
+            )
+            if _discography_artist_from_release(release) != "noisia":
+                raise RuntimeError("Could not identify the explicitly named Noisia source root.")
+            if not _main_artist_remix(track, "noisia") or _main_artist_remix(track, "skrillex"):
+                raise RuntimeError("Main-artist remixer decision is not discriminating.")
+            configure_exclusions([release], True, False, [], {})
+            if track.exclude_from_coverage:
+                raise RuntimeError("Main artist's own Remix was excluded.")
+            key, label = _classify_track_pattern(track, "remix")
+            if not key or not label:
+                raise RuntimeError("No pattern extracted for map classification.")
+            categories = {key: {"kind": "skip", "label": label}}
+            _save_pattern_categories(categories)
+            if _load_pattern_categories() != categories:
+                raise RuntimeError("Skip category did not survive reload.")
+            configure_exclusions([release], False, False, [], categories)
+            apply_pattern_exclusions([release], {key})
+            if not track.exclude_from_coverage:
+                raise RuntimeError("Skip did not eliminate the pattern.")
+            picks: List[Dict[str, str]] = []
+            _add_personal_pattern_rule(picks, key, label)
+            if not _personal_pick_match(track, picks):
+                raise RuntimeError("Promoting pattern to Personal Picks does not match.")
+            configure_exclusions([release], True, False, picks, {})
+            if track.exclude_from_coverage:
+                raise RuntimeError("Personal Picks did not override remix exclusion.")
+            if infer_release_type("Best of Noisia", "Best of Noisia", 4, {},
+                                  track_artists=["Noisia"] * 4,
+                                  discography_artist="noisia")[0] != "anthology":
+                raise RuntimeError("Same-artist retrospective not classified Anthology.")
+            if infer_release_type("Sampler", "Sampler", 5,
+                                  {"releasetype": "Album"},
+                                  track_artists=["Noisia", "Other A", "Other B", "Other C", "Other D"],
+                                  discography_artist="noisia") != ("compilation", "majority-other-artist"):
+                raise RuntimeError("Strict majority of other performers not Compilation.")
+            if _other_artist_majority(["Noisia", "Other", "Other", "Noisia"], "noisia"):
+                raise RuntimeError("Half of the credits was incorrectly a majority.")
+            saved_path = _manual_album_group_path_key(release.path)
+            _save_manual_kept_release_paths({saved_path})
+            if saved_path not in _load_manual_kept_release_paths():
+                raise RuntimeError("Keep release was not persisted.")
+            if _committed_kept_paths_for_plan([release], set()):
+                raise RuntimeError("Unkeep did not clear its stored pin.")
+    finally:
+        globals()["_state_dir"] = original_state
+
+
 def _ui_contract_self_test() -> None:
+    _classification_and_release_keep_regression_self_test()
     _deferred_patterns_regression_self_test()
     _recording_ignore_regression_self_test()
     _candidate_router_regression_self_test()
@@ -16203,6 +16264,22 @@ def _ui_contract_self_test() -> None:
         or 'id="changesRemovedBtn"' not in map_ui
     ):
         raise RuntimeError("Release Map Changes/Full map and category filter controls regressed.")
+
+    map_html = _webview_release_map_html()
+    main_html = _webview_main_html()
+    if (
+        'id="keepReleaseBtn"' not in map_html
+        or 'bridge.toggleReleaseKeep(Number(n.id),receiveState)' not in map_html
+        or 'class="patternMark"' not in map_html
+        or 'class="patternBadge"' not in map_html
+        or 'bridge.markTrackPattern(' not in map_html
+        or 'state.requiresFreshScan' not in map_html
+        or 'kind:"remix"' in map_html
+        or 'id="pendingPatterns">Classify patterns' not in main_html
+        or 'function patternManagerModal(raw)' not in main_html
+        or '["remix","Remix"],["live","Live"],["skip","Skip"]' not in main_html
+    ):
+        raise RuntimeError("Classification and Keep UI contract failed.")
 
     if WEBVIEW_PRIVATE_MODE is not True:
         raise RuntimeError(
