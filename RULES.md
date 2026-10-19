@@ -5,6 +5,12 @@ Last updated: 2026-10-19
 This file is the project-specific rulebook for the Discography Builder and Duplicate / Edition Analyzer.
 The account-wide `SOFTWARE_RULES.md` baseline always applies. This file may add stricter project-specific requirements but must never weaken or override a newer global rule or a newer explicit user instruction. When project rules conflict with the global baseline, the stricter/newer requirement wins.
 
+## MCC v0.5.37 - external-decoder readiness and no invalid audio map
+
+- Before accepting an audio scan, verify FFmpeg and FFprobe can be spawned and safely supervised under Windows Job restrictions; abort before inspecting media if external subprocess access is denied. Preserve the kill-on-close subprocess lifecycle; do not launch unmanaged fallback children.
+- If **all** physical audio files fail full decoding, abort analysis and present one actionable batch failure instead of producing a metadata-only optimization, Release Map or any Copy/Move plan. Partial integrity failures still use existing per-release safety and Apply-blocking behavior.
+- Preserve original files, prior snapshots and previous complete source. Verify real Windows access-denied/restricted-launcher behavior and successful recovery scan; run Python compile, `--ui-self-test`, GUI acceptance and disposable Copy/Move/Undo. v0.5.37 remains **Under construction ⚠️** until validated.
+
 ## MCC v0.5.36 - first click pattern-mark must classify, not promote
 
 - The 🇷 / 🇱 / 🛑 buttons always **save the chosen Remix / Live / Skip classification** on the first click, even if the track is already automatically identified as a remix/live. Detection alone is **not** proof that the user has saved the category.
