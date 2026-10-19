@@ -13353,8 +13353,15 @@ def launch_webview_release_map(session: Dict[str, object]) -> Dict[str, object]:
                 self.pinned_release_ids.remove(release_id)
                 note = f'Keep reverted to automatic: "{rel.path.name}"'
             else:
+                was_ignored = release_id in self.blocked_release_ids
                 self.blocked_release_ids.discard(release_id)
                 self.pinned_release_ids.add(release_id)
+                if was_ignored:
+                    # Keep supersedes an old committed Ignore immediately,
+                    # including when the user closes before Re-Analyze.
+                    _save_manual_ignored_release_paths(
+                        _committed_ignore_paths_for_plan(self.releases, self.blocked_release_ids)
+                    )
                 note = f'Keep release: "{rel.path.name}"'
             _save_manual_kept_release_paths(
                 _committed_kept_paths_for_plan(self.releases, self.pinned_release_ids)
