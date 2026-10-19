@@ -1444,7 +1444,7 @@ def apply_pattern_exclusions(releases: List["Release"], excluded_pattern_keys: S
     for release in releases:
         for track in release.tracks:
             matched = sorted(track_pattern_keys(track) & excluded)
-            if matched:
+            if matched and not track.personal_keep_rule:
                 track.exclude_from_coverage = True
                 track.excluded_by_pattern = ", ".join(matched)
 
@@ -2603,6 +2603,8 @@ def configure_exclusions(
             matched_rule = _personal_pick_match(track, rules)
             if matched_rule:
                 track.personal_keep_rule = matched_rule
+                # Explicit Keep/Personal Picks overrides remix/live exclusion.
+                track.exclude_from_coverage = False
 
         if track.exclude_from_coverage:
             track.fingerprint = tuple()
@@ -13129,6 +13131,74 @@ def launch_webview_release_map(session: Dict[str, object]) -> Dict[str, object]:
             }
             return _json_ui_dumps(payload)
     
+        def markTrackPattern(self, track_index: int, kind: str):
+            if not self.editable or not (0 <= track_index < len(self.tracks)):
+                return self._state()
+            if kind not in {"remix", "live", "skip", "keep"}:
+                raise ValueError("Unknown track classification.")
+            track = self.tracks[track_index]
+            categories = _load_pattern_categories()
+            matches = [key for key in sorted(track_pattern_keys(track)) if key in categories]
+            if kind == "keep" and matches:
+                key = matches[0]
+                label = categories[key]["label"]
+            else:
+                key, label = _classify_track_pattern(track, kind)
+            # Clicking the current classification reverses it into Personal Picks.
+            previous = categories.get(key, {}).get("kind", "")
+            auto_kind = "live" if track.is_live else ("remix" if track.is_remix else "")
+            promote = kind == "keep" or kind == previous or (
+                not previous and kind == auto_kind
+            )
+            if promote:
+                categories.pop(key, None)
+                settings = _load_app_settings()
+                picks = _load_personal_keep_rules(settings)
+                _add_personal_pattern_rule(picks, key, label)
+                _save_app_settings(
+                    str(settings.get("existing_discography", "") or ""),
+                    str(settings.get("recycle_update_folder", "") or ""),
+                    bool(settings.get("save_remixes", False)),
+                    bool(settings.get("save_live", False)),
+                    bool(settings.get("logging_enabled", False)),
+                    personal_keep_rules=picks,
+                    io_workers=str(settings.get("io_workers", "auto") or "auto"),
+                )
+                if key not in _personal_pattern_keys(_load_personal_keep_rules(_load_app_settings())):
+                    raise OSError("Could not persist Personal Picks; classification not changed.")
+            else:
+                categories[key] = {"kind": kind, "label": label}
+            _save_pattern_categories(categories)
+            # A new inclusion choice may need fingerprints that an earlier scan
+            # never computed. Never silently re-optimize the stale acoustic groups.
+            self.requires_fresh_scan = True
+            self._mark_dirty(f'Pattern "{label}": {"Personal Picks" if promote else kind}')
+            self._refresh_pending_state()
+            patches = []
+            for i, item in enumerate(self.tracks):
+                candidate_keys = track_pattern_keys(item)
+                if key not in candidate_keys:
+                    continue
+                matched = [k for k in sorted(candidate_keys) if k in categories]
+                if matched:
+                    cat_key = matched[0]
+                    status = categories[cat_key]["kind"]
+                else:
+                    cat_key = key
+                    status = "" if promote else kind
+                    if not promote:
+                        status = kind
+                patches.append({"index": i, "patternKey": cat_key, "patternKind": status})
+                for node in self._ui_state.get("nodes", []):
+                    for row in node.get("tracks", []):
+                        if row.get("index") == i:
+                            row["patternKey"] = cat_key
+                            row["patternKind"] = status
+            return _json_ui_dumps({
+                "kind": "patternToggle", "tracks": patches,
+                "requiresFreshScan": True, **self._toggle_delta_base(),
+            })
+
         def toggleReleaseKeep(self, release_id: int):
             if not self.editable:
                 return self._state()
@@ -13456,6 +13526,7 @@ def launch_webview_release_map(session: Dict[str, object]) -> Dict[str, object]:
             "toggleTrack",
             "toggleRelease",
             "toggleReleaseKeep",
+            "markTrackPattern",
             "setAlbumGroup",
             "reanalyze",
             "openFolder",
@@ -14587,6 +14658,10 @@ def _webview_main_app() -> int:
         ):
             if self.running or self.review_pending or self.map_open:
                 return self._state_json()
+            # Map actions can change categories and Personal Picks externally.
+            self.pattern_categories = _load_pattern_categories()
+            self.personal_keep_rules = _load_personal_keep_rules(_load_app_settings())
+            self.pending_pattern_reviews = _load_pending_pattern_reviews()
     
             self.existing_path = str(existing_text or "").strip()
             self.recycle_path = str(recycle_text or "").strip()
