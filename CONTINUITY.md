@@ -20,9 +20,9 @@
 - **NOT RUN:** complete v0.5.32 `py_compile`, embedded `--ui-self-test`, v0.5.32 fresh GIMS full scan, timing `candidate_routing_seconds`, candidate-set/group parity against v0.5.30, Windows WebView2 visual/interaction, Ignore/Restore/Release Ignore actions, or disposable real Copy/Move/Undo. GitHub source is accessible to the connector, but it was not available as a locally mountable executable file in this execution environment; no Github Actions workflows/runs exist here to substitute for actual tests. No new .pyw source was written.
 - **Exact next action on user's Windows PC:** download `Music Collection Cleaner v0.05.32.pyw`; run `py -m py_compile "Music Collection Cleaner v0.05.32.pyw"`, then `py "Music Collection Cleaner v0.05.32.pyw" --ui-self-test`. If either fails, preserve the entire error and fix in the next versioned .pyw. Follow with the precise recording-wide Ignore/Restore/Release Ignore and new candidate-routing timing/GIMS regression matrix above. Keep `v0.5.32 - Under construction ⚠️` until real Windows acceptance.
 
-Last updated: 2026-10-15
-Status: **v0.5.32 - Under construction ⚠️** (not Windows-verified)
-Canonical file: `Music Collection Cleaner v0.05.32.pyw` on `karpuzikov/MCC/main`. Earlier v0.5.31, v0.5.30, v0.5.29, v0.5.28, v0.5.27, v0.5.26, v0.5.19 and user-tested v0.5.18 retained.
+Last updated: 2026-10-19
+Status: **v0.5.33 - Under construction ⚠️** (not Windows-verified)
+Canonical file: `Music Collection Cleaner v0.05.33.pyw` on `karpuzikov/MCC/main`. Earlier v0.5.32, v0.5.31, v0.5.30, v0.5.29, v0.5.28, v0.5.27, v0.5.26, v0.5.19 and user-tested v0.5.18 retained.
 
 ## Latest checkpoint - 2026-10-15, MCC v0.5.32 acoustic-wide Ignore
 
