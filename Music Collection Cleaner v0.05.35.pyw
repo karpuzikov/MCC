@@ -13992,7 +13992,6 @@ let bridge=null;
 let state=null;
 let modalKind="";
 let localPicks=[];
-let localCategories=[];
 let currentDone=null;
 let modalReturnFocus=null;
 let patternLaterAction=null;
@@ -14297,34 +14296,8 @@ function renderPickRows(){
     btn.onclick=function(){localPicks.splice(Number(btn.dataset.i),1);renderPickRows();};
   });
 }
-function renderCategoryRows(){
-  const host=document.getElementById("categoryRows");
-  if(!host)return;
-  if(!localCategories.length){
-    host.innerHTML='<div class="empty">No saved Remix/Live/Skip classifications</div>';
-    return;
-  }
-  host.innerHTML=localCategories.map(function(p,i){
-    return '<div class="pickRow categoryRow">'
-      +'<div class="pickValue">'+esc(p.label||p.key)+'</div>'
-      +'<select class="categoryKind" data-i="'+i+'" aria-label="Category for '+esc(p.label||p.key)+'">'
-      +'<option value="remix" '+(p.kind==="remix"?"selected":"")+'>Remix</option>'
-      +'<option value="live" '+(p.kind==="live"?"selected":"")+'>Live</option><option value="skip" '+(p.kind==="skip"?"selected":"")+'>Skip</option></select>'
-      +'<button class="btn categoryRemove" data-i="'+i+'" aria-label="Forget classification for '+esc(p.label||p.key)+'">Forget</button>'
-      +'</div>';
-  }).join("");
-  document.querySelectorAll(".categoryKind").forEach(function(sel){
-    sel.onchange=function(){localCategories[Number(sel.dataset.i)].kind=sel.value;};
-  });
-  document.querySelectorAll(".categoryRemove").forEach(function(btn){
-    btn.onclick=function(){localCategories.splice(Number(btn.dataset.i),1);renderCategoryRows();};
-  });
-}
 function personalPicksModal(raw){
   const data=typeof raw==="string"?JSON.parse(raw):raw;
-  localCategories=(data.categories||[]).map(function(x){
-    return {key:String(x.key||""),label:String(x.label||x.key||""),kind:String(x.kind||"remix")};
-  });
   localPicks=(data.rules||[]).map(function(x){
     const mode=x.mode==="pattern"?"pattern":(x.mode==="exact"?"exact":"contains");
     const item={mode:mode,value:String(x.value||"")};
@@ -14332,17 +14305,14 @@ function personalPicksModal(raw){
     return item;
   });
   openModal("picks","Personal Picks",
-    "Edit persistent Personal Picks and Remix/Live pattern classifications. Forget a category to review it again.",
+    "Keep patterns and titles as explicit inclusion exceptions.",
     '<div class="picksEntry"><input class="pathInput" id="pickInput" placeholder="Phrase or exact track title">'
       +'<button class="btn" id="addPhrase">Add phrase</button><button class="btn" id="addExact">Add exact title</button></div>'
-      +'<div class="picksList" id="pickRows"></div>'
-      +'<div class="categoryHeading">Saved Remix / Live / Skip classifications</div>'
-      +'<div class="picksList" id="categoryRows"></div>',
+      +'<div class="picksList" id="pickRows"></div>',
     '<button class="btn" id="copyPicks">Copy picks</button><button class="btn danger" id="clearPicks">Clear all</button>'
       +'<div class="modalSpacer"></div><button class="btn" id="picksCancel">Cancel</button>'
       +'<button class="btn primary" id="picksSave">Save</button>');
   renderPickRows();
-  renderCategoryRows();
   function add(mode){
     const input=document.getElementById("pickInput"),value=input.value.trim();if(!value)return;
     const key=value.toLowerCase().replace(/[^a-z0-9]+/g,"");
@@ -14362,7 +14332,7 @@ function personalPicksModal(raw){
   document.getElementById("clearPicks").onclick=function(){localPicks=[];renderPickRows();};
   document.getElementById("picksCancel").onclick=closeModal;
   document.getElementById("picksSave").onclick=function(){
-    closeModal();bridge.savePersonalPicks(JSON.stringify({rules:localPicks,categories:localCategories}),renderState);
+    closeModal();bridge.savePersonalPicks(JSON.stringify({rules:localPicks}),renderState);
   };
   document.getElementById("pickInput").focus();
 }
@@ -16282,9 +16252,9 @@ def _ui_contract_self_test() -> None:
         or 'id="patternsNone"' in main_map_html
         or 'id="patternContinue"' in main_map_html
         or '<select class="patternAction"' in main_map_html
-        or 'localCategories' not in main_map_html
-        or 'renderCategoryRows()' not in main_map_html
-        or 'rules:localPicks,categories:localCategories' not in main_map_html
+        or 'function renderPickRows()' not in main_map_html
+        or 'rules:localPicks' not in main_map_html
+        or 'function renderCategoryRows()' in main_map_html
     ):
         raise RuntimeError("Single-click Remix/Live pattern-review UI contract failed.")
 
