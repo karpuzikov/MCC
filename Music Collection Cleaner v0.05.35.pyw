@@ -2470,6 +2470,9 @@ def _personal_pick_match(track: "Track", rules: List[Dict[str, str]]) -> str:
             continue
         mode = str(item.get("mode", "contains")).strip().lower()
         if mode == "pattern":
+            key = _personal_pattern_key(item)
+            if key and key in track_pattern_keys(track):
+                return str(item.get("value", key))
             continue
         raw = str(item.get("value", "")).strip()
         needle = _personal_pick_normalize(raw)
@@ -12504,7 +12507,9 @@ def _assign_release_map_display_groups(nodes: List[Dict[str, object]], releases:
     by_kind: Dict[str, List[Dict[str, object]]] = defaultdict(list)
     for node in nodes:
         release_type = str(node.get("releaseType", "") or "").lower()
-        if release_type == "ep":
+        if release_type in {"compilation", "anthology"}:
+            kind = release_type
+        elif release_type == "ep":
             kind = "ep"
         elif release_type == "single":
             kind = "single"
@@ -13351,6 +13356,9 @@ def launch_webview_release_map(session: Dict[str, object]) -> Dict[str, object]:
                 self.blocked_release_ids.discard(release_id)
                 self.pinned_release_ids.add(release_id)
                 note = f'Keep release: "{rel.path.name}"'
+            _save_manual_kept_release_paths(
+                _committed_kept_paths_for_plan(self.releases, self.pinned_release_ids)
+            )
             self._mark_dirty(note)
             self._refresh_pending_state()
             self._rebuild_ui_state()
