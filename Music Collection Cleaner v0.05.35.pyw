@@ -13674,6 +13674,7 @@ def launch_webview_release_map(session: Dict[str, object]) -> Dict[str, object]:
                 "blocked_release_ids": self.blocked_release_ids,
                 "initial_plan_counts": self.initial_plan_counts,
                 "requires_fresh_scan": bool(self.requires_fresh_scan),
+                "pending_plan": bool(self.dirty),
             }
             self.done_event.set()
             if self.window is not None:
@@ -13721,6 +13722,7 @@ def launch_webview_release_map(session: Dict[str, object]) -> Dict[str, object]:
                 "blocked_release_ids": bridge.blocked_release_ids,
                 "initial_plan_counts": bridge.initial_plan_counts,
                 "requires_fresh_scan": bool(bridge.requires_fresh_scan),
+                "pending_plan": bool(bridge.dirty),
             }
         bridge.done_event.set()
 
@@ -14590,6 +14592,12 @@ def _webview_main_app() -> int:
             self._pattern_review_mode = ""
             self._review_visible_rows: List[Dict[str, object]] = []
     
+        def _invalidate_live_analysis_after_preferences(self) -> None:
+            if self._live_release_map_session is not None:
+                self._live_release_map_session = None
+                self.status = "Preferences changed - Analyze again"
+                self._append_activity("Preferences changed; previous Release Map is read-only until next analysis.")
+
         def _save_settings(self) -> None:
             _save_app_settings(
                 self.existing_path,
@@ -14803,6 +14811,7 @@ def _webview_main_app() -> int:
                 self.pattern_categories = new_categories
             self.personal_keep_rules = cleaned
             self._save_settings()
+            self._invalidate_live_analysis_after_preferences()
             return self._state_json()
 
         def copyText(self, value: str):
@@ -15020,6 +15029,7 @@ def _webview_main_app() -> int:
                 self.pending_pattern_reviews = remaining
                 self.personal_keep_rules = picks
                 self._save_settings()
+                self._invalidate_live_analysis_after_preferences()
                 self._emit_state()
             except Exception as exc:
                 self._event({"type":"error","title":APP_NAME,
@@ -15554,10 +15564,10 @@ def _webview_main_app() -> int:
         ) -> None:
             self._update_live_release_map_session(session, map_result)
             self.map_open = False
-            if map_result.get("requires_fresh_scan"):
+            if map_result.get("requires_fresh_scan") or map_result.get("pending_plan"):
                 session["allow_apply"] = False
-                self.status = "Classifications changed - Analyze again"
-                self._append_activity("Saved classifications require a fresh fingerprint scan before Copy/Move.")
+                self.status = "Pending changes - Analyze again"
+                self._append_activity("Release Map decisions are not applied. Analyze again before Copy/Move.")
                 self._emit_state()
                 return
             action = str(map_result.get("action", "") or "")
