@@ -1,6 +1,22 @@
 # Music Collection Cleaner - Continuity Handoff
 
-## Current checkpoint - 2026-10-19, MCC v0.5.39 - Under construction ⚠️
+## Current checkpoint - 2026-10-19, MCC v0.5.40 - Under construction ⚠️
+
+**User's actual Windows testing:** `S:\test\MCC`, PowerShell 7.6.7/Python 3.14. `git clone` and `git pull --ff-only` succeeded, `py -m py_compile "Music Collection Cleaner v0.05.39.pyw"` PASSED. `py "Music Collection Cleaner v0.05.39.pyw" --ui-self-test` **FAILED** at Dirty Vibe fixture (`RuntimeError: Dirty Vibe remix self-test failed: remix-only audio kept.`, approximately line 18248). The user then invoked `py tests\visual_qa.py --browser edge`, but did not provide any result for that run. **Do not call browser runner PASS or FAIL from this incomplete transcript.**
+
+**Root cause** confirmed in current GitHub source: Old Dirty Vibe negative regression fixture passed `personal_keep_rules=[{"mode":"contains","value":"Jack Beats"}]` but then expected *all* tracks excluded with Save Remixes OFF. Personal Picks are a positive override by design; that test is internally contradictory, not a sign that the user's Keep preference should be removed. Another negative generic Remix/Live fixture also injected `Example Remix` Personal Picks and expected the chosen remix/live audio excluded.
+
+**v0.5.40 changes** (new versioned source `Music Collection Cleaner v0.05.40.pyw`, initial commit `bb5a3a894bbd686689b6dc9fc0eb1e961c87bab9`):
+- Dirty Vibe *negative* fixture is now run with **no Personal Picks**, preserving requirements that four remix tracks on both old/new EPs be excluded, OLD release reported removed, NEW skipped and optimizer retains neither. An additional *positive* fixture explicitly keeps only Jack Beats Re-work tracks (2 matched tracks, 6 unmatched excluded), confirms neither whole EP is considered excluded-only while Picks apply, then clears preference and confirms both audio subsets revert to excluded.
+- Generic early Remix/Live *negative* fixture now runs with **no Personal Picks**, preserving real remix-added featured-vocal exception versus ordinary remix/Live filtering. Independent *positive* fixture checks that an explicit `Example Remix` Pick rescues matching remixes and the corresponding Live/Remix track, but not the nonmatching Live-only track; clearing rules restores exclusion.
+- Updated classifier docstring only, no change to production `configure_exclusions` logic or recording identity, optimizer, original audio, UI markup, Copy/Move/Undo or previous Windows Job handling.
+- Updated `tests/visual_qa.py` to automatically target the newest versioned MCC `.pyw` source in the repo, removing hard-coded v0.5.39 which risked silently testing the wrong UI on later releases. `README.md`, `RULES.md` and `UI_UX_ACCEPTANCE.md` updated.
+
+**Verification:** GitHub source readback and source structure checks planned; **NOT RUN locally or on user Windows** for v0.5.40: Python compile, complete `--ui-self-test`, Playwright, screenshot inspection and native WebView2. Remain **Under construction ⚠️** until retest and native visual acceptance. Other blockers unchanged: cross-volume Move/Undo pre-journaling, Soundtrack/DJ Mix taxonomy, per-startup crash log uniqueness, real audio fingerprint/Explicit-Clean parity, etc. No GitHub Actions workflows touched.
+
+**Exact next command (inside `S:\test\MCC`):** `git pull --ff-only`; `py -m py_compile "Music Collection Cleaner v0.05.40.pyw"`; `py "Music Collection Cleaner v0.05.40.pyw" --ui-self-test`; `py tests\visual_qa.py --browser edge`. Capture full PowerShell output; if browser reports FAIL, inspect latest `Documents\Karpuzikov Tools\Music Collection Cleaner\testing\visual-qa-*\report.json` and screenshots. Do not operate Move on valuable music until safe journal fix passes. Preserve separate Visual QA Gate, Windows WebView2 acceptance, previous user decisions and all upstream repo rules.
+
+## Prior checkpoint - 2026-10-19, MCC v0.5.39 - Under construction ⚠️
 
 **New user-supplied Windows evidence:** Tests in `S:\test\MCC` (Windows PowerShell, Python 3.14, Playwright 1.64.0) for v0.5.38: Git clone / Playwright installed / `py_compile` PASS; `--ui-self-test` **FAIL** with stale `Release Map UPDATED default/Move confirmation UI regression.` assertion at line 17677. Playwright Visual QA **FAIL** with `Page.wait_for_function` timeout 30000ms before first Release Map render. No visual acceptance results. Do NOT interpret the timeout as verified overlapped layout.
 
