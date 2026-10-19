@@ -10924,10 +10924,6 @@ button,input { font:inherit; }
 .track.skipped:hover { background:#192029; }
 .track .num,.track .dur { color:#8793a4; text-align:center; align-self:center; }
 .track .titleCell { display:flex; align-items:center; min-width:0; gap:5px; }
-@media (max-width:1120px) {
-  .track { grid-template-columns:22px minmax(100px,1fr) 45px minmax(65px,85px) minmax(68px,78px) 134px; gap:4px; padding:6px; font-size:11px; }
-  .track.noActions { grid-template-columns:22px minmax(100px,1fr) 45px minmax(65px,85px) minmax(68px,95px); }
-}
 
 .track .dur.differentLength { color:#f3d17a; font-weight:750; }
 .track .dur .lengthDelta { display:inline-block; white-space:nowrap; font-size:9px; font-weight:780; line-height:1.3; color:#ffe2a1; background:#3c2b13; border:1px solid #786033; border-radius:4px; padding:1px 3px; margin-top:2px; }
@@ -12007,7 +12003,7 @@ function openDetails(n) {
     const statusClass=(n.manualRemoved&&!t.excluded)
       ?((t.orphaned||!t.replacementSource)?"status missing":"status replacement")
       :"status";
-    const shortStatus=/^Excluded: (?:Remix|Live|Remix \/ Live)$/.test(statusText)?"Excluded":statusText;
+    const shortStatus=t.patternKind && /^Excluded: (?:Remix|Live|Remix \/ Live)$/.test(statusText)?"Excluded":statusText;
     tracks+='<div class="'+cls.join(" ")+'" role="button" tabindex="0" aria-label="Inspect track '+esc(t.title)+(advisoryName?' - '+advisoryName+' metadata':'')+'" data-group="'+t.groupId+'" data-index="'+t.index+'" title="'+esc(statusText)+'">'
       +'<div class="num">'+esc(t.number)+'</div><div class="titleCell"><span class="titleText" title="'+esc(t.title)+'">'+esc(t.title)+advisoryBadge+'</span>'+badge+'</div>'
       +'<div class="dur'+(nearestDelta!==null?' differentLength':'')+'" title="'+esc(nearestDelta!==null?'Different-length version: '+lengthDeltaText(nearestDelta)+' compared with another edition':'Length: '+t.duration)+'">'+esc(t.duration)
@@ -12122,6 +12118,13 @@ function openDetails(n) {
   aside.classList.add("open");
   document.getElementById("closeDetailsBtn").onclick=closeDetails;
   document.getElementById("openFolderBtn").onclick=function(){bridge.openFolder(n.path);};
+  document.getElementById("releasePath").onkeydown=function(ev){
+    if((ev.ctrlKey||ev.metaKey) && ev.key.toLowerCase()==="a"){
+      ev.preventDefault();
+      const selection=window.getSelection(),range=document.createRange();
+      range.selectNodeContents(this);selection.removeAllRanges();selection.addRange(range);
+    }
+  };
   const rb=document.getElementById("ignoreReleaseBtn"); if(rb) rb.onclick=function(){bridge.toggleRelease(Number(n.id),receiveReleaseToggle);};
   const groupBtn=document.getElementById("assignAlbumGroupBtn");
   if(groupBtn)groupBtn.onclick=function(){
@@ -16410,6 +16413,21 @@ def _ui_contract_self_test() -> None:
         or '["remix","Remix"],["live","Live"],["skip","Skip"]' not in main_html
     ):
         raise RuntimeError("Classification and Keep UI contract failed.")
+
+    # Release Map visual-contract regression: no overlapping hover row
+    # controls, repeated copy action or redundant uppercase plan status.
+    if (
+        'id="copyPathBtn"' in map_html
+        or 'DUPLICATE / ' in map_html
+        or 'position:absolute;right:8px;top:4px' in map_html
+        or 'class="titleCell"' not in map_html
+        or 'width:100%; align-self:center; justify-self:end; visibility:hidden' not in map_html
+        or 'kind!==t.patternKind' not in map_html
+        or '<details class="albumGroupActions">' not in map_html
+        or 'role="textbox" aria-readonly="true"' not in map_html
+        or 'Track = exact audio group' in map_html
+    ):
+        raise RuntimeError("Release Map compact track/details layout contract regressed.")
 
     if WEBVIEW_PRIVATE_MODE is not True:
         raise RuntimeError(
