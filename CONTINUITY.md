@@ -1,6 +1,14 @@
 # Music Collection Cleaner - Continuity Handoff
 
-## Current checkpoint - 2026-10-19, MCC v0.5.38 - Under construction ⚠️
+## Current checkpoint - 2026-10-19, MCC v0.5.39 - Under construction ⚠️
+
+**New user-supplied Windows evidence:** Tests in `S:\test\MCC` (Windows PowerShell, Python 3.14, Playwright 1.64.0) for v0.5.38: Git clone / Playwright installed / `py_compile` PASS; `--ui-self-test` **FAIL** with stale `Release Map UPDATED default/Move confirmation UI regression.` assertion at line 17677. Playwright Visual QA **FAIL** with `Page.wait_for_function` timeout 30000ms before first Release Map render. No visual acceptance results. Do NOT interpret the timeout as verified overlapped layout.
+
+**Root causes fixed in GitHub (not yet executed on Windows):** source `Music Collection Cleaner v0.05.39.pyw`, new commit `dc34f43e546c934a5b471a3ea1c4506ff043955d`, changes *only* the obsolete main-window `Original release folders relocated.` self-test text assertion to the current `Undo Last Run can restore moved folders.` map confirmation text. All nine Move/export assertions statically verified against actual map HTML; no export operation changed. Developer test `tests/visual_qa.py` commit `a2cfe22a907343965a3ccf175ddb8d3e0449f58c` now loads the original `<script type="module">` under a mocked `http://mcc-visual.test/release-map` Playwright route instead of a `file://` origin subject to module/CORS blocking; startup failures capture a screenshot and JS/console errors. No network requests or file-operation side effects are required by the mock. Embedded JavaScript parse PASS for both source HTML scripts. `README.md` and `UI_UX_ACCEPTANCE.md` updated to reflect v0.5.39 and recorded failing Windows runs. **Not a claim of actual Python self-test or Playwright pass.**
+
+**Exact next user command from existing repo checkout:** `git pull` then `py -m py_compile "Music Collection Cleaner v0.05.39.pyw"`, `py "Music Collection Cleaner v0.05.39.pyw" --ui-self-test`, and `py tests\visual_qa.py --browser edge`. Provide report.json plus screenshot artifacts if failed or requiring review. Real Windows WebView2 native screenshots (including hover/focus/resize at 100% and 125%), Copy/Move/Undo safe-file regression and other outstanding release blockers remain **NOT RUN**. Do not mark stable. No GitHub Actions changes.
+
+## Prior checkpoint - 2026-10-19, MCC v0.5.38 - Under construction ⚠️
 
 ### Visual QA Gate implemented 2026-10-19 (global rule + MCC, no app-version change)
 
