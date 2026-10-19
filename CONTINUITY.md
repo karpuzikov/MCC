@@ -1,6 +1,18 @@
 # Music Collection Cleaner - Continuity Handoff
 
-## Current checkpoint - 2026-10-19, MCC v0.5.35 - Under construction ⚠️
+## Current checkpoint - 2026-10-19, MCC v0.5.36 - Under construction ⚠️
+
+**Canonical source:** `Music Collection Cleaner v0.05.36.pyw` on `karpuzikov/MCC/main` (commit `4d78c6c47e9b489edb0182ea387d108e1bce5fd5`); preceding v0.5.35/v0.5.34 kept.
+
+**v0.5.36 correction:** An audit found that v0.5.35 `markTrackPattern` treated the *first* 🇷/🇱 click on a track already detected as Remix/Live as an implicit Personal Picks promotion, rather than persisting the user's explicitly selected pattern category. Removed the automatic-status promotion condition. Now only explicit **Keep**, the existing classified badge, or re-click of an *already saved matching category* promotes to Personal Picks. First 🇷/🇱/🛑 persists in Classify patterns; choosing a different category overwrites instead of promoting. New `_promote_pattern_choice` helper and embedded regression assertions cover first click, repeated click, category change and Keep.
+
+**Preserved v0.5.35 features:** Saved Remix/Live/Skip categories (including Callout hook) in the three-section manager; conditional pending patterns, reversible track hover controls/badge, persistent Keep/Unkeep release pins, CD-first planning, Noisia Remix exception, strict >50% foreign-primary-artist Compilation warning, conservative same-artist retrospective Anthology grouping. New classifications require fresh Analyze before Copy/Move because fingerprints/eligibility might have changed.
+
+**Verified:** GitHub source committed; both embedded WebView2 JavaScript blocks parsed with V8; mocked pure first-click/repeat/change-category expectations passed; source includes expanded embedded regression checks. **NOT RUN:** full Python compilation/embedded Python tests, Windows WebView2 visual/keyboard/scroll/hover, real Noisia and linked MusicBrainz example validation, persistent Callout hook after restart, Keep/Unkeep planning on real media, Copy/Move/Undo safety. Keep Under construction ⚠️. Official UXDT site and linked MusicBrainz release were unavailable during this session; do not claim independent external verification.
+
+**Next:** On Windows run `py -m py_compile "Music Collection Cleaner v0.05.36.pyw"` then `py "Music Collection Cleaner v0.05.36.pyw" --ui-self-test`. Test 🇷 on already recognized `Asteroids (Noisia Remix)`: first click places pattern in Remix (not Personal Picks); second click promotes. Verify persistent Skip, pinning a removed release with Re-Analyze, Compilation/Anthology, and file-safe Copy/Move/Undo with test copies only.
+
+## Prior checkpoint - 2026-10-19, MCC v0.5.35 - Under construction ⚠️
 
 **Canonical source:** `Music Collection Cleaner v0.05.35.pyw` on `karpuzikov/MCC/main`; v0.5.34 retained. Source after latest inspection: 18,985 lines; Git blob `a521db777fe03ebaf9117257a1980dc7eb15ccd9`. Rules mirrored from canonical `karpuzikov/userscripts` and were verified unchanged. No Actions workflows modified.
 
