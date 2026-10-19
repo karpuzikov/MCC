@@ -14059,7 +14059,10 @@ setInterval(function(){
 
 function openModal(kind,title,subtitle,bodyHtml,buttonsHtml){
   modalKind=kind;
-  modalReturnFocus=document.activeElement;
+  // Re-rendering an already open modal must not replace its original focus target
+  // with a now-deleted row button.
+  if(!document.getElementById("modalBackdrop").classList.contains("open"))
+    modalReturnFocus=document.activeElement;
   document.getElementById("modalTitle").textContent=title||"";
   document.getElementById("modalSubtitle").textContent=subtitle||"";
   document.getElementById("modalBody").innerHTML=bodyHtml||"";
