@@ -1,6 +1,25 @@
 # Music Collection Cleaner - Continuity Handoff
 
-## Current checkpoint - 2026-10-19, MCC v0.5.37 - Under construction ⚠️
+## Current checkpoint - 2026-10-19, MCC v0.5.38 - Under construction ⚠️
+
+**Canonical source:** `Music Collection Cleaner v0.05.38.pyw` on `karpuzikov/MCC/main`. Created `0224a8b85d0feda4309a73466a18f41fa1e4cc2a`, refined `00d8a8850f004b0d567bdd8e31367c61118e8eca`. Previous v0.5.37 remains available, with its decoder preflight/all-failed-media fixes unchanged.
+
+**User report (actual Windows screenshot):** `image(20261019-092934).png`, Release Map Noisia `2017-06-09 - Outer Edges (Noisia Remixes) [VSN030]`, 1486×913. v0.5.37 now visibly runs, with 50 releases/290 tracks reported in the UI. User flagged repeated root and release paths, pointless Copy path button, all-caps `DUPLICATE / REMOVE`, excess explanatory text and source panels, inline Remix badge wrapped into second row, repeated hover Remix button, misaligned Regional Indicator R glyph, and R/L/Stop controls absolutely overlapping `Excluded: Remix`. Screenshot is a user-provided reference, **not successful native acceptance of v0.5.38**.
+
+**Implemented v0.5.38 (Release Map HTML/CSS/JS only):**
+- Compact sentence-case plan display (`Removed · Duplicate`) and `OLD · WEB`-style provenance without the redundant source-root repetition (source root still in tooltip and final path).
+- Kept complete selectable release path and folder opener; removed redundant Copy path button. Focused selectable path supports Ctrl+A, then Ctrl+C; long strings can wrap.
+- Track grid has distinct number/title/duration/alternatives/status/**reserved actions** columns. Classification and recording Ignore/Restore buttons are now **in the grid**, never absolutely overlaid; button glyphs are flex-centered in consistent 28px controls. Long titles wrap in a flex title cell; saved badge is an independent centered 24px button, never pushed to a new unrelated row. Excluded tracks remain readable rather than dimmed to opacity 0.46.
+- Saved Remix/Live/Skip badge remains a one-click Personal Picks promotion. Hover/focus actions omit the already saved category (its badge implements promotion) but retain the other classifications and the independent recording-wide Ignore/Restore action. For unsaved types, keep specific Excluded: Remix/Live explanation; with a saved identifying badge, shorten duplicated exclusion wording to `Excluded`. Full exact reason remains in the row/status tooltip.
+- The uncommon Move to Album/EP family (and Restore automatic) controls now live in a native `<details>` disclosure `Album group`, collapsed by default; Keep release and Ignore release remain direct one-click buttons. Shortened unnecessary help text while retaining Re-Analyze safety wording.
+- Retained all Release Map board modes, version/remix/live alternative panels, SVG links, audio/optimizer/planning logic, classification persistence, dirty and Re-Analyze export guards, Copy/Move/Undo implementation and v0.5.37 decoder safety.
+- Added source-mode `--ui-self-test` static contract detecting duplicate path button, old uppercase status, absolute hover action overlap, missing title cell/saved-category filtering/disclosure and repeated on-screen tutorial line.
+
+**Validation performed:** Read latest GitHub rules, canonical global mirrors verified byte-for-byte, relevant UXDT accessibility/typography/iconography guidelines and Fluent 2 Layout/Accessibility consulted, real user screenshot inspected, both embedded JS scripts parsed via V8, source readback and static markers checked before commit. **NOT RUN:** actual Windows Python `py_compile`, `--ui-self-test`, real WebView2 hover/focus/click/tab/reflow at different DPI and screen sizes, native screenshot comparison to user's image, persisted interactions, Noisia audio parity, Copy/Move/Undo.
+
+**NEXT - user Windows acceptance:** Download `Music Collection Cleaner v0.05.38.pyw`, run `py -m py_compile "Music Collection Cleaner v0.05.38.pyw"` and `py "Music Collection Cleaner v0.05.38.pyw" --ui-self-test`, then re-open `Outer Edges (Noisia Remixes) [VSN030]` in Release Map. Check no collisions/overflows with *short and long titles*, at 100%/125% scaling and smaller/normal windows, R/L/Stop alignment, saved-badge click versus distinct hover controls, mouse focus/keyboard Tab-Enter-Space-Escape, select/copy path, Album group expand/assign/reset, Keep/Ignore and safe Re-Analyze. Provide screenshot and exact error if any. No stable claim, no actual Copy/Move on valuable media. Older unresolved blockers continue: cross-volume Move journaling/Undo, Soundtrack/DJ Mix taxonomy, startup crash log overwriting, Explicit/Clean verification, performance/acoustic parity and full file-safe acceptance. Do not edit GitHub Actions workflows without explicit approval.
+
+## Prior checkpoint - 2026-10-19, MCC v0.5.37 - Under construction ⚠️
 
 **Canonical source:** `Music Collection Cleaner v0.05.37.pyw` on `karpuzikov/MCC/main`, created in commit `8f41102bf0b0b14519513aaac2c9593037d2b30f`; v0.5.36 remains intact. This is a source-only corrective test version, **not Windows accepted or stable**.
 
