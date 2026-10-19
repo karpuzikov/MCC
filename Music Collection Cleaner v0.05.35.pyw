@@ -14141,7 +14141,7 @@ function patternReview(data){
     ["remix","Remix","Remember as Remix; follows Save Remixes"],
     ["live","Live","Remember as Live; follows Save Live recordings"],
     ["keep","Keep","Remember in Personal Picks"],
-    ["skip","Skip",data.deferred?"Dismiss pending; ask again on a future scan":"Skip this run only; ask again on the next scan"]
+    ["skip","Skip","Remember: exclude this pattern in future scans"]
   ];
   let rows="";
   patterns.forEach(function(p,i){
@@ -14713,7 +14713,13 @@ def _webview_main_app() -> int:
                 self._save_settings()
             return self._state_json()
 
+        def _reload_classifications(self) -> None:
+            self.pattern_categories = _load_pattern_categories()
+            self.personal_keep_rules = _load_personal_keep_rules(_load_app_settings())
+            self.pending_pattern_reviews = _load_pending_pattern_reviews()
+
         def getPersonalPicks(self):
+            self._reload_classifications()
             return _json_ui_dumps({
                 "rules": self.personal_keep_rules,
                 "categories": [
@@ -14950,6 +14956,7 @@ def _webview_main_app() -> int:
             self._begin_prepared_analysis(set())
     
         def getPatternManager(self):
+            self._reload_classifications()
             return _json_ui_dumps({
                 "categories": [
                     {"key": key, **value}
@@ -14962,6 +14969,7 @@ def _webview_main_app() -> int:
         def savePatternManager(self, raw: str):
             if self.running or self.review_pending or self.map_open:
                 return self._state_json()
+            self._reload_classifications()
             try:
                 data = json.loads(raw or "{}")
                 if not isinstance(data, dict):
@@ -15116,7 +15124,7 @@ def _webview_main_app() -> int:
                 else:
                     self._append_activity(
                         f"Pattern review complete: {len(selections)} choice(s); "
-                        f"{len(excluded)} skipped this run"
+                        f"{len(excluded)} saved Skip classification(s)"
                     )
                 if self._pending_analysis:
                     self._pending_analysis["pattern_categories"] = dict(updated_categories)
