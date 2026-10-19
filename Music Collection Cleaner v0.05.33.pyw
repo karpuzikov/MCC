@@ -13725,8 +13725,10 @@ document.addEventListener("keydown",function(e){
   if(e.key==="Escape"&&document.getElementById("modalBackdrop").classList.contains("open")){
     e.preventDefault();
     const postpone=modalKind==="pattern"?patternLaterAction:null;
+    const cancelManual=modalKind==="manual";
     closeModal();
     if(postpone)postpone();
+    else if(cancelManual)bridge.cancelReview();
   }
 });
 function messageBodyWithPaths(message){
