@@ -5,6 +5,13 @@ Last updated: 2026-10-19
 This file is the project-specific rulebook for the Discography Builder and Duplicate / Edition Analyzer.
 The account-wide `SOFTWARE_RULES.md` baseline always applies. This file may add stricter project-specific requirements but must never weaken or override a newer global rule or a newer explicit user instruction. When project rules conflict with the global baseline, the stricter/newer requirement wins.
 
+## MCC - mandatory Visual QA Gate (2026-10-19)
+
+- All MCC UI edits must comply with the canonical `UI_UX_RULES.md` Visual QA Gate **before** being called fixed: inventory controls, remove redundant content, use shared spacing/icon rules, render the actual UI, run automated geometry and interaction tests, inspect/compare screenshots, then verify native Windows WebView2 at 100%/125%, minimum/normal/large windows with actual representative Noisia data.
+- Developer-only runner: `py tests/visual_qa.py --browser edge` (after `py -m pip install playwright`). It loads the embedded current Release Map HTML/JS, adds realistic synthetic edge cases, captures screenshots and checks overlapping or clipped track components, hover/focus accessibility, duplicate controls, keyboard path selection, album-group disclosure and Escape. Never modify real music or enable Apply/Move via the test harness.
+- The browser runner **cannot** certify native WebView2 behavior or visually judge glyph optical centering. Human review of its screenshots plus actual Windows WebView2 screenshots/interactions are mandatory. Every unrun or failed item stays **NOT RUN/FAIL** in `UI_UX_ACCEPTANCE.md` and `CONTINUITY.md`, and the software remains **Under construction ⚠️**.
+- Tests and artifacts must remain separate from the single-file `.pyw` runtime and isolated from source media. Do not add redundant end-user UI just for testing; do not modify GitHub Actions workflows without explicit permission.
+
 ## MCC v0.5.38 - compact Release Map details and track rows
 
 - Main Release Map must provide a minimal, compact details overlay without duplicating the same source path or a selectable path's Copy button. Preserve the folder opener and reliable keyboard/pointer selection of the full visible path; short readable statuses (`Removed · Duplicate`), source medium and actionable integrity warnings replace all-caps status prose and repetitive tutorials.
