@@ -5,6 +5,14 @@ Last updated: 2026-10-05
 This file is the project-specific rulebook for the Discography Builder and Duplicate / Edition Analyzer.
 The account-wide `SOFTWARE_RULES.md` baseline always applies. This file may add stricter project-specific requirements but must never weaken or override a newer global rule or a newer explicit user instruction. When project rules conflict with the global baseline, the stricter/newer requirement wins.
 
+## MCC 2026-10-19 - postpone unusual-pattern classification (v0.5.33)
+
+- Pre-analysis unusual-pattern review has a distinct **Later** action. Clicking Later (or Escape) must preserve undecided patterns as pending **before** audio comparison continues. It must not implicitly classify or exclude undecided recordings; unlike per-pattern Skip, undecided audio remains included. Explicit partial Remix/Live/Keep/Skip choices must retain their established meanings.
+- Persist grouped pending pattern keys, labels and example context under the isolated MCC state folder; keep the backlog through Windows/application restarts and subsequent scans. Already-deferred keys must not block later scans. Show a single **Classify patterns (N)** control only when pending entries exist; reopen without an audio rescan, allow one-click classifications and partial postponement.
+- A late Remix/Live/Keep decision applies to **future analysis**. Do not silently claim it retroactively changed an existing Release Map plan; recompute planning separately before applying newly altered eligibility to an old result. Deferred-mode Skip only dismisses the saved reminder; the same pattern may be offered again on the next fresh scan (not a persistent exclusion).
+- **Cancel scan** remains distinct from Later, and available only during initial pre-analysis review. Escape is non-destructive Later for the pattern dialog. Preserve existing separate manual acoustic-review behavior.
+- Validate data persistence, no accidental exclusions, no repeated prompt for already-pending patterns, button visibility, keyboard accessibility, error recovery, restart and actual Windows WebView2/Copy/Move/Undo before stable status.
+
 ## MCC 2026-10-15 - Ignore recording EVERYWHERE vs Ignore release ONLY (v0.5.32)
 
 - **Track Ignore:** excludes every acoustically confirmed copy of THAT recording from all editions; use current-scan `track.group_id` (NOT the replaceable-edit `coverage_group_id`). The optimizer must not source another copy of the ignored recording from a different release.
