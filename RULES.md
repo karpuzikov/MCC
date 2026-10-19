@@ -5,6 +5,12 @@ Last updated: 2026-10-19
 This file is the project-specific rulebook for the Discography Builder and Duplicate / Edition Analyzer.
 The account-wide `SOFTWARE_RULES.md` baseline always applies. This file may add stricter project-specific requirements but must never weaken or override a newer global rule or a newer explicit user instruction. When project rules conflict with the global baseline, the stricter/newer requirement wins.
 
+## MCC v0.5.36 - first click pattern-mark must classify, not promote
+
+- The 🇷 / 🇱 / 🛑 buttons always **save the chosen Remix / Live / Skip classification** on the first click, even if the track is already automatically identified as a remix/live. Detection alone is **not** proof that the user has saved the category.
+- Only clicking an existing *saved* category again, explicitly clicking the existing category badge, or selecting Keep sends the pattern to Personal Picks. Selecting a different category replaces the previous saved category instead of promoting it. Persist results and require fresh Analyze to update source-safe export plans.
+- Check the first-click/repeat-click distinction with `Asteroids (Noisia Remix)` in an actual Noisia Release Map, including restart and change-to-Personal Picks.
+
 ## MCC 2026-10-19 - positive Keep, persistent categories and correct release types (v0.5.35)
 
 - **Keep release** is distinct from Ignore release and ensures chosen complete release is included in optimized retained output, even if automatic minimization would remove it. Persist explicit pins by canonical source path, not transient release ID. Manual Keep supersedes committed Ignore, and the forced selection must not compromise wanted acoustic group coverage, album anchors or files. Re-Analyze before export; never copy/move using a stale plan.
