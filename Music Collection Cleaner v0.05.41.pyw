@@ -10052,11 +10052,19 @@ def move_retained_plan(
         _remove_empty_dirs(recycle)
     except Exception:
         conflicts = []
-        for original, target in reversed(completed):
+        # The last rename might succeed and then raise BEFORE it enters
+        # 'completed'. Use the pre-journaled moves, not the success list.
+        for item in reversed(manifest["moves"]):
+            original = Path(item["original"])
+            target = Path(item["moved_to"])
             try:
                 if target.exists() and not original.exists():
                     original.parent.mkdir(parents=True, exist_ok=True)
                     _verified_release_directory_move(target, original)
+                elif target.exists() and original.exists():
+                    conflicts.append(f"Both original and target exist: {original} / {target}")
+                elif not original.exists():
+                    conflicts.append(f"Both original and target missing: {original} / {target}")
             except Exception as exc:
                 conflicts.append(f"{target}: {exc}")
         if not conflicts:
@@ -17624,8 +17632,8 @@ def _ui_contract_self_test() -> None:
             restored, conflicts = undo_last_run()
             if restored != 2 or conflicts or not old_release.exists() or not new_release.exists():
                 raise RuntimeError("Move Undo contract failed.")
-            # Simulate EXDEV, even on same-volume CI, to validate checked
-            # cross-volume copy-before-delete path.
+            # Simulate EXDEV, even on same-volume CI. It must fail closed;
+            # the source stays intact and no target is published.
             from unittest import mock
             cross_source = temp / "cross-volume-source"
             cross_target = temp / "cross-volume-target"
@@ -17639,9 +17647,15 @@ def _ui_contract_self_test() -> None:
                 return native_rename(a, b)
 
             with mock.patch.object(os, "rename", side_effect=simulate_cross_volume):
-                _verified_release_directory_move(cross_source, cross_target)
-            if cross_source.exists() or (cross_target / "content.flac").read_bytes() != b"checked transfer":
-                raise RuntimeError("Cross-volume move verification regression.")
+                try:
+                    _verified_release_directory_move(cross_source, cross_target)
+                except RuntimeError as exc:
+                    if "Cross-volume Move is disabled" not in str(exc):
+                        raise
+                else:
+                    raise RuntimeError("Cross-volume Move incorrectly copied/deleted sources.")
+            if not (cross_source / "content.flac").is_file() or cross_target.exists():
+                raise RuntimeError("Cross-volume denial altered music files.")
 
             locked_source = temp / "locked-source"
             locked_target = temp / "locked-target"
@@ -17714,7 +17728,7 @@ def _ui_contract_self_test() -> None:
         or 'const path=selectedExportPath("all")' not in map_html
         or 'const path=selectedExportPath("new")' not in map_html
         or 'Move old + new releases into:' not in map_html
-        or 'This WILL remove each retained release folder' not in map_html
+        or 'Same-volume Move only; cross-volume transfers are blocked.' not in map_html
         or 'Undo Last Run can restore moved folders.' not in map_html
     ):
         raise RuntimeError("Release Map UPDATED default/Move confirmation UI regression.")
