@@ -11600,7 +11600,8 @@ function appendReleaseRow(host,n) {
   const changed=changeKind(n);
   const changeIcon=changed?'<span class="rowChangeIcon '+changed+'" aria-hidden="true">'+esc(changeSymbol(changed))+'</span>':"";
   const auditIcon=(n.auditIssues||[]).length?'<span title="Audio integrity or incomplete release" aria-label="Validation warning">⚠️ </span>':"";
-  row.innerHTML=changeIcon+auditIcon+'<span class="folderIcon"></span><span class="releaseName">'+esc(n.name)+'</span>';
+  const typeIcon=n.typeWarning?'<span title="'+esc(n.typeWarning)+'" aria-label="Release type warning">⚠️ </span>':"";
+  row.innerHTML=changeIcon+auditIcon+typeIcon+'<span class="folderIcon"></span><span class="releaseName">'+esc(n.name)+'</span>';
   function activateReleaseRow(){
     const details=document.getElementById("details");
     // Do not unexpectedly dismiss the details when the same row is clicked.
@@ -11629,7 +11630,7 @@ function appendChangeRow(host,n,kind) {
   row.dataset.baseAriaLabel=row.getAttribute("aria-label");
   paintReanalyzeHighlight(row,n.id);
   row.innerHTML='<div class="changeIcon '+kind+'">'+esc(changeSymbol(kind))+'</div>'
-    +'<div class="changeMain"><div class="changeName">'+esc(n.name)+'</div><div class="changeReason">'+esc(changeReason(n,kind))+'</div></div>'
+    +'<div class="changeMain"><div class="changeName">'+esc(n.name)+(n.typeWarning?' <span title="'+esc(n.typeWarning)+'" aria-label="Release type warning">⚠️</span>':"")+'</div><div class="changeReason">'+esc(changeReason(n,kind))+'</div></div>'
     +'<div class="changeType">'+esc(releaseType)+'</div>';
   function activate(){
     selectedId=Number(n.id);activeTrack=null;openDetails(n);updateRowHighlights();scheduleConnections();updateTrackMode();
