@@ -7857,7 +7857,8 @@ def optimize_collection(
                 "Rejected an unsafe late quality tie-break and restored the "
                 f"exact optimized plan. Reason: {late_tiebreak_reverted}"
             )
-        selected = set(exact_selected)
+        # Quality-tie fallback must retain user-pinned releases as well.
+        selected = set(exact_selected) | forced
         verify_plan(selected)
 
     optimizer_stats.update(
