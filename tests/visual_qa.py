@@ -142,6 +142,8 @@ def run(app, output, browser_kind):
                     page=context.new_page()
                     js_errors=[]
                     page.on("pageerror",lambda e:js_errors.append(str(e)))
+                    page.on("console",lambda m:js_errors.append(
+                        "console: "+m.text) if m.type=="error" else None)
                     init="window.__qaFixture="+json.dumps(data,ensure_ascii=False)+";"+r"""
 window.__qaEvents=[];window.pywebview={api:{
  getState:()=>JSON.stringify(window.__qaFixture),
@@ -151,8 +153,26 @@ window.__qaEvents=[];window.pywebview={api:{
  }
 }};"""
                     page.add_init_script(init)
-                    page.goto(fixture_file.as_uri())
-                    page.wait_for_function("!!window.__visualQa&&!!document.querySelector('.releaseRow')")
+                    # Real <script type="module"> is blocked on file:// in
+                    # Chromium by origin/CORS policy. Fulfill a same-origin HTTP
+                    # navigation locally, without making any external requests.
+                    # This tests the actual module, not a downgraded classic script.
+                    page.route("http://mcc-visual.test/**", lambda route: route.fulfill(
+                        status=200, content_type="text/html; charset=utf-8", body=html))
+                    page.goto("http://mcc-visual.test/release-map", wait_until="load")
+                    try:
+                        page.wait_for_function(
+                            "!!window.__visualQa && !!document.querySelector('.releaseRow')",
+                            timeout=15000)
+                    except Exception:
+                        # Keep actionable diagnostic artifacts even if init fails.
+                        screenshot=name+"-initialization-error.png"
+                        page.screenshot(path=str(output/screenshot), full_page=True)
+                        report["screenshots"].append(screenshot)
+                        report["errors"].append(
+                            name+": startup failed: "+("; ".join(js_errors) or
+                            page.evaluate("document.body.innerText.slice(0,800)")))
+                        raise
                     if zoom!=1:
                         page.evaluate("(z)=>document.body.style.zoom=String(z)",zoom)
                     page.locator('.releaseRow[data-id="1"]').click()
@@ -214,7 +234,7 @@ window.__qaEvents=[];window.pywebview={api:{
 if __name__=="__main__":
     p=argparse.ArgumentParser(description="MCC headless visual regression gate")
     p.add_argument("--app",type=Path,
-        default=Path(__file__).resolve().parents[1]/"Music Collection Cleaner v0.05.38.pyw")
+        default=Path(__file__).resolve().parents[1]/"Music Collection Cleaner v0.05.39.pyw")
     p.add_argument("--browser",choices=["edge","chromium","system"],
         default="edge" if os.name=="nt" else "system")
     p.add_argument("--output",type=Path,default=Path.home()/"Documents"/"Karpuzikov Tools"/
