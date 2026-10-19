@@ -1,6 +1,6 @@
 # Music Collection Cleaner (MCC)
 
-**Version: 0.5.39 - Under construction ⚠️**
+**Version: 0.5.40 - Under construction ⚠️**
 
 Music Collection Cleaner compares existing music releases with new ones, finds the best combination of editions, and helps preserve every wanted unique recording while removing unnecessary redundancy.
 
@@ -21,11 +21,11 @@ On other platforms, install Playwright Chromium or use `--browser system` for an
 
 ## Download and run
 
-**[Music Collection Cleaner v0.05.39.pyw](Music%20Collection%20Cleaner%20v0.05.39.pyw)** - latest single-file Windows Python application. **Under construction ⚠️** until actual Windows WebView2 testing. Earlier source versions remain available.
+**[Music Collection Cleaner v0.05.40.pyw](Music%20Collection%20Cleaner%20v0.05.40.pyw)** - latest single-file Windows Python application. **Under construction ⚠️** until actual Windows WebView2 testing. Earlier source versions remain available.
 
-Open with Python 3 on Windows 11 (or run from a console with `python "Music Collection Cleaner v0.05.39.pyw"`). The application checks or installs supported dependencies. The GUI uses Microsoft Edge WebView2 through pywebview; it is not a terminal-based replacement.
+Open with Python 3 on Windows 11 (or run from a console with `python "Music Collection Cleaner v0.05.40.pyw"`). The application checks or installs supported dependencies. The GUI uses Microsoft Edge WebView2 through pywebview; it is not a terminal-based replacement.
 
-Source-level regression checks: `python "Music Collection Cleaner v0.05.39.pyw" --ui-self-test`. `--self-test` additionally requires a packaged standalone EXE.
+Source-level regression checks: `python "Music Collection Cleaner v0.05.40.pyw" --ui-self-test`. `--self-test` additionally requires a packaged standalone EXE.
 
 ## What it does
 
@@ -39,6 +39,14 @@ Source-level regression checks: `python "Music Collection Cleaner v0.05.39.pyw" 
 - Explicitly **Copy OLD + NEW** or **Move OLD + NEW** retained releases into the selected destination; Undo for supported completed moves.
 - Log comparisons, validate incomplete/corrupt inputs, choose I/O worker counts with drive awareness, and manage spawned subprocesses.
 
+
+## v0.5.40 - Correct contradictory Dirty Vibe and Remix/Live test fixtures (Under construction ⚠️)
+
+- User's Windows 11 / Python 3.14 v0.5.39 compile passed. Its `--ui-self-test` failed with `Dirty Vibe remix self-test failed: remix-only audio kept.` The existing negative remix test passed a `Jack Beats` Personal Pick yet expected the matching remix to be excluded: that contradicted the explicit Personal Picks override feature.
+- Split two contradictory fixtures (Dirty Vibe EP and generic Remix/Live) into negative tests with no saved Personal Picks, then positive tests in which an explicit Personal Pick correctly overrides Save Remixes/Live OFF for matching recordings only. Also confirm removing the Pick restores ordinary exclusions. **No audio classification or file-operation behavior changed.**
+- The Playwright Visual QA developer script now automatically targets the highest versioned MCC `.pyw` in the checkout, avoiding a stale v0.5.39 test target when new versions are published. Browser report, native WebView2 and screenshot acceptance are still pending.
+- **Run on Windows:** `git pull`, `py -m py_compile "Music Collection Cleaner v0.05.40.pyw"`, `py "Music Collection Cleaner v0.05.40.pyw" --ui-self-test`, `py tests/visual_qa.py --browser edge`.
+- **NOT RUN:** Full Python runtime self-test, browser visual acceptance, WebView2, real Copy/Move/Undo. `Under construction ⚠️` remains mandatory.
 
 ## v0.5.39 - Fix test failures reported on Windows (Under construction ⚠️)
 
