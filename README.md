@@ -1,16 +1,16 @@
 # Music Collection Cleaner (MCC)
 
-**Version: 0.5.37 - Under construction ⚠️**
+**Version: 0.5.38 - Under construction ⚠️**
 
 Music Collection Cleaner compares existing music releases with new ones, finds the best combination of editions, and helps preserve every wanted unique recording while removing unnecessary redundancy.
 
 ## Download and run
 
-**[Music Collection Cleaner v0.05.37.pyw](Music%20Collection%20Cleaner%20v0.05.37.pyw)** - latest single-file Windows Python application. **Under construction ⚠️** until actual Windows WebView2 testing. Earlier source versions remain available.
+**[Music Collection Cleaner v0.05.38.pyw](Music%20Collection%20Cleaner%20v0.05.38.pyw)** - latest single-file Windows Python application. **Under construction ⚠️** until actual Windows WebView2 testing. Earlier source versions remain available.
 
-Open with Python 3 on Windows 11 (or run from a console with `python "Music Collection Cleaner v0.05.37.pyw"`). The application checks or installs supported dependencies. The GUI uses Microsoft Edge WebView2 through pywebview; it is not a terminal-based replacement.
+Open with Python 3 on Windows 11 (or run from a console with `python "Music Collection Cleaner v0.05.38.pyw"`). The application checks or installs supported dependencies. The GUI uses Microsoft Edge WebView2 through pywebview; it is not a terminal-based replacement.
 
-Source-level regression checks: `python "Music Collection Cleaner v0.05.37.pyw" --ui-self-test`. `--self-test` additionally requires a packaged standalone EXE.
+Source-level regression checks: `python "Music Collection Cleaner v0.05.38.pyw" --ui-self-test`. `--self-test` additionally requires a packaged standalone EXE.
 
 ## What it does
 
@@ -24,6 +24,15 @@ Source-level regression checks: `python "Music Collection Cleaner v0.05.37.pyw" 
 - Explicitly **Copy OLD + NEW** or **Move OLD + NEW** retained releases into the selected destination; Undo for supported completed moves.
 - Log comparisons, validate incomplete/corrupt inputs, choose I/O worker counts with drive awareness, and manage spawned subprocesses.
 
+
+## v0.5.38 - Release Map track/details cleanup (Under construction ⚠️)
+
+- Reworked Release Map tracks into a stable grid with dedicated space for version links, statuses and classification/Ignore actions, preventing overlaps and inconsistent wrapped rows.
+- Saved Remix/Live/Skip badges sit in a separate aligned icon cell; when one is saved the hover actions do not duplicate the same category. The existing saved badge still promotes to Personal Picks, and category changes retain first-click semantics.
+- Optical centering uses common flex-aligned 28px icon buttons. Exclusion descriptions appear once where the saved badge already identifies Remix/Live; detailed reasoning remains in each row tooltip.
+- Removed duplicate root path, redundant Copy path button, track-equivalence tutorial line and all-caps "DUPLICATE / REMOVE" labels; kept the selectable full release path, keyboard Ctrl+A / Ctrl+C and folder opener.
+- Infrequent Album/EP family reassignment is under a native "Album group" disclosure (still directly available), while Keep/Ignore remain one-click.
+- JS parser and static visual-contract checks passed in development. The real Windows WebView2 hover/click/focus/layout/resizing/screenshots and audio/file safety are **NOT RUN**. This is **not a stable release**.
 
 ## v0.5.37 - Fail-fast decoding and Windows Job compatibility (Under construction ⚠️)
 
