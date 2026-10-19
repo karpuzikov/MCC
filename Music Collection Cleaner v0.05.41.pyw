@@ -10896,14 +10896,14 @@ button,input { font:inherit; }
 #tracksTitle { padding:10px 16px 7px; font-size:13px; font-weight:750; color:#e4e9f1; }
 #tracks { min-height:0; flex:1; overflow:auto; padding:0 8px 14px; }
 .track {
-  display:grid; grid-template-columns:24px minmax(120px,1fr) 52px minmax(66px,94px) minmax(72px,90px) 160px;
+  display:grid; grid-template-columns:22px minmax(100px,1.2fr) 48px minmax(62px,auto) minmax(108px,1fr) minmax(90px,auto);
   gap:6px; align-items:center; min-height:40px; padding:6px 8px;
   border-bottom:1px solid #232933; border-radius:6px; color:#edf1f7; font-size:12px; cursor:pointer;
 }
-.track.noActions { grid-template-columns:24px minmax(120px,1fr) 52px minmax(66px,94px) minmax(72px,110px); }
+.track.noActions { grid-template-columns:22px minmax(100px,1.3fr) 48px minmax(62px,auto) minmax(115px,1fr); }
 .track:hover { background:#1a2029; }
 .track:focus-visible { outline:2px solid #8cc8ff; outline-offset:-2px; }
-.track.unique { background:rgba(245,158,11,.12); box-shadow:inset 3px 0 var(--yellow); }
+.track.unique { background:rgba(245,158,11,.05); box-shadow:inset 2px 0 #bb9341; }
 .track.orphan { background:rgba(239,68,68,.14); box-shadow:inset 3px 0 var(--red); }
 .track.activeTrack { background:rgba(85,215,255,.12); box-shadow:inset 3px 0 var(--cyan); }
 .track.manual { color:#c4b5fd; }
@@ -10934,7 +10934,7 @@ button,input { font:inherit; }
   display:inline-flex; align-items:center; justify-content:center; min-width:26px; height:26px;
   font-family:"Segoe UI Emoji","Segoe UI Symbol","Segoe UI",sans-serif; font-size:15px;
 }
-.track .status { color:#929eae; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; align-self:center; }
+.track .status { color:#abb7c5; min-width:0; overflow-wrap:anywhere; white-space:normal; line-height:1.45; align-self:center; font-size:11px; }
 .track .status.replacement { color:#8ee7a7; font-weight:650; }
 .track .status.missing { color:#ff9da5; font-weight:750; }
 .versionsCell { display:flex; justify-content:center; flex-wrap:wrap; gap:4px; align-self:center; min-width:0; }
@@ -11908,13 +11908,13 @@ function trackStatus(t,n) {
     const unverified=Math.max(0,Number(t.unverifiedEditions)||0);
     if(matched||unverified){
       const parts=[];
-      if(matched) parts.push("Audio match on "+matched+" other edition"+(matched===1?"":"s"));
+      if(matched) parts.push("Same audio on "+matched+" edition"+(matched===1?"":"s"));
       if(unverified) parts.push("Also listed on "+unverified+" edition"+(unverified===1?"":"s")+" (audio unverified)");
       return parts.join("; ");
     }
   }
   if(t.isGem) return "Gem - no duplicates or other versions";
-  if(t.unique) return "Needed for retained plan";
+  if(t.unique) return "Unique to selection";
   if(t.coveredBy && t.coveredBy.length) return (t.coveredByAlternateVersion?"Replaceable version on: ":"Also on: ")+t.coveredBy.slice(0,2).join("; ");
   if(t.excluded) return exclusionStatus(t);
   if(t.distinction) return t.distinction;
@@ -13862,6 +13862,8 @@ button,input{font:inherit}
 button{user-select:none}
 #content{flex:1;min-height:0;display:grid;grid-template-rows:auto auto minmax(180px,1fr);gap:12px;
   padding:14px 18px 12px;overflow:auto}
+#content.emptyActivity{grid-template-rows:auto auto;align-content:start}
+#content.emptyActivity .activityCard{display:none}
 .card{border:1px solid var(--line);border-radius:10px;background:var(--panel);box-shadow:var(--shadow)}
 .cardHead{display:flex;align-items:center;justify-content:space-between;padding:11px 13px 8px}
 .cardTitle{font-size:14px;font-weight:760}
@@ -13969,6 +13971,7 @@ button:focus-visible,input:focus-visible{
 }
 @media(max-width:570px){.patternChoice{flex:1 1 calc(50% - 7px)}}
 .categoryHeading{font-weight:700;color:#d4e2f4;margin:12px 0 7px;font-size:12px}
+.pendingPatternNames{color:#a7b5c6;font-size:12px;line-height:1.5;padding:8px 10px;border:1px solid #29313c;border-radius:7px;overflow-wrap:anywhere}
 .categoryRow{grid-template-columns:minmax(0,1fr) 150px auto}
 @media(max-width:570px){.reviewTop{flex-wrap:wrap}.categoryRow{grid-template-columns:minmax(0,1fr) auto}.categoryKind{grid-column:1}}
 .picksEntry{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:7px;margin-bottom:10px}
@@ -14112,6 +14115,7 @@ function renderState(raw){
   document.getElementById("progressTrack").setAttribute("aria-valuenow",String(Math.round(pct)));
   document.getElementById("progressDetail").textContent=currentDetail();
   const act=(state.activity||[]).join("\n");
+  document.getElementById("content").classList.toggle("emptyActivity",!act.trim()&&!state.running);
   const box=document.getElementById("activity");
   const atBottom=box.scrollHeight-box.scrollTop-box.clientHeight<30;
   box.textContent=act;
@@ -14217,11 +14221,11 @@ function patternManagerModal(raw){
   });
   if(pending.length){
     content+='<div class="categoryHeading">Pending ('+pending.length+')</div>'
-      +pending.map(p=>'<div class="pickRow"><div class="pickValue">'+esc(p.label||p.key)+'</div>'
-      +'<button class="btn patternPending" data-key="'+esc(p.key)+'">Classify</button></div>').join("");
+      +'<div class="pendingPatternNames">'+pending.map(p=>esc(p.label||p.key)).join(' · ')+'</div>';
   }
   openModal("patternManager","Classify patterns","",content,
-    '<div class="modalSpacer"></div><button class="btn" id="patternsClose">Close</button>');
+    (pending.length?'<button class="btn primary" id="reviewPendingBtn">Review pending ('+pending.length+')</button>':'')
+    +'<div class="modalSpacer"></div><button class="btn" id="patternsClose">Close</button>');
   function update(action,key){
     const found=cat.findIndex(x=>x.key===key);
     if(found<0)return;
@@ -14235,9 +14239,8 @@ function patternManagerModal(raw){
   document.querySelectorAll(".patternToPicks").forEach(btn=>{
     btn.onclick=function(){update("picks",btn.dataset.key);};
   });
-  document.querySelectorAll(".patternPending").forEach(btn=>{
-    btn.onclick=function(){closeModal();bridge.openPendingPatterns();};
-  });
+  const reviewPending=document.getElementById("reviewPendingBtn");
+  if(reviewPending)reviewPending.onclick=function(){closeModal();bridge.openPendingPatterns();};
   document.getElementById("patternsClose").onclick=closeModal;
 }
 function patternReview(data){
