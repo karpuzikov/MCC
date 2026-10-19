@@ -5,6 +5,14 @@ Last updated: 2026-10-19
 This file is the project-specific rulebook for the Discography Builder and Duplicate / Edition Analyzer.
 The account-wide `SOFTWARE_RULES.md` baseline always applies. This file may add stricter project-specific requirements but must never weaken or override a newer global rule or a newer explicit user instruction. When project rules conflict with the global baseline, the stricter/newer requirement wins.
 
+## MCC v0.5.38 - compact Release Map details and track rows
+
+- Main Release Map must provide a minimal, compact details overlay without duplicating the same source path or a selectable path's Copy button. Preserve the folder opener and reliable keyboard/pointer selection of the full visible path; short readable statuses (`Removed · Duplicate`), source medium and actionable integrity warnings replace all-caps status prose and repetitive tutorials.
+- Track titles must wrap in their own flex cell. Badges for **saved** categories sit in a dedicated centered icon position and never fall onto the next text row. Hover/focus classification actions occupy a **reserved grid column**, never absolutely overlay a status, duration or title. Every button has equal visual geometry, optical center, accessible name, focus and pointer feedback.
+- A saved category badge directly moves its pattern to Personal Picks. Do not add a second hover action with the same saved category; preserve the ability to reclassify into the other two types. With no saved category, direct Remix/Live/Skip actions remain available and first click saves classification.
+- Keep distinct Release Keep/Unkeep and Ignore/Restore; keep the Album/EP family reassignment feature but collapse its infrequent controls behind a native keyboard-operable disclosure. Preserve Re-Analyze safety/dirty status, Complete Full Map, alternatives, Ignore recordings, audio equivalence and Copy/Move/Undo.
+- Compare with user-supplied Windows reference `image(20261019-092934).png`; actual Windows WebView2 screenshots at multiple dimensions and DPI, mouse/keyboard/focus/hover, long titles and real media workflow remain mandatory before stable. Status **v0.5.38 - Under construction ⚠️**.
+
 ## MCC v0.5.37 - external-decoder readiness and no invalid audio map
 
 - Before accepting an audio scan, verify FFmpeg and FFprobe can be spawned and safely supervised under Windows Job restrictions; abort before inspecting media if external subprocess access is denied. Preserve the kill-on-close subprocess lifecycle; do not launch unmanaged fallback children.
