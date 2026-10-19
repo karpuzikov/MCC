@@ -1,5 +1,14 @@
 # Music Collection Cleaner - Continuity Handoff
 
+## Latest checkpoint - 2026-10-19, MCC v0.5.34 Release Map duplicate-control removal (Under construction ⚠️)
+
+- **Canonical new source:** `Music Collection Cleaner v0.05.34.pyw` on `karpuzikov/MCC/main`. v0.5.33 is preserved; new source created at commit `4a17c8995c9839f9f9f9f19727d5841c71a86ed3`. Rules and UX guidance reviewed; no Actions workflows modified.
+- User-provided v0.5.33 screenshot proved the **Changes** view and **All changes** chip had the identical visible outcome. Root cause: Changes was bound to `setViewMode("changes","all")` while the All changes chip independently selected the same `"all"` filter.
+- **v0.5.34** removes the All changes chip entirely and leaves `Changes N` as one-click restore to all categories. **Full map** still includes unchanged releases. Added / Upgraded / Replaced / Removed / Ignored chips still filter the Changes view and return to it directly when clicked. Selected view and filter have distinct aria-pressed and active states; counts are derived from the same changed-node data. Deleted redundant hint/spacer elements. No core audio, file or optimization behavior changed.
+- **UI contract:** one Changes view button / one Full map button / five useful category filters. Changes count describes total distinct changed releases (not the number of underlying tracks). Changes resets any active category in one click; Full map displays all analyzed releases and may still display the category chips as shortcuts back to the changes view. Preserve keyboard-focus and hover behavior.
+- **Verified:** code source created and V8 successfully parsed embedded Release Map JS; mocked interaction exercises Changes (total 5), Added filter, reset to All (no All button), and Full map; added embedded `--ui-self-test` contract checks that assert the duplicate control remains absent. **NOT RUN:** full Python compile, embedded Python self-tests, Windows WebView2 visual/resizing/keyboard/screenshots, full real scan and Copy/Move/Undo disposable test. Keep Under construction ⚠️ until actual Windows testing.
+- **Next:** On Windows run `py -m py_compile "Music Collection Cleaner v0.05.34.pyw"` and `py "Music Collection Cleaner v0.05.34.pyw" --ui-self-test`; inspect Release Map at native DPI and reduced width. Check 1) Changes shows all changes, 2) Added filters only Added, 3) Changes resets that filter, 4) Full map includes unchanged releases, 5) active and disabled states, keyboard focus, search, details overlay and Copy/Move/Undo on disposable media. Preserve unresolved v0.5.32 acoustic Ignore and routing runtime checks.
+
 ## Latest checkpoint - 2026-10-19, MCC v0.5.33 deferred pattern review (Under construction ⚠️)
 
 - **Canonical new source:** `Music Collection Cleaner v0.05.33.pyw` on `karpuzikov/MCC/main`. Prior v0.5.32 kept unchanged. Commit `7e14c066a83abd70c84bdc6a821b995f91844518`. Global `SOFTWARE_RULES.md` / `UI_UX_RULES.md` mirrors were read and matched `karpuzikov/userscripts` before work.
@@ -21,8 +30,8 @@
 - **Exact next action on user's Windows PC:** download `Music Collection Cleaner v0.05.32.pyw`; run `py -m py_compile "Music Collection Cleaner v0.05.32.pyw"`, then `py "Music Collection Cleaner v0.05.32.pyw" --ui-self-test`. If either fails, preserve the entire error and fix in the next versioned .pyw. Follow with the precise recording-wide Ignore/Restore/Release Ignore and new candidate-routing timing/GIMS regression matrix above. Keep `v0.5.32 - Under construction ⚠️` until real Windows acceptance.
 
 Last updated: 2026-10-19
-Status: **v0.5.33 - Under construction ⚠️** (not Windows-verified)
-Canonical file: `Music Collection Cleaner v0.05.33.pyw` on `karpuzikov/MCC/main`. Earlier v0.5.32, v0.5.31, v0.5.30, v0.5.29, v0.5.28, v0.5.27, v0.5.26, v0.5.19 and user-tested v0.5.18 retained.
+Status: **v0.5.34 - Under construction ⚠️** (not Windows-verified)
+Canonical file: `Music Collection Cleaner v0.05.34.pyw` on `karpuzikov/MCC/main`. Earlier v0.5.33, v0.5.32, v0.5.31, v0.5.30, v0.5.29, v0.5.28, v0.5.27, v0.5.26, v0.5.19 and user-tested v0.5.18 retained.
 
 ## Latest checkpoint - 2026-10-15, MCC v0.5.32 acoustic-wide Ignore
 
