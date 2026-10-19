@@ -233,8 +233,16 @@ window.__qaEvents=[];window.pywebview={api:{
 
 if __name__=="__main__":
     p=argparse.ArgumentParser(description="MCC headless visual regression gate")
-    p.add_argument("--app",type=Path,
-        default=Path(__file__).resolve().parents[1]/"Music Collection Cleaner v0.05.39.pyw")
+    # Always test the latest versioned one-file app in the checkout. Keeping a
+    # hard-coded old default silently tests the wrong UI after version bumps.
+    root=Path(__file__).resolve().parents[1]
+    candidates=list(root.glob("Music Collection Cleaner v*.pyw"))
+    if not candidates:
+        raise SystemExit("No Music Collection Cleaner versioned .pyw in "+str(root))
+    latest=max(candidates,key=lambda file: tuple(
+        int(part) for part in file.stem.rsplit(" v",1)[-1].split(".")
+    ))
+    p.add_argument("--app",type=Path,default=latest)
     p.add_argument("--browser",choices=["edge","chromium","system"],
         default="edge" if os.name=="nt" else "system")
     p.add_argument("--output",type=Path,default=Path.home()/"Documents"/"Karpuzikov Tools"/
