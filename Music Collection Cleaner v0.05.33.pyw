@@ -2309,10 +2309,14 @@ def _clean_pending_pattern_reviews(rows: object) -> List[Dict[str, object]]:
             continue
         def safe_strings(value, limit):
             return [str(s)[:300] for s in value[:limit] if str(s).strip()] if isinstance(value, list) else []
+        try:
+            count = max(0, int(item.get("count", 0) or 0))
+        except (ValueError, TypeError, OverflowError):
+            count = 0
         cleaned[key] = {
             "key": key,
             "label": str(item.get("label", key))[:300],
-            "count": max(0, int(item.get("count", 0) or 0)),
+            "count": count,
             "variants": safe_strings(item.get("variants", []), 8),
             "examples": safe_strings(item.get("examples", []), 4),
         }
