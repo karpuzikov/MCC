@@ -1,3 +1,44 @@
+## MCC v0.5.41 - Screenshot audit implementation / Visual QA Gate (2026-10-19)
+
+**Input evidence:** User supplied 12 actual Windows WebView2 screenshot views of v0.5.40, spanning Ready/Activity, Personal Picks (~40 rules), Classify patterns, Changes, Full map, release details across widths, hover actions, multi-version badges, rejected release with missing replacements, and full-size 1280px-width track panel. This is stronger visual evidence than the old mocked browser fixture; however **v0.5.41 has NOT been displayed or visually accepted by user**. The prior v0.5.40 Windows `py "Music Collection Cleaner v0.05.40.pyw" --ui-self-test` **PASSED**. The Playwright run for v0.5.40 **FAILED** with startup check expecting `.releaseRow` during the initial `Changes` view, although the real page rendered and contained `.changeRow`. That is a test-harness defect, not evidence that the GUI failed to render. Native WebView2 use on v0.5.40 is evidenced by screenshots, but no systematic interaction or accessibility tests were provided.
+
+**Control contracts audited before implementation:**
+
+| Workflow / control | Distinct behavior and persistence | Pointer/keyboard and visual states | Failure prevention / validation |
+| --- | --- | --- | --- |
+| Main paths, Browse, Open folder, Clear | Select separate OLD/NEW roots; Browse changes input; Open folder navigates; Clear affects OLD only | Existing input focus and button states remain; native open and Browse actions unchanged | Invalid / nested roots reject analysis |
+| Save Remixes / Live / Audio I/O / Logging | Preserve existing analysis policies, persisted settings; independent toggles | No duplicated action; standard disabled states during scan | No modification of decision logic |
+| Analyze / progress / Activity | Run analysis; logs appear after first activity; idle no longer shows an enormous blank log card | Activity auto-expands on run and remains visible with content; footer untouched | Errors still show in activity and dialogs |
+| Personal Picks Search / Add phrase / Add exact / Edit / Remove / Save / Cancel / Clear | In-memory editing until Save; filter independent of underlying picks; grouped by mode, stable Pattern keys never edited as free text | Search immediate; Edit text focus/select then Enter or blur to commit, Escape cancel; Save persists entire working set | Blank edit disallowed, duplicate mode/value edit disallowed; Cancel discards pending edits |
+| Classify patterns / Review pending (N) / Forget / Personal Picks promote | Category manager preserves 3 types Remix/Live/Skip; single pending-review action loads all unresolved entries; Forget/promote remain per saved pattern | Dedicated review button is visible only if pending; no deceptive per-item buttons | Existing bridge validation/persistence and scan gating preserved |
+| Release Map Changes / Full map / filter chips / Show all links | Changes vs Full map; filters do not mutate data; all connections suppressed by default until release selected or Show all links is enabled | Links button only in Full map; toggle aria-pressed; selected-release relation strokes emphasized | No changes to optimizer selections or source files |
+| Release details / version buttons / track badges / hover R/L/Ignore / Album group | Keep original actions, pattern persistence and hover/focus, full track explanations wrap instead of clipping; smaller amber highlighting | Preserve grid action column, focus behavior, full status in title, native drawer docking; version and album group expand | Re-Analyze required after classification/ignore; do not modify audio during review |
+| Copy vs Move / destinations / confirm / Undo | Copy is non-destructive and green. Move is amber, explicitly destructive, same-volume-only atomic rename, durable pre-rename Undo journal | Separate named actions and existing confirmations; disabled until current plan is applicable | Reject cross-drive before moves, reject EXDEV without copy-delete fallback; collision guard, rollback from **prewritten** entries; no source overwrite |
+
+**Changes in GitHub:** `Music Collection Cleaner v0.05.41.pyw` and `tests/visual_qa.py`. No new runtime dependencies; single-file executable architecture and Copy/Move/Undo UI preserved. Added synthetic post-rename failure injection in the `--ui-self-test`; failure should roll back from journaled entries, including a rename not yet marked completed. Browser harness now locates `.changeRow` in Changes view, takes screenshots, switches Full map and locates `.releaseRow`, then tests hovered details at each viewport.
+
+**Acceptance status as of commit:**
+
+| Gate | Result |
+| --- | --- |
+| User native v0.5.40 UI screenshot review | PASS - screenshot evidence reviewed, issues identified and implemented as v0.5.41 changes |
+| GitHub source readback / patch markers | PASS - exact v0.5.41 file, 17 checked source markers |
+| Embedded current Release Map JS syntax (V8) | PASS |
+| Embedded current Main Window JS syntax (V8) | PASS |
+| Python `py_compile` v0.5.41 | NOT RUN |
+| Python `--ui-self-test` v0.5.41 (including Move fault injection) | NOT RUN |
+| Browser `tests/visual_qa.py --browser edge` with screenshot/geometry tests | NOT RUN |
+| Human screenshot comparison of v0.5.41 to user v0.5.40 reference | NOT RUN |
+| Native Windows WebView2 v0.5.41 pointer/keyboard/resize/scroll/error/persistence | NOT RUN |
+| Real disposable same-drive Move, failure recovery and Undo, plus Copy | NOT RUN |
+| Cross-drive Move permission/error handling on Windows test volumes | NOT RUN |
+
+**Known limitation:** Cross-volume Move is intentionally **disabled** rather than risking partial deletion of originals. Use non-destructive Copy when the destination is on another filesystem. This is an explicit temporary safety restriction pending a well-tested transactional cross-drive move design; do not describe it as full cross-volume support. The older unsupported operation was **unsafe** and cannot be grandfathered in. Previous release blockers (cross-volume source safety / full Undo certification, acoustic correctness, native UI acceptance and taxonomy) remain until separately resolved.
+
+**Next user test (fresh folder if the prior clone has been deliberately deleted):** `git clone https://github.com/karpuzikov/MCC.git S:\\test\\MCC`; `cd S:\\test\\MCC`; `py -m py_compile "Music Collection Cleaner v0.05.41.pyw"`; `py "Music Collection Cleaner v0.05.41.pyw" --ui-self-test`; `py tests\\visual_qa.py --browser edge`. Send **native v0.5.41 Release Map with open details at 1280-wide, v0.5.41 Personal Picks with search, v0.5.41 Classify patterns with pending items**, plus browser screenshots/report if generated. Do not use Move on valuable source data pending real Windows acceptance.
+
+--- 
+
 ## MCC v0.5.40 - Windows self-test contradiction: Dirty Vibe / Personal Picks (2026-10-19)
 
 **User test evidence:** Windows PowerShell 7.6.7 in `S:\test\MCC`, Python 3.14, fresh Git checkout, `git pull` up to date, `py -m py_compile "Music Collection Cleaner v0.05.39.pyw"` PASS. `py "Music Collection Cleaner v0.05.39.pyw" --ui-self-test` **FAIL** at source line 18248: `RuntimeError: Dirty Vibe remix self-test failed: remix-only audio kept.`. The `py tests\visual_qa.py --browser edge` command was issued, but its output was NOT PROVIDED. Therefore browser visual QA result is **UNKNOWN/NOT VERIFIED**, not PASS or FAIL for that later run.
