@@ -13976,6 +13976,10 @@ button:focus-visible,input:focus-visible{
 @media(max-width:570px){.reviewTop{flex-wrap:wrap}.categoryRow{grid-template-columns:minmax(0,1fr) auto}.categoryKind{grid-column:1}}
 .picksEntry{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:7px;margin-bottom:10px}
 .picksList{border:1px solid #29313c;border-radius:8px;overflow:hidden}
+.picksList .categoryHeading{margin:0;padding:9px 10px;background:#1a222c;border-bottom:1px solid #29313c}
+.picksList .pickRow{grid-template-columns:68px minmax(0,1fr) auto auto}
+.pickFilter{width:100%;margin-bottom:9px}
+.pickEditInput{min-width:0;height:30px}
 .pickRow{display:grid;grid-template-columns:90px minmax(0,1fr) auto;gap:9px;align-items:center;padding:8px 10px;
   border-bottom:1px solid #242b34;background:#14191f}
 .pickRow:last-child{border-bottom:0}
@@ -14368,14 +14372,51 @@ function manualReview(data){
 function renderPickRows(){
   const host=document.getElementById("pickRows");
   if(!host)return;
-  if(!localPicks.length){host.innerHTML='<div class="empty">No Personal Picks</div>';return;}
-  host.innerHTML=localPicks.map(function(p,i){
-    const mode=p.mode==="pattern"?"Pattern":(p.mode==="exact"?"Exact title":"Phrase");
-    return '<div class="pickRow"><div class="pickMode">'+mode+'</div>'
-      +'<div class="pickValue">'+esc(p.value)+'</div><button class="btn pickRemove" data-i="'+i+'">Remove</button></div>';
+  const search=document.getElementById("picksSearch");
+  const query=String(search&&search.value||"").trim().toLocaleLowerCase();
+  const sections=[["contains","Phrases"],["exact","Exact titles"],["pattern","Patterns"]];
+  const rows=sections.map(function(section){
+    const matches=localPicks.map((p,i)=>({p,i})).filter(function(x){
+      return x.p.mode===section[0] && String(x.p.value).toLocaleLowerCase().includes(query);
+    });
+    if(!matches.length)return "";
+    return '<div class="categoryHeading">'+section[1]+' ('+matches.length+')</div>'
+      +matches.map(function(x){
+        return '<div class="pickRow"><div class="pickMode">'+(x.p.mode==="contains"?"Phrase":(x.p.mode==="exact"?"Exact":"Pattern"))+'</div>'
+          +'<div class="pickValue" title="'+esc(x.p.value)+'">'+esc(x.p.value)+'</div>'
+          +(x.p.mode==="pattern"?"":'<button class="btn pickEdit" data-i="'+x.i+'" aria-label="Edit '+esc(x.p.value)+'">Edit</button>')
+          +'<button class="btn pickRemove" data-i="'+x.i+'" aria-label="Remove '+esc(x.p.value)+'">Remove</button></div>';
+      }).join("");
   }).join("");
-  document.querySelectorAll(".pickRemove").forEach(function(btn){
+  host.innerHTML=rows||(query?'<div class="empty">No matching picks</div>':'<div class="empty">No Personal Picks</div>');
+  host.querySelectorAll(".pickRemove").forEach(function(btn){
     btn.onclick=function(){localPicks.splice(Number(btn.dataset.i),1);renderPickRows();};
+  });
+  host.querySelectorAll(".pickEdit").forEach(function(btn){
+    btn.onclick=function(){
+      const i=Number(btn.dataset.i), valueEl=btn.parentElement.querySelector(".pickValue");
+      const input=document.createElement("input");
+      input.className="pathInput pickEditInput";input.value=localPicks[i].value;
+      input.setAttribute("aria-label","Edit Personal Pick");
+      valueEl.replaceWith(input);btn.textContent="Done";btn.disabled=true;
+      let finished=false;
+      function finish(commit){
+        if(finished)return;finished=true;
+        const next=input.value.trim();
+        if(commit&&next){
+          const duplicate=localPicks.some((p,j)=>j!==i&&p.mode===localPicks[i].mode&&p.value.toLocaleLowerCase()===next.toLocaleLowerCase());
+          if(!duplicate)localPicks[i].value=next;
+        }
+        renderPickRows();
+        if(search)search.focus();
+      }
+      input.addEventListener("keydown",function(ev){
+        if(ev.key==="Enter"){ev.preventDefault();finish(true);}
+        if(ev.key==="Escape"){ev.preventDefault();finish(false);}
+      });
+      input.addEventListener("blur",function(){finish(true);},{once:true});
+      input.focus();input.select();
+    };
   });
 }
 function personalPicksModal(raw){
@@ -14390,11 +14431,13 @@ function personalPicksModal(raw){
     "Keep patterns and titles as explicit inclusion exceptions.",
     '<div class="picksEntry"><input class="pathInput" id="pickInput" placeholder="Phrase or exact track title">'
       +'<button class="btn" id="addPhrase">Add phrase</button><button class="btn" id="addExact">Add exact title</button></div>'
+      +'<input class="pathInput pickFilter" type="search" id="picksSearch" aria-label="Search Personal Picks" placeholder="Find saved pick...">'
       +'<div class="picksList" id="pickRows"></div>',
     '<button class="btn" id="copyPicks">Copy picks</button><button class="btn danger" id="clearPicks">Clear all</button>'
       +'<div class="modalSpacer"></div><button class="btn" id="picksCancel">Cancel</button>'
       +'<button class="btn primary" id="picksSave">Save</button>');
   renderPickRows();
+  document.getElementById("picksSearch").oninput=renderPickRows;
   function add(mode){
     const input=document.getElementById("pickInput"),value=input.value.trim();if(!value)return;
     const key=value.toLowerCase().replace(/[^a-z0-9]+/g,"");
