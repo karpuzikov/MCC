@@ -5,6 +5,13 @@ Last updated: 2026-10-19
 This file is the project-specific rulebook for the Discography Builder and Duplicate / Edition Analyzer.
 The account-wide `SOFTWARE_RULES.md` baseline always applies. This file may add stricter project-specific requirements but must never weaken or override a newer global rule or a newer explicit user instruction. When project rules conflict with the global baseline, the stricter/newer requirement wins.
 
+## MCC v0.5.40 - Personal Picks and negative-fixture isolation
+
+- **Personal Picks have explicit positive precedence** over Save Remixes/Save Live OFF for tracks whose saved rules match; an unchecked Remix/Live setting does not prohibit user-requested songs. A user-authored Pick must never be silently ignored just to make older negative-only tests pass.
+- **Test isolation:** Exclusion regression tests MUST use no Personal Picks or positive overrides. Separately test that explicit Personal Picks retain precisely matched tracks, that nonmatching remixes/live recordings remain excluded, and that removing the Pick restores ordinary exclusions. Never provide a Pick in a negative "all remixes excluded" fixture.
+- Dirty Vibe: when no Picks and Save Remixes OFF, all four mixes on each EP must be excluded; OLD can be removed and NEW skipped as appropriate. When `Jack Beats` is deliberately saved as a Personal Pick, its two Re-work versions must remain wanted while six other mixes remain excluded; verify restoring normal exclusions after clearing the Pick.
+- Keep audio comparison identity, classification persistence, source safety, export/Undo behavior unchanged while correcting fixture expectations. Every failed `--ui-self-test` is release blocking; the same applies to browser and real Windows WebView2 acceptance. Status remains **Under construction ⚠️**.
+
 ## MCC - mandatory Visual QA Gate (2026-10-19)
 
 - All MCC UI edits must comply with the canonical `UI_UX_RULES.md` Visual QA Gate **before** being called fixed: inventory controls, remove redundant content, use shared spacing/icon rules, render the actual UI, run automated geometry and interaction tests, inspect/compare screenshots, then verify native Windows WebView2 at 100%/125%, minimum/normal/large windows with actual representative Noisia data.
