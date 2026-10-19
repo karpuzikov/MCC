@@ -1,6 +1,6 @@
 # Discography Torrent Project - Rules
 
-Last updated: 2026-10-05
+Last updated: 2026-10-19
 
 This file is the project-specific rulebook for the Discography Builder and Duplicate / Edition Analyzer.
 The account-wide `SOFTWARE_RULES.md` baseline always applies. This file may add stricter project-specific requirements but must never weaken or override a newer global rule or a newer explicit user instruction. When project rules conflict with the global baseline, the stricter/newer requirement wins.
