@@ -1,3 +1,15 @@
+## MCC v0.5.39 - Windows test failures and QA harness repair (2026-10-19)
+
+**Actual Windows test supplied by user:** Windows PowerShell at `S:\test\MCC`, Python 3.14, Playwright 1.64.0. `git clone` PASS, `py -m pip install playwright` satisfied, `py -m py_compile "Music Collection Cleaner v0.05.38.pyw"` PASS. `py "Music Collection Cleaner v0.05.38.pyw" --ui-self-test` **FAIL** at line 17677 with `RuntimeError: Release Map UPDATED default/Move confirmation UI regression.`. `py tests\visual_qa.py --browser edge` **FAIL** with `TimeoutError: Page.wait_for_function: Timeout 30000ms exceeded`. Neither visual render nor native WebView2 was proven accepted.
+
+**Root causes:**
+- The source self-test erroneously searched the **main-window** HTML for an obsolete exact string `Original release folders relocated.`. The currently implemented safety copy appears in Release Map's Move confirmation. v0.5.39 replaces the stale assertion with the current explicit `Undo Last Run can restore moved folders.` in the correct map HTML; other Move safety assertions remain.
+- Playwright opened `file://` with `<script type="module">`, so Chromium could prevent module execution because of local-origin/CORS restrictions. v0.5.39 test harness now intercepts `http://mcc-visual.test/release-map` and fulfills the full unchanged module-based HTML from memory. This is entirely local browser request interception; no external server/network and no music access. A startup failure now captures screenshots and JavaScript/console errors rather than only reporting a bare timeout.
+
+**Static verification on GitHub:** readback shows all nine Move-warning assertion tokens now present in Release Map HTML, both embedded JavaScript scripts parse in V8, app version `0.5.39`, test runner points to v0.5.39 and uses local HTTP route. This is **not** a claim that Python/WebView2/browser tests passed.
+
+**Next Windows verification (PENDING):** run `git pull`, `py -m py_compile "Music Collection Cleaner v0.05.39.pyw"`, `py "Music Collection Cleaner v0.05.39.pyw" --ui-self-test`, `py tests\visual_qa.py --browser edge`. Capture updated report and screenshots, triage any further failures. Human inspection of rendered screenshots and actual Windows WebView2 reference comparison remain **NOT RUN**. Copy/Move/Undo against real sources must not proceed while outstanding safety blockers remain. Status **v0.5.39 - Under construction ⚠️**.
+
 ## MCC 2026-10-19 - Visual QA Gate implementation (v0.5.38 remains Under construction ⚠️)
 
 - **Global rule:** canonical `karpuzikov/userscripts/SOFTWARE_RULES.md` and `UI_UX_RULES.md` now require a Visual QA Gate for every UI update; MCC mirrors match. No static JS parse, source review, mock UI or screenshot screenshot alone may be called a completed visual acceptance.
