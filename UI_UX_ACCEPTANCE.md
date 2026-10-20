@@ -1,3 +1,11 @@
+## MCC v0.5.54 - Alternate mastering fingerprint detection (2026-10-21)
+
+No user-facing controls, panel layout, style, text, focus or pointer actions changed. The existing docked v0.5.53 release details and dark WebView2 UI are preserved. Source-only audio comparison update.
+- Provided v0.5.53 JSONL record pairs 275/622 and 622/623 were inspected; their rejection criteria identified. PASS (diagnosis only).
+- Independent synthetic fingerprint distribution and JSONL threshold replay: PASS for arithmetic/selection checks only, not a complete runtime/audio test.
+- Full source Python compilation, full `--ui-self-test`, Windows scan, live full-length source audio, group/selection result, native rendered UI and Copy/Move/Undo: NOT RUN.
+- No automated visual QA was requested or run. Version 0.5.54 remains **Under construction ⚠️**.
+
 ## MCC visual review - user-provided screenshots only (2026-10-20)
 
 ## v0.5.44 - Fingerprint authority, 2026-10-20
