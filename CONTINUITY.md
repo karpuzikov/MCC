@@ -1,5 +1,17 @@
 # Music Collection Cleaner - Continuity Handoff
 
+## Development checkpoint - 2026-10-20, MCC v0.5.49 - Under construction ⚠️
+
+- **Branch**: `fix/verified-leading-silence-identity`. **New build**: `Music Collection Cleaner v0.05.49.pyw`; `main` remains v0.5.48 pending real Windows regression testing. No merge/stable claim.
+- User explicitly clarified the Watch the Throne `Illest Motherfucker Alive` duration anomaly: longer 503.32s ALAC track contains leading silence, shorter masked-title FLAC is 323.260635s. Such independently verified silence must not count toward inclusive <=8-second effective duration threshold.
+- Actual user JSONL `Music Collection Cleaner Comparison 2026-10-20-12-36-31.jsonl` contains 684 scanned tracks. Index 124 (503.32s, release id 10) and index 433 (323.260635s, release id 55) had **no comparison row**; v0.5.48 router dropped them because censored title differs, Deluxe Edition vs Deluxe album key differs and raw gap is ~180.06s >45s duration route. Their acoustic group IDs 123/310 remain separate. The report cannot establish whether the audible tracks match.
+- Source patch normalizes only Deluxe wording for album/track-slot *candidate routing* (not identity); allows censored/uncensored title pair; adds targeted, read-only leading-silence check for >8s routed gaps. For >10s gaps an FFmpeg 2-second 8k preview cheaply excludes files with audible starts, never confirms identity. Real identity path decodes audio, locates long silence, independently verifies ignored prefix/tail in source-native rate/all channels via existing strict RMS<=2 and peak<=4 LSB, confirms <=8-second effective duration difference and aligned PCM agreement. Only then it adjusts `identity_duration_seconds` and accepts decoded edge. Raw durations and source files remain unchanged; failed/uncertain cases do not merge. Reworked long-boundary PCM silence check to avoid huge temporary lists.
+- Diagnostics now can accurately report `verified_silent_padding` audio acceptance despite weak whole-file Chromaprint profile; added 10-second synthetic PCM and Deluxe-alias self-test (plus audible-prefix negative) to `_candidate_router_regression_self_test`.
+- Isolated local Python smoke test of the same helper algorithm passed (10s silence, loud-prefix negative, album title alias). **Not performed**: full v0.5.49 `py_compile`, full `--ui-self-test`, native FFmpeg padding test on the user's actual audio, actual Windows WebView2 and optimizer test. Do not claim successful merge of actual songs or release drop.
+- Preserve mandatory global/source rule files, v0.5.48 retained-track highlighting behavior and all Ignore/Restore changes. No UI/Actions changes or new dependencies.
+- **Next**: run full source compile/self-test and a fresh `Analyze` on a disposable or backed-up copy of these two full 16-track deluxe albums. Inspect JSONL for pair 124/433, `decoded_padding_verification`, `decoded_audio_verification`, actual effective duration and coherent grouping/retention. If a strict native-rate check rejects the real files, inspect the exact measured boundaries before changing thresholds. Re-run file safety regression and release-map check before merging.
+
+
 ## Current checkpoint - 2026-10-20, MCC v0.5.48 - Under construction ⚠️
 
 **Canonical source:** `Music Collection Cleaner v0.05.48.pyw` on `karpuzikov/MCC/main`; historical versions remain. This checkpoint supersedes the v0.5.47 all-scanned song-presence rule below. The user explicitly approved: **Highlight the tracks that are the reason the release is retained.**

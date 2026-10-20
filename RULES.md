@@ -5,6 +5,15 @@ Last updated: 2026-10-20
 This file is the project-specific rulebook for the Discography Builder and Duplicate / Edition Analyzer.
 The account-wide `SOFTWARE_RULES.md` baseline always applies. This file may add stricter project-specific requirements but must never weaken or override a newer global rule or a newer explicit user instruction. When project rules conflict with the global baseline, the stricter/newer requirement wins.
 
+## MCC v0.5.49 - Independently verified leading silence (2026-10-20)
+
+- A genuinely silent opening is not part of recording-version length. The inclusive <=8-second difference applies to **effective audible recording durations**, not raw container durations. Never merge by duration, album name, track number, censorship mask or metadata alone.
+- A same-family album track slot can route candidates despite Deluxe / Deluxe Edition wording and censored/uncensored title variants. Such routing never proves identity.
+- For any greater-than-8-second routed duration mismatch with appropriate title/slot evidence, test the long recording for leading silence. A 2-second low-rate preview may reject an obviously audible start, but cannot establish silence. Decode the full candidate audio, align the real performance, and confirm every ignored unmatched boundary is silent **at the original native sample rate in every channel** using the existing strict RMS/peak checks.
+- Only after native-rate silence verification, effective duration within <=8 seconds and a successful independent aligned-audio PCM identity check may those recordings share an acoustic group. Failed, ambiguous or unavailable proof leaves different recordings separate; original raw duration, fingerprint and file content are never modified.
+- Regression target: user's Watch the Throne deluxe pair: 2011-08-08 [US - B0015958-02] 503.32s "Illest Motherfucker Alive" vs 2011-08-12 [602458447699] 323.260635s "Illest Motherf***** Alive". v0.5.48 never compared the pair (indices 124,433); don't assume audio identity from this JSONL, since it contains no decoded sample evidence.
+- No changes to Release Map controls, previous v0.5.48 highlight/Ignore contract, source file operations, dependencies or Actions. Keep 0.5.49 - Under construction ⚠️ pending the user's actual Windows data test and confirmation. No automated visual QA requested.
+
 ## MCC v0.5.48 - Highlight the tracks that retain the release (2026-10-20)
 
 - User-approved rule: **Highlight the tracks that are the reason the release is retained.** Tracks covered by another retained release stay unhighlighted. Copies on discarded releases do not cancel highlighting. A discarded duplicate release has no highlighted tracks. This supersedes v0.5.47's all-scanned-song-presence rule and v0.5.46's generic Needed recording status wording.
