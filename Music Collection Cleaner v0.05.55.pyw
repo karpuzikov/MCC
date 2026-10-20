@@ -17439,8 +17439,87 @@ def _high_overlap_mastering_regression_self_test() -> None:
         raise RuntimeError("High-overlap mastering accepted missing musical content.")
 
 
+def _decoded_mastering_rescue_regression_self_test() -> None:
+    """Exercise the Stronger/instrumental negative-control distinction."""
+    from array import array
+    sample_fp = (0x55AA33CC,) * 2502
+    strong = (6.279023, 0.900320, 1.0, -1, 0.417534, 6.0, 10)
+    instrumental = (6.287454, 0.920593, 1.0, 0, 0.429328, 6.0, 10)
+    for profile in (strong, instrumental):
+        if not _fingerprint_pcm_rescue_candidate(
+                sample_fp, 311.946667, sample_fp, 312.373333, profile):
+            raise RuntimeError("A borderline mastering or instrumental was skipped before PCM.")
+        if _fingerprint_profile_identity(
+                profile, fingerprint_items=len(sample_fp), acoustic_coverage=1.0):
+            raise RuntimeError("A borderline fingerprint bypassed PCM proof.")
+        if _fingerprint_pcm_rescue_candidate(
+                sample_fp, 311.946667, sample_fp, 320.0, profile):
+            raise RuntimeError("PCM rescue bypassed the 8-second version bound.")
+    positive = {"passed": True, "method": "decoded-positive-mastering-v1",
+                "reason": "Waveform consistency confirmed"}
+    negative = {**positive, "passed": False}
+    for verdict, expected in ((positive, True), (negative, False)):
+        result = _comparison_decision_details(
+            sample_fp, 311.946667, sample_fp, 312.373333, expected, strong,
+            pcm_verification=verdict)
+        if (result["derived_final_match"] != expected
+                or result["decision_consistent"] is not True
+                or result["decoded_mastering_confirmed"] != expected):
+            raise RuntimeError("Decoded mastering audit disagrees with positive-only evidence.")
+
+    # Deterministic stereo PCM fixtures. Different gain/EQ/dynamics must pass;
+    # removing an independently audible lead performance must not.
+    if sys.byteorder != "little":
+        return
+    with tempfile.TemporaryDirectory(prefix="mcc-pcm-mastering-test-") as work:
+        files = {name: Path(work) / (name + ".pcm")
+                 for name in ("song", "master", "instrumental")}
+        buffers = {name: array("h") for name in files}
+        previous = 0.0
+        for i in range(14 * 8000):
+            t = i / 8000.0
+            backing = (0.25 * math.sin(2 * math.pi * 170 * t)
+                       + 0.20 * math.sin(2 * math.pi * 360 * t)
+                       + 0.12 * math.sin(2 * math.pi * 690 * t))
+            lead = (0.32 * math.sin(2 * math.pi * (560 * t + 15 * t * t))
+                    if math.sin(2 * math.pi * 0.14 * t) > -0.3 else 0.0)
+            song = backing + lead
+            equalized = 0.90 * 0.82 * song + 0.10 * 0.82 * previous
+            master = math.tanh(equalized * 1.3) / 1.3
+            previous = song
+            for name, value in (("song", song), ("master", master),
+                                ("instrumental", backing)):
+                quantized = max(-32768, min(32767, round(value * 20000)))
+                buffers[name].extend((quantized, quantized))
+        for name, path in files.items():
+            with path.open("wb") as handle:
+                buffers[name].tofile(handle)
+
+        class FixtureVerifier(_PCMIdentityVerifier):
+            def _decode(self, track, _pinned):
+                return files[track.path.stem]
+
+        verifier = FixtureVerifier()
+        song = Track(-9501, Path("song.flac"), 1, duration=14.0)
+        master = Track(-9502, Path("master.flac"), 1, duration=14.0)
+        instrumental_track = Track(-9503, Path("instrumental.flac"), 1, duration=14.0)
+        simulated_alignment = (6.279023, 0.900320, 1.0, 0, 0.417534, 6.0, 10)
+        for a, b, expected in (
+                (song, master, True), (master, song, True),
+                (song, instrumental_track, False),
+                (instrumental_track, song, False)):
+            result = verifier.verify_mastering(a, b, simulated_alignment)
+            if result["passed"] != expected:
+                raise RuntimeError(
+                    "Decoded mastering regression failed for "
+                    + a.path.stem + "/" + b.path.stem + ": "
+                    + str(result.get("reason"))
+                )
+
+
 def _ui_contract_self_test() -> None:
     _high_overlap_mastering_regression_self_test()
+    _decoded_mastering_rescue_regression_self_test()
     # A successful whole-track comparison is final under the user policy.
     # A local changed section cannot introduce another identity veto.
     identity_fp = tuple(((i*0x9E3779B9)^0x12345678)&0xffffffff for i in range(1000))
