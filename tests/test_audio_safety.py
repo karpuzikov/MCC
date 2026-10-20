@@ -17,7 +17,7 @@ from unittest.mock import patch
 import wave
 
 ROOT = Path(__file__).resolve().parents[1]
-SOURCE = Path(os.environ.get('MCC_TEST_SOURCE', str(ROOT / 'Music Collection Cleaner v0.05.44.pyw')))
+SOURCE = Path(os.environ.get('MCC_TEST_SOURCE', str(ROOT / 'Music Collection Cleaner v0.05.45.pyw')))
 loader = importlib.machinery.SourceFileLoader('mcc_test_subject', str(SOURCE))
 spec = importlib.util.spec_from_loader(loader.name, loader)
 mcc = importlib.util.module_from_spec(spec)
@@ -377,8 +377,11 @@ class PCMVerification(unittest.TestCase):
             with wave.open(str(path),'wb') as dst:
                 dst.setnchannels(2);dst.setsampwidth(2);dst.setframerate(8000)
                 dst.writeframes(struct.pack('<'+'h'*len(data),*data))
+            # Deliberately uncertain fingerprints exercise decoded evidence.
+            # One-bit variants now correctly qualify as consistent identity.
+            mask = (0, 7, 56)[index]
             tracks.append(mcc.Track(index+1,path,1,title='Song',duration=8,
-                          fingerprint=tuple(value^index for value in fp())))
+                          fingerprint=tuple(value^mask for value in fp())))
         path=self.root/'chain.jsonl'
         with patch.object(mcc,'_compare_workers',return_value=1):
             mcc.merge_equivalent_tracks(tracks,comparison_log_path=path)
@@ -395,8 +398,8 @@ class PCMVerification(unittest.TestCase):
         b = self.write_audio('mastered.wav', gain=.6, delay=81)
         c = self.write_audio('vocal.wav', vocal=True)
         a.release_id, b.release_id, c.release_id = 1, 2, 3
-        b.fingerprint = tuple(value ^ 1 for value in a.fingerprint)
-        c.fingerprint = tuple(value ^ 7 for value in a.fingerprint)
+        b.fingerprint = tuple(value ^ 7 for value in a.fingerprint)
+        c.fingerprint = tuple(value ^ 56 for value in a.fingerprint)
         path=self.root/'comparison.jsonl'
         groups, _, _ = mcc.merge_equivalent_tracks([a,b,c], comparison_log_path=path)
         self.assertEqual(a.group_id,b.group_id)

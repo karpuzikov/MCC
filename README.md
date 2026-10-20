@@ -1,6 +1,6 @@
 # Music Collection Cleaner (MCC)
 
-**Version: 0.5.44 - Under construction ⚠️**
+**Version: 0.5.45 - Under construction ⚠️**
 
 Music Collection Cleaner compares existing music releases with new ones, finds the best combination of editions, and helps preserve every wanted unique recording while removing unnecessary redundancy.
 
@@ -10,11 +10,11 @@ For MCC, the user supplies Windows WebView2 screenshots for visual review when r
 
 ## Download and run
 
-**[Music Collection Cleaner v0.05.44.pyw](Music%20Collection%20Cleaner%20v0.05.44.pyw)** - latest single-file Windows Python application. **Under construction ⚠️** until actual Windows WebView2 testing. Earlier source versions remain available.
+**[Music Collection Cleaner v0.05.45.pyw](Music%20Collection%20Cleaner%20v0.05.45.pyw)** - latest single-file Windows Python application. **Under construction ⚠️** until actual Windows WebView2 testing. Earlier source versions remain available.
 
-Open with Python 3 on Windows 11 (or run from a console with `python "Music Collection Cleaner v0.05.44.pyw"`). The application checks or installs supported dependencies. The GUI uses Microsoft Edge WebView2 through pywebview; it is not a terminal-based replacement.
+Open with Python 3 on Windows 11 (or run from a console with `python "Music Collection Cleaner v0.05.45.pyw"`). The application checks or installs supported dependencies. The GUI uses Microsoft Edge WebView2 through pywebview; it is not a terminal-based replacement.
 
-Source-level regression checks: `python "Music Collection Cleaner v0.05.44.pyw" --ui-self-test`. `--self-test` additionally requires a packaged standalone EXE.
+Source-level regression checks: `python "Music Collection Cleaner v0.05.45.pyw" --ui-self-test`. `--self-test` additionally requires a packaged standalone EXE.
 
 ## What it does
 
@@ -28,6 +28,15 @@ Source-level regression checks: `python "Music Collection Cleaner v0.05.44.pyw" 
 - Explicitly **Copy OLD + NEW** or **Move OLD + NEW** retained releases into the selected destination; Undo for supported completed moves.
 - Log comparisons, validate incomplete/corrupt inputs, choose I/O worker counts with drive awareness, and manage spawned subprocesses.
 
+
+## v0.5.45 - Equivalent album recordings and one Ignore action (Under construction ⚠️)
+
+- Recognize consistently aligned mastering differences with a tight global fingerprint profile and a local-window limit relative to the whole-track difference. This fixes the false splits behind the reported 808s, College Dropout, Graduation and MBDTF additions. Resolve coherent fingerprint groups before weaker decoded edges; retain local changed-section checks, direct rejected-pair constraints and independent decoded checks for uncertain evidence, including known Clean/Explicit disagreements.
+- Apply the inclusive 8-second rule to identity durations. A larger raw gap can normalize only after read-only decoded boundary checks prove removable silence at the native sample rate in every channel. Keep raw duration and source files intact; audible endings, DC and high-frequency-only content remain distinct.
+- Remove the duplicate Stop/Skip hover action. Keep R/L, the existing recording-wide Ignore/Restore, saved Skip classification and its management. Saved Big Brother Ignore still does not create a wanted requirement.
+- Replay of the supplied v0.5.44 log reproduces the original 75 releases / 600 tracks, then selects 65 / 469 under the new fingerprint policy, covering all 402 resulting wanted groups. The four redundant WEB albums are omitted and their CD anchors retained. This is a replay of logged metrics, not a fresh scan of the user's audio.
+- Late Registration's Gone has a 29.306667-second raw difference and remains separate in that replay. The new decoder check must establish whether its extra boundary is silence; no actual source audio was available here. A passed full-band check allows equivalent copies to merge; audible or unavailable evidence keeps them separate.
+- All 63 functional regressions, compilation and the complete `--ui-self-test` pass on Linux. Run a fresh **Analyze** in v0.5.45 to rebuild acoustic groups; Re-Analyze reuses existing groups. Native Windows collection/file-operation acceptance remains pending. No automated visual QA or GitHub Actions changes.
 
 ## v0.5.44 - Fingerprint identity within 8 seconds (Under construction ⚠️)
 
