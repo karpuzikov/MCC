@@ -4615,6 +4615,37 @@ class _PCMIdentityVerifier:
         return max(candidates,
                    key=lambda value: (_pcm_correlation(self._probe(a,start+value),probe),-abs(value-guess)))
 
+    def preview_long_leading_silence(self, track: Track) -> bool:
+        """Cheap negative filter only: do not decode entire songs needlessly.
+
+        Called only if a length gap >10 seconds would require >2 seconds of
+        verified leading silence. A failed/short preview must NOT be used as
+        acoustic proof or as a reason to merge anything.
+        """
+        try:
+            if self.ffmpeg is None:
+                pair = _locate_ffmpeg_pair()
+                if not pair:
+                    return True  # No prefilter; full verification fails closed.
+                self.ffmpeg = pair[0]
+            args = [self.ffmpeg, "-v", "error", "-nostdin"]
+            if track.virtual_from_cue:
+                args += ["-ss", str(track.cue_start_seconds)]
+            args += ["-i", str(track.path), "-t", "2.0", "-map", "0:a:0",
+                     "-vn", "-ac", "2", "-ar", str(self.rate),
+                     "-c:a", "pcm_s16le", "-f", "s16le", "-"]
+            result = run_hidden(args, stdout=subprocess.PIPE,
+                                stderr=subprocess.PIPE, timeout=30)
+            if result.returncode or len(result.stdout) < self.rate * 4 * 2:
+                return True  # Uncertain: let native verification decide.
+            samples = memoryview(result.stdout).cast("h")
+            try:
+                return all(abs(sample) <= 4 for sample in samples)
+            finally:
+                samples.release()
+        except Exception:
+            return True  # Never allow prefilter failure to cause a false veto.
+
     def decoded_leading_silence_guess(
         self, first: Track, second: Track,
     ) -> Optional[Dict[str, object]]:
@@ -6356,6 +6387,11 @@ def merge_equivalent_tracks(
                                  tracks[b].display_title)))):
                 continue
             try:
+                gap = abs(tracks[a].duration - tracks[b].duration)
+                if gap > DURATION_VERSION_MAX_SAME_SECONDS + 2:
+                    longer = tracks[a] if tracks[a].duration > tracks[b].duration else tracks[b]
+                    if not verifier.preview_long_leading_silence(longer):
+                        continue
                 guess = verifier.decoded_leading_silence_guess(tracks[a], tracks[b])
                 if not guess:
                     continue
