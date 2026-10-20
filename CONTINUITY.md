@@ -1,6 +1,20 @@
 # Music Collection Cleaner - Continuity Handoff
 
-## Current checkpoint - 2026-10-20, MCC v0.5.43 - Under construction ⚠️
+## Current checkpoint - 2026-10-20, MCC v0.5.44 - Under construction ⚠️
+
+**Canonical source:** `Music Collection Cleaner v0.05.44.pyw` on `karpuzikov/MCC/main`. Older sources remain. This checkpoint supersedes earlier active-version and identity-acceptance instructions below.
+
+**Latest user decision:** "identical fingerprint, length difference below 8 seconds = dupe" after auditing the actual v0.5.43 log. Apply to conclusive near-carbon fingerprint identity, including the three discussed 808s tracks. Retain the existing inclusive <=8-second boundary; >8 seconds remains a separate version.
+
+**New log audit:** `Music Collection Cleaner Comparison 2026-10-20-06-17-58.jsonl`, SHA-256 `b2fd73cacf012d68cfd01f7186d37c0574bcdae92040c55412f32a80a9b08e9b`; 3,966 valid records, 684 tracks, 104 releases. Compared to v0.5.42, the track input paths/durations/fingerprint lengths/integrity are unchanged. v0.5.43 selected 77 releases / 625 tracks (previous 51 / 370), retaining all 527 wanted groups. Both targeted 808s editions remained selected: only 9/12 pairs shared a group. Welcome to Heartbreak (82/387), See You in My Nightmares (90/395), Coldest Winter (91/396) had fingerprint distances 0.027117 / 0.040233 / 0.062787, worst local windows 0.125 / 0.2 / 1.1, length gaps 0.426667 / 0.133333 / 1.24 seconds, but 4 / 1 / 10 unmatched fingerprint frames forced PCM. PCM then rejected an internal correlation window or a small non-silent boundary. Pinocchio 92/397 now matches and the Japanese CD track is correctly reconciled/eligible. Graduation CD5/WEB45 share only Good Morning; of WEB's 14 tracks, Big Brother382 is explicitly excluded by `skip-recording-732f26f0867288e114df`, leaving 13 wanted and 12 split from CD. Ten Graduation pairs fail small unmatched boundaries, Champion/Good Night fail correlation. Do not claim the broader Graduation matching issue solved by this bounded conclusive-fingerprint change.
+
+**v0.5.44 change:** Keep near-carbon/global fingerprint thresholds and <=2.0 local-window distance, but remove zero-unaligned-frames as a positive-identity condition. Conclusive fingerprints within <=8 seconds bypass unmatched-content gates and require no PCM check; uncertain fingerprints retain PCM safeguards. Both matcher and diagnostics use the same authority rule. Comparison rows record `fingerprint_identity_authoritative` and accepted-by authority; the run header explicitly records that end frames and PCM cannot veto conclusive fingerprints. The standalone self-test includes small-end and exact-8s/greater-than-8s regressions. No UI, dependencies, source-file operations, global mirrored rules or workflows changed.
+
+**Validation:** All 31 focused tests, Python compilation and full `--ui-self-test` pass on Linux. New regressions were observed failing against v0.5.43 first. Synthetic fingerprints reproduce the three logged mean/local distances and end-frame counts; they are not the user's original vectors (the JSONL omits those). Other tests retain changed-internal-section, instrumental/vocal, rejected-pair coherence, saved exclusions and alias checks. Actual v0.5.44 Windows scan, source audio results and native file-operation acceptance remain NOT RUN. Independent review passed with no blocking findings and independently reproduced all 31 focused tests plus the full self-test.
+
+**Exact next action:** Run `Music Collection Cleaner v0.05.44.pyw` and perform a fresh Analyze of the same OLD/NEW folders. Re-Analyze reuses existing groups. Inspect the new log for all twelve 808s pair verdicts and final selected editions, plus Graduation's remaining non-conclusive pairs. Do not promise a particular selection without new evidence. Keep Under construction; no automated visual QA requests. Test Copy/Move/Undo only with disposable copies.
+
+## Prior checkpoint - 2026-10-20, MCC v0.5.43 - Under construction ⚠️
 
 **Canonical source:** `Music Collection Cleaner v0.05.43.pyw` on `karpuzikov/MCC/main`; v0.5.42 and earlier sources remain. This checkpoint supersedes older current-version/next-action instructions below. The user's no-automated-visual-QA override remains in force.
 

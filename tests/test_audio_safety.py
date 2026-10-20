@@ -17,7 +17,7 @@ from unittest.mock import patch
 import wave
 
 ROOT = Path(__file__).resolve().parents[1]
-SOURCE = Path(os.environ.get('MCC_TEST_SOURCE', str(ROOT / 'Music Collection Cleaner v0.05.43.pyw')))
+SOURCE = Path(os.environ.get('MCC_TEST_SOURCE', str(ROOT / 'Music Collection Cleaner v0.05.44.pyw')))
 loader = importlib.machinery.SourceFileLoader('mcc_test_subject', str(SOURCE))
 spec = importlib.util.spec_from_loader(loader.name, loader)
 mcc = importlib.util.module_from_spec(spec)
@@ -31,6 +31,70 @@ def fp(seed=42, count=1000):
 
 
 class AcousticSafety(unittest.TestCase):
+    def test_authoritative_fingerprint_tolerates_small_unmatched_ends(self):
+        original=fp()
+        for extra,delta in ((1,.133333),(4,.426667),(10,1.24)):
+            extended=original+fp(314,extra)
+            for reverse in (False,True):
+                with self.subTest(extra=extra,reverse=reverse):
+                    args=(original,200,extended,200+delta)
+                    if reverse:args=(args[2],args[3],args[0],args[1])
+                    self.assertTrue(mcc.fingerprint_auto_match_values(*args)[0])
+
+    def test_authoritative_fingerprint_obeys_eight_second_boundary(self):
+        original=fp();extended=original+fp(314,10)
+        for delta,expected in ((0,True),(7.999,True),(8,True),(8.001,False),(29.3,False)):
+            with self.subTest(delta=delta):
+                self.assertEqual(mcc.fingerprint_auto_match_values(original,200,extended,200+delta)[0],expected)
+
+    def test_authoritative_fingerprint_precedes_unmatched_content_gate(self):
+        original=fp(count=400);extended=original+fp(314,160)
+        self.assertTrue(mcc.fingerprint_auto_match_values(original,100,extended,107)[0])
+
+    def test_logged_808s_profiles_accept_fingerprint_authority(self):
+        for frames,extra,duration,delta,score,worst in ((2102,4,262.933333,.426667,.027117,.125),
+                (2063,1,258.12,.133333,.040233,.2),(1306,10,164.333333,1.24,.062787,1.1)):
+            with self.subTest(score=score):
+                # Synthetic vectors reproduce the logged mean/local distances;
+                # the log does not contain the user's original fingerprint words.
+                short=fp(count=frames);long=list(short)
+                local_bits=round(worst*40);position=0
+                while local_bits:
+                    bits=min(5,local_bits);long[position]^=(1<<bits)-1
+                    local_bits-=bits;position+=1
+                remaining=round(score*frames)-round(worst*40)
+                step=(frames-61)//max(1,remaining-1)
+                for index in range(remaining):long[60+index*step]^=1
+                long=tuple(long)+fp(314,extra)
+                matched,sim=mcc.fingerprint_auto_match_values(long,duration+delta,short,duration)
+                self.assertTrue(matched)
+                self.assertAlmostEqual(sim[0],score,places=6)
+                self.assertEqual(mcc._fingerprint_local_identity(long,short,sim)['worst_window_score'],worst)
+                details=mcc._comparison_decision_details(long,duration+delta,short,duration,True,sim,
+                    {'passed':False,'reason':'PCM would reject mastering or boundary difference'})
+                self.assertTrue(details['identity_confirmed'])
+                self.assertTrue(details['derived_final_match'])
+                self.assertTrue(details['decision_consistent'])
+
+    def test_authoritative_fingerprint_pipeline_does_not_invoke_pcm(self):
+        original=fp()
+        tracks=[mcc.Track(1,Path('missing-cd.flac'),1,title='Song',duration=200,
+                          fingerprint=original+fp(314,4)),
+                mcc.Track(2,Path('missing-web.flac'),1,title='Unrelated wrong title',duration=199.573333,
+                          fingerprint=original)]
+        with tempfile.TemporaryDirectory() as td:
+            path=Path(td)/'authority.jsonl'
+            with patch.object(mcc,'_compare_workers',return_value=1), \
+                 patch.object(mcc._PCMIdentityVerifier,'verify',side_effect=AssertionError('PCM must not veto authoritative fingerprints')):
+                mcc.merge_equivalent_tracks(tracks,comparison_log_path=path)
+            rows=[json.loads(line) for line in path.read_text().splitlines()]
+        self.assertEqual(tracks[0].group_id,tracks[1].group_id)
+        decisions=[row for row in rows if row['record_type']=='comparison']
+        self.assertEqual(len(decisions),1)
+        self.assertEqual(decisions[0]['decision'],'MATCH')
+        self.assertTrue(decisions[0]['details']['decision_consistent'])
+        self.assertIsNone(decisions[0]['details']['decoded_audio_verification'])
+
     def test_changed_verse_is_not_a_mastering_match(self):
         original = fp()
         changed = tuple(value ^ (0xffffffff if 400 <= i < 490 else 0)

@@ -1,5 +1,9 @@
 ## MCC visual review - user-provided screenshots only (2026-10-20)
 
+## v0.5.44 - Fingerprint authority, 2026-10-20
+
+Backend-only correction to the user's conclusive-fingerprint + <=8-second duplicate rule. No controls, layout, text or interaction changes. Functional/self-test acceptance is separate from native Windows acceptance. No automated visual QA or Actions changes. Status: 0.5.44 - Under construction ⚠️.
+
 
 ## v0.5.43 - Functional correction, 2026-10-20
 

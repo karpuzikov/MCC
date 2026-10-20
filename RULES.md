@@ -5,6 +5,13 @@ Last updated: 2026-10-20
 This file is the project-specific rulebook for the Discography Builder and Duplicate / Edition Analyzer.
 The account-wide `SOFTWARE_RULES.md` baseline always applies. This file may add stricter project-specific requirements but must never weaken or override a newer global rule or a newer explicit user instruction. When project rules conflict with the global baseline, the stricter/newer requirement wins.
 
+## MCC v0.5.44 - Fingerprint identity plus the 8-second rule (2026-10-20)
+
+- Latest explicit user decision: "identical fingerprint, length difference below 8 seconds = dupe". Preserve the existing inclusive boundary: a gap of exactly 8 seconds is allowed; only a greater gap forces a separate version.
+- Conclusive near-carbon Chromaprint evidence (`_definitive_acoustic_identity`) with consistent aligned local windows is authoritative within that limit. Unmatched end-frame counts are diagnostic; they must not require zero padding, silence-only ends, or decoded PCM approval. This supersedes v0.5.43's zero-unaligned-frames requirement and any PCM veto of conclusive identity.
+- Keep minimum valid fingerprint evidence and local changed-content checks. This is not permission to treat every broad strict/mastering candidate as conclusive; non-conclusive candidates retain independent decoded verification. Duration or titles alone never establish identity.
+- Keep known distinct versions, saved inclusion/Ignore rules, source-file safety and coherent grouping constraints. No new controls, dependency, visual-QA workflow or Actions changes. v0.5.44 remains Under construction pending actual Windows collection testing.
+
 ## MCC v0.5.43 - Acoustic verification and version preservation (2026-10-20)
 
 - Chromaprint remains the discovery backbone. Titles and descriptors cannot veto acoustic candidates. Whole-track fingerprint similarity is not sufficient for non-carbon identity: use local fingerprint consistency, then independent read-only decoded stereo windows for uncertain candidates. Failed or unavailable confirmation means separate groups, with the exact reason in the comparison log. No new manual review or UI controls.

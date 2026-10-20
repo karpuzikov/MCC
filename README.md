@@ -1,6 +1,6 @@
 # Music Collection Cleaner (MCC)
 
-**Version: 0.5.43 - Under construction ⚠️**
+**Version: 0.5.44 - Under construction ⚠️**
 
 Music Collection Cleaner compares existing music releases with new ones, finds the best combination of editions, and helps preserve every wanted unique recording while removing unnecessary redundancy.
 
@@ -10,11 +10,11 @@ For MCC, the user supplies Windows WebView2 screenshots for visual review when r
 
 ## Download and run
 
-**[Music Collection Cleaner v0.05.43.pyw](Music%20Collection%20Cleaner%20v0.05.43.pyw)** - latest single-file Windows Python application. **Under construction ⚠️** until actual Windows WebView2 testing. Earlier source versions remain available.
+**[Music Collection Cleaner v0.05.44.pyw](Music%20Collection%20Cleaner%20v0.05.44.pyw)** - latest single-file Windows Python application. **Under construction ⚠️** until actual Windows WebView2 testing. Earlier source versions remain available.
 
-Open with Python 3 on Windows 11 (or run from a console with `python "Music Collection Cleaner v0.05.43.pyw"`). The application checks or installs supported dependencies. The GUI uses Microsoft Edge WebView2 through pywebview; it is not a terminal-based replacement.
+Open with Python 3 on Windows 11 (or run from a console with `python "Music Collection Cleaner v0.05.44.pyw"`). The application checks or installs supported dependencies. The GUI uses Microsoft Edge WebView2 through pywebview; it is not a terminal-based replacement.
 
-Source-level regression checks: `python "Music Collection Cleaner v0.05.43.pyw" --ui-self-test`. `--self-test` additionally requires a packaged standalone EXE.
+Source-level regression checks: `python "Music Collection Cleaner v0.05.44.pyw" --ui-self-test`. `--self-test` additionally requires a packaged standalone EXE.
 
 ## What it does
 
@@ -28,6 +28,13 @@ Source-level regression checks: `python "Music Collection Cleaner v0.05.43.pyw" 
 - Explicitly **Copy OLD + NEW** or **Move OLD + NEW** retained releases into the selected destination; Undo for supported completed moves.
 - Log comparisons, validate incomplete/corrupt inputs, choose I/O worker counts with drive awareness, and manage spawned subprocesses.
 
+
+## v0.5.44 - Fingerprint identity within 8 seconds (Under construction ⚠️)
+
+- Conclusive near-identical fingerprints with consistent local content and a length difference of 8 seconds or less count as duplicates. Small unmatched ends and decoded PCM differences cannot veto that decision.
+- Preserve the changed-interior safeguards and independent PCM checks for non-conclusive candidates; differences greater than 8 seconds remain separate versions.
+- Correct the three logged 808s rejection paths and record fingerprint authority explicitly in comparison diagnostics. Broader non-conclusive Graduation matching remains unverified.
+- All 31 focused regressions, compilation and the full `--ui-self-test` pass on Linux. Run a fresh Windows Analyze to verify actual collection results; Re-Analyze reuses old groups. No UI or workflow changes.
 
 ## v0.5.43 - Comparison-log safety fixes (Under construction ⚠️)
 
