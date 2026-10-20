@@ -1,6 +1,6 @@
 # Music Collection Cleaner (MCC)
 
-**Version: 0.5.52 - Under construction ⚠️**
+**Version: 0.5.53 - Under construction ⚠️**
 
 Music Collection Cleaner compares existing music releases with new ones, finds the best combination of editions, and helps preserve every wanted unique recording while removing unnecessary redundancy.
 
@@ -10,11 +10,11 @@ For MCC, the user supplies Windows WebView2 screenshots for visual review when r
 
 ## Download and run
 
-**[Music Collection Cleaner v0.05.52.pyw](Music%20Collection%20Cleaner%20v0.05.52.pyw)** - latest single-file Windows Python application. **Under construction ⚠️** until actual Windows WebView2 testing. Earlier source versions remain available.
+**[Music Collection Cleaner v0.05.53.pyw](Music%20Collection%20Cleaner%20v0.05.53.pyw)** - latest single-file Windows Python application. **Under construction ⚠️** until actual Windows WebView2 testing. Earlier source versions remain available.
 
-Open with Python 3 on Windows 11 (or run from a console with `python "Music Collection Cleaner v0.05.52.pyw"`). The application checks or installs supported dependencies. The GUI uses Microsoft Edge WebView2 through pywebview; it is not a terminal-based replacement.
+Open with Python 3 on Windows 11 (or run from a console with `python "Music Collection Cleaner v0.05.53.pyw"`). The application checks or installs supported dependencies. The GUI uses Microsoft Edge WebView2 through pywebview; it is not a terminal-based replacement.
 
-Source-level regression checks: `python "Music Collection Cleaner v0.05.52.pyw" --ui-self-test`. `--self-test` additionally requires a packaged standalone EXE.
+Source-level regression checks: `python "Music Collection Cleaner v0.05.53.pyw" --ui-self-test`. `--self-test` additionally requires a packaged standalone EXE.
 
 ## What it does
 
@@ -28,6 +28,14 @@ Source-level regression checks: `python "Music Collection Cleaner v0.05.52.pyw" 
 - Explicitly **Copy OLD + NEW** or **Move OLD + NEW** retained releases into the selected destination; Undo for supported completed moves.
 - Log comparisons, validate incomplete/corrupt inputs, choose I/O worker counts with drive awareness, and manage spawned subprocesses.
 
+
+## v0.5.53 - Details beside the release list (Under construction ⚠️)
+
+- Opening release details narrows the list and lets its existing columns reflow beside a docked panel on the right. The panel uses up to 52% of the main area, capped at 720px. Closing it restores the list's full width.
+- Keep the selected release visible after the first open. Already-open details updates leave board scrolling alone. Existing controls, Escape/close, selection, Ignore, audio rules and source operations are preserved; no new controls or steps.
+- Both embedded scripts compile in V8, and four non-rendering checks cover first-open scrolling and stale/closed/already-open cases. Python compilation, full tests/self-test, native Windows interaction and visual acceptance are NOT RUN: the execution environment is offline. No automated visual QA was run or requested. The supplied screenshot could not be opened.
+
+- Independent source review found no blocking issues; its stale close/reflow comment is corrected. Runtime and native UI acceptance remain pending.
 
 ## v0.5.52 - Normalize near-silent padding without losing audible duration (Under construction ⚠️)
 

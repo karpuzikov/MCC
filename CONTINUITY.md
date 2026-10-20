@@ -1,5 +1,31 @@
 # Music Collection Cleaner - Continuity Handoff
 
+## Current checkpoint - 2026-10-20, MCC v0.5.53 - Under construction ⚠️
+
+**Goal/source:** User requests release details take layout space and squeeze/reflow the release list, keeping releases visible instead of covering them. Canonical source `Music Collection Cleaner v0.05.53.pyw`, based on published v0.5.52 at main `185adf925151ccd908357c4222c185c76dbc28f9`. The supplied screenshot `image(20261020-200230).png` was inaccessible; no screenshot inspection is claimed.
+
+**Implementation:** Existing `#main` is a flex row. Replace absolute/translated overlay CSS with `#details { flex:0 0 52%; max-width:720px; display:none; ... }` and `#details.open { display:flex; }`. Remove dockLeft, side-switching calculations, overlay shadow/transition and the narrow-window overlay override. The board's flex:1/min-width:0 and existing container queries adapt to available space; closing details returns all width. Existing board ResizeObserver schedules connection redraws. On initial open only, a requestAnimationFrame callback keeps the selected row visible with nearest/auto scrolling; it checks current selection/open state before acting. No board rerender or focus change is introduced by opening. Already-open updates do not scroll the board. Existing Close/X/Escape and repeated-click behavior remain. Update the superseded v0.5.29 Python overlay self-test contract while preserving its repeated-click conditions verbatim.
+
+**Control contract before implementation:**
+
+Release Map v0.5.53 control contract (2026-10-20):
+- Release row: existing pointer/Enter/Space selection opens details once and selects that release. The right-hand details panel occupies normal flex layout, at most 720px and 52% of the main area; board retains at least 48%. Reflow uses existing container queries; existing list DOM, search and filters are retained.
+- Details panel: read the selected release and tracks; closed display:none reserves no space, open display:flex. No overlay, side-switching, transform or animation. Existing details/track scroll, hover actions, Ignore/Restore, Keep, Versions, path controls and album grouping keep their purpose, handlers, focus and persistence.
+- Close details X / Escape: existing closeDetails clears selected/active track state and hides panel, restoring full list width. No additional controls, text or clicks.
+- First open: after layout settles, scroll the selected row into view only if that release remains selected and details are still open. Already-open refreshes do not move the board; pending Ignore updates remain in place.
+- Main window: existing 1050x680 minimum, toolbar, typography, icons and dark theme unchanged. Native resize and independent board/details scrolling remain available. Existing ResizeObserver redraws SVG connections after board reflow.
+Acceptance: source/embedded-JS review can run via connector/V8. Python compilation, full functional/self-tests, native Windows interactions and screenshot review NOT RUN because execution environment and uploaded image are unavailable. No automated visual QA.
+
+**Scope/preservation:** Only seven source blocks change: APP_VERSION; details CSS; removal of the old docking function; first-open detection; the selected-row frame callback; existing obsolete layout self-test checks; the close comment describing restored width. Reversing those exact edits reconstructs v0.5.52 source text exactly. Thus backend matching, v0.5.52 near-silent normalization, optimizer, bridge, Ignore persistence, retention highlighting and source operations remain unchanged. Three existing test entry points now default to the v0.05.53 filename; no extra test files or runtime dependencies. Global mirrored rule/acceptance files, historical app sources and Actions are untouched.
+
+**Verified here:** Both complete embedded JavaScript bodies compile in V8 without executing page/DOM code. Four checks execute the exact new frame callback: first open scrolls/redraws; already-open refresh does not scroll; closing before the frame prevents scrolling; changing selection before the frame prevents stale scrolling. Source invariants verify the flex panel and absence of overlay/side-switching in generated HTML. Canonical SOFTWARE_RULES/UI_UX_RULES match their MCC mirrors exactly. Fluent 2 layout/reflow guidance was read at https://fluent2.microsoft.design/layout ; the UXDT efficiency page timed out.
+
+**Independent review:** No Critical/Important findings in the docked-panel source review. The review's one Minor stale close/reflow comment is corrected. Final source blob `fa05c29994a5c366981011deb6cefdb62ada3cbc` differs from reviewed blob `eacd6adfb7abe83061d209d04434b951efd0dcfb` only by that comment. Both full embedded scripts compile again; all four exact callback checks pass again on the final source. Seven-edit reversal reconstructs published v0.5.52 text exactly. Review did not run Python or native/visual UI checks.
+
+**NOT RUN:** Python compilation; full functional suite; full `--ui-self-test`; actual WebView2 startup, responsive rendering, screenshots, hover, keyboard/scroll/focus/native Windows interaction, Copy/Move/Undo. The execution environment is unavailable, so earlier v0.5.52's 88 passing tests are historical and are NOT a v0.5.53 test result. No automated visual QA or geometry reports. Preserve Under construction; do not claim native acceptance.
+
+**Exact next action:** Use the v0.5.53 source for ordinary Windows use and review subsequent user feedback on opening/closing release details in Changes and Full map. The list should reflow beside the panel and selected release remain visible; closing restores full width. When an execution environment returns, run the existing compilation and functional/self-tests; do not request automated visual QA or screenshots. Matching policy and prior original-audio acceptance remain as recorded in the v0.5.52 checkpoint.
+
 ## Current checkpoint - 2026-10-20, MCC v0.5.52 - Under construction ⚠️
 
 **Canonical source:** `Music Collection Cleaner v0.05.52.pyw`, based on published v0.5.51. Historical sources, global mirrored rules and Actions are unchanged. Preserve compact single-file WebView2, source media, Copy/Move/Undo, recording Ignore and retention highlighting.

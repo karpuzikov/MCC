@@ -5,6 +5,14 @@ Last updated: 2026-10-20
 This file is the project-specific rulebook for the Discography Builder and Duplicate / Edition Analyzer.
 The account-wide `SOFTWARE_RULES.md` baseline always applies. This file may add stricter project-specific requirements but must never weaken or override a newer global rule or a newer explicit user instruction. When project rules conflict with the global baseline, the stricter/newer requirement wins.
 
+## MCC v0.5.53 - Dock release details beside the list (2026-10-20)
+
+- Latest explicit user request: the side panel must squeeze/reflow the release list rather than slide over and cover it. This supersedes the older v0.5.29 overlay/stable-board-width requirement and its side-switching drawer behavior.
+- Use one right-side details panel in the existing flex layout. Opening reserves at most 52% of the main area and 720px; the board uses the remainder and existing container queries reflow its release columns. Closing removes the panel from layout and restores the board's full width. Do not add modes, resizers, controls or clicks.
+- Keep the selected release visible after the initial layout change. Cancel that pending scroll when details close or another release becomes selected. Already-open refreshes and in-place recording Ignore/Restore must not move the board.
+- Preserve existing dark styling, controls, keyboard and hover actions, focus, independent scrolling, recording Ignore, acoustic grouping, retention highlights, source media and Copy/Move/Undo. Keep the v0.5.52 audio behavior intact.
+- Record only checks actually run. V8 script compilation and non-rendering JavaScript callback checks do not certify CSS rendering, Python/self-tests or Windows interaction. These runtime gates are NOT RUN while the environment is unavailable; retain v0.5.53 Under construction. Never request automated visual QA or replacement screenshots because the current image is inaccessible.
+
 ## MCC v0.5.52 - Near-silent padding and retained audible boundaries (2026-10-20)
 
 - Treat the actual measured Illest prefix (native RMS 1.18590086/1.18666323, peak 5.0001523 in 16-bit sample units) as near-silent padding after fingerprint identity passes. Keep RMS <=2 and allow peak <=8, with 0.001 level-conversion tolerance. Require nonempty, finite, nonnegative levels in every native channel. Peak 9, larger RMS, isolated clicks, DC and high-frequency-only audio must not be discarded as padding.
