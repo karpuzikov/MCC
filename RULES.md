@@ -5,6 +5,12 @@ Last updated: 2026-10-20
 This file is the project-specific rulebook for the Discography Builder and Duplicate / Edition Analyzer.
 The account-wide `SOFTWARE_RULES.md` baseline always applies. This file may add stricter project-specific requirements but must never weaken or override a newer global rule or a newer explicit user instruction. When project rules conflict with the global baseline, the stricter/newer requirement wins.
 
+## MCC v0.5.51 - Candidate routing must reach edition/censored pairs (2026-10-20)
+
+- Do not silently skip an acoustic comparison because album tags say Deluxe Edition versus Deluxe or because the title uses a censorship mask. Album-slot routing uses the existing album-family normalization. The censored-title safety route also works without album/number metadata. Empty or fully masked titles provide no censorship-routing evidence. These are comparison routes only; metadata never establishes a duplicate or satisfies coverage.
+- The actual v0.5.50 log has no comparison row for Illest tracks 124/433; all other 15 corresponding Watch the Throne tracks match. Both retained releases list only their separate Illest groups as essential. Metric-profile replay alone cannot verify candidate routing: regressions must begin at the router and exercise comparison, native padding normalization, grouping and CD selection.
+- Preserve the v0.5.50 4.02 primary fingerprint policy, <=8-second effective-duration rule, read-only native-rate/all-channel silence measurement, saved recording Ignore, optimizer and retention highlighting. Keep v0.5.51 Under construction. A fresh Analyze is required; uploaded metadata/profiles cannot certify new native measurements against the original files.
+
 ## MCC v0.5.50 - Calibrated fingerprint matching is authoritative (2026-10-20)
 
 - Latest explicit user instructions: there should be no rejection after the acoustic fingerprint comparison, then calculate the mastering difference between Watch the Throne CD [US - B0015958-02] and WEB [602458447699] and make it the new threshold. This supersedes the local-window, decoded-identity, unmatched-content, Clean/Explicit identity-veto and negative-pair grouping rules in older sections. Inclusion preferences and recording Ignore remain separate from identity.

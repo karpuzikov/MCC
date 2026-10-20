@@ -16,7 +16,7 @@ import wave
 
 
 ROOT = Path(__file__).resolve().parents[1]
-SOURCE = Path(os.environ.get('MCC_TEST_SOURCE', str(ROOT / 'Music Collection Cleaner v0.05.50.pyw')))
+SOURCE = Path(os.environ.get('MCC_TEST_SOURCE', str(ROOT / 'Music Collection Cleaner v0.05.51.pyw')))
 loader = importlib.machinery.SourceFileLoader('mcc_padding_subject', str(SOURCE))
 spec = importlib.util.spec_from_loader(loader.name, loader)
 mcc = importlib.util.module_from_spec(spec)
@@ -136,6 +136,39 @@ class SilencePaddingVerification(unittest.TestCase):
                 self.assertAlmostEqual(abs(result['alignment_lag_samples'])/8000,180.059375,places=4)
                 self.assertLessEqual(abs(result['effective_durations_seconds'][0]-result['effective_durations_seconds'][1]),.0021)
                 self.assertEqual(result['effective_durations_seconds'], [12.0, 12.0])
+
+    def test_full_pipeline_routes_illest_metadata_before_three_minute_padding(self):
+        # Actual edition/censorship naming, controlled vectors and generated
+        # media: this reaches the real router, comparison and native decoder.
+        from test_audio_safety import fp
+        base = self.write_audio('13 Illest Motherf***** Alive.wav', seconds=12)
+        padded = self.write_audio('13 Illest Motherfucker Alive.wav',
+                                  prefix=180.059375, seconds=12)
+        base.fingerprint = fp(count=76)
+        mastered = tuple(value ^ (0x08400000 if i % 10 < 6 else 0)
+                         for i, value in enumerate(base.fingerprint))
+        padded.fingerprint = (0,) * 1454 + mastered
+        base.title, padded.title = 'Illest Motherf***** Alive', 'Illest Motherfucker Alive'
+        base.album, padded.album = 'Watch The Throne (Deluxe)', 'Watch the Throne (Deluxe Edition)'
+        base.release_id, padded.release_id = 55, 10
+        before = [hashlib.sha256(t.path.read_bytes()).digest() for t in (padded, base)]
+        with patch.object(mcc, 'FP_SHADOW_SAMPLE_SIZE', 0), \
+             patch.object(mcc, '_compare_workers', return_value=1):
+            groups, _, _ = mcc.merge_equivalent_tracks([padded, base])
+        self.assertEqual(padded.group_id, base.group_id,
+                         'Illest must reach native silence normalization through the router')
+        self.assertEqual(len(groups), 1)
+        self.assertAlmostEqual(padded.identity_duration_seconds, 12, places=3)
+        self.assertAlmostEqual(base.identity_duration_seconds, 12, places=3)
+        self.assertEqual([padded.duration, base.duration], [192.059375, 12])
+        self.assertEqual(before, [hashlib.sha256(t.path.read_bytes()).digest() for t in (padded, base)])
+        cd = mcc.Release(10, 'existing', self.root / 'CD',
+                         title=padded.album, tracks=[padded], release_type='album',
+                         source_medium='CD', has_cue=True, has_rip_log=True)
+        web = mcc.Release(55, 'recycle', self.root / 'WEB',
+                          title=base.album, tracks=[base], release_type='album',
+                          source_medium='Digital Media')
+        self.assertEqual(mcc.optimize_collection([cd, web], {}), {10})
 
     def test_offset_and_silent_ends_preserve_silence_on_the_shared_timeline(self):
         first = self.write_audio('first.wav', prefix=1.25, tail=1.75)

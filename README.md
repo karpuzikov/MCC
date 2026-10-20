@@ -1,6 +1,6 @@
 # Music Collection Cleaner (MCC)
 
-**Version: 0.5.50 - Under construction ⚠️**
+**Version: 0.5.51 - Under construction ⚠️**
 
 Music Collection Cleaner compares existing music releases with new ones, finds the best combination of editions, and helps preserve every wanted unique recording while removing unnecessary redundancy.
 
@@ -10,11 +10,11 @@ For MCC, the user supplies Windows WebView2 screenshots for visual review when r
 
 ## Download and run
 
-**[Music Collection Cleaner v0.05.50.pyw](Music%20Collection%20Cleaner%20v0.05.50.pyw)** - latest single-file Windows Python application. **Under construction ⚠️** until actual Windows WebView2 testing. Earlier source versions remain available.
+**[Music Collection Cleaner v0.05.51.pyw](Music%20Collection%20Cleaner%20v0.05.51.pyw)** - latest single-file Windows Python application. **Under construction ⚠️** until actual Windows WebView2 testing. Earlier source versions remain available.
 
-Open with Python 3 on Windows 11 (or run from a console with `python "Music Collection Cleaner v0.05.50.pyw"`). The application checks or installs supported dependencies. The GUI uses Microsoft Edge WebView2 through pywebview; it is not a terminal-based replacement.
+Open with Python 3 on Windows 11 (or run from a console with `python "Music Collection Cleaner v0.05.51.pyw"`). The application checks or installs supported dependencies. The GUI uses Microsoft Edge WebView2 through pywebview; it is not a terminal-based replacement.
 
-Source-level regression checks: `python "Music Collection Cleaner v0.05.50.pyw" --ui-self-test`. `--self-test` additionally requires a packaged standalone EXE.
+Source-level regression checks: `python "Music Collection Cleaner v0.05.51.pyw" --ui-self-test`. `--self-test` additionally requires a packaged standalone EXE.
 
 ## What it does
 
@@ -28,6 +28,14 @@ Source-level regression checks: `python "Music Collection Cleaner v0.05.50.pyw" 
 - Explicitly **Copy OLD + NEW** or **Move OLD + NEW** retained releases into the selected destination; Undo for supported completed moves.
 - Log comparisons, validate incomplete/corrupt inputs, choose I/O worker counts with drive awareness, and manage spawned subprocesses.
 
+
+## v0.5.51 - Reach comparisons across edition and censored names (Under construction ⚠️)
+
+- The fresh v0.5.50 log matches 15 Watch the Throne pairs but never compares Illest. Exact album-slot keys split Deluxe Edition from Deluxe, while the censored Motherf***** spelling defeats the ordinary title fallback. Both editions are retained solely for the resulting two Illest groups.
+- Normalize edition suffixes for album-slot candidate routing and add a censored-title safety route, including files without album/track-number metadata. Metadata only schedules comparison; the calibrated 4.02 fingerprint cutoff, inclusive 8-second effective-duration rule and native all-channel silence measurement still decide the result.
+- New regressions reproduce the skipped comparison on v0.5.50. The generated-audio pipeline now reaches real fingerprint comparison and native verification of a 180.059375-second silent prefix, merges the pair and retains the CD without changing source media. The actual 684-track log metadata routes all 16 corresponding album slots; real Illest padding still requires a fresh Analyze of the original files.
+
+- All 84 functional tests, the complete UI self-test, compilation and both embedded JavaScript syntax checks passed. Independent review found no remaining issues. Actual Windows acceptance and the original Illest boundary measurement remain pending.
 
 ## v0.5.50 - Calibrated mastering fingerprint threshold (Under construction ⚠️)
 

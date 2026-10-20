@@ -1,5 +1,25 @@
 # Music Collection Cleaner - Continuity Handoff
 
+## Current checkpoint - 2026-10-20, MCC v0.5.51 - Under construction ⚠️
+
+**Canonical source:** `Music Collection Cleaner v0.05.51.pyw`, based on published v0.5.50. Preserve archived sources, global mirrored rules and Actions. Single-file WebView2 UI, optimizer, Ignore and source operations are unchanged.
+
+**New actual evidence:** `Music Collection Cleaner Comparison 2026-10-20-16-18-25(1).jsonl`, SHA256 `8f82f752fe746605f72b5c3532fd3eab56f10bc52a3d2b99dda646a519fbf8dc`. Fresh v0.5.50 Analyze: 684 tracks/104 releases, 2,597 detailed rows, 442 accepted edges, 345 acoustic groups/344 wanted groups, 56 retained releases/421 physical tracks, all wanted groups covered. The original five CD0/2/5/6/9 remain and WEB37/39/45/47/53 are discarded. Two Big Brother copies remain recording-Ignored. No secondary decoded identity checks ran.
+
+**Actual root cause:** fifteen corresponding Watch the Throne pairs match, but there is NO comparison row for Illest124/433. The exact album-slot key uses `watchthethronedeluxeedition` versus `watchthethronedeluxe`; the title fallback uses `illestmotherfuckeralive` versus `illestmotherfalive`. Its 180.059365-second raw gap bypasses duration-neighbor routing and its old weighted token containment 0.3938 is below the far-rare 0.55 gate. Thus it never reaches the corrected v0.5.50 padding measurement. Both CD10 and WEB55 are retained only for their separate Illest groups. Prior metric-only replay did not cover this router failure; do not claim a successful profile proves the pair was actually compared.
+
+**Correction:** existing album-family normalization for album-slot routing; separate censored-title safety route with the existing mask matcher, including missing album/number metadata. Both only schedule comparison. Preserve the 4.02 primary fingerprint cap, inclusive <=8-second effective-duration bound and native all-channel read-only silence measurement. No new identity veto, threshold change, title whitelist or metadata-based grouping. Added routing diagnostics declare both safety policies.
+
+**Regression evidence:** three focused route tests fail against v0.5.50 (zero candidate/route versus required one), then pass on v0.5.51. Exact real metadata/durations/item counts use generated vectors, never pretend to contain original fingerprints. A fourth generated-audio full-pipeline test fails grouping on v0.5.50, then reaches the router, fingerprint comparison, actual FFmpeg/native 180.059375-second silence measurement, shared group and CD-only optimizer selection on v0.5.51. Source bytes and raw durations remain intact. This is not fresh verification of the user's original Illest media.
+
+**Metadata audit:** reconstructed all 684 actual logged tracks. Album-slot candidates increase 217 to 331 (114 added, zero removed); all 16 corresponding Watch the Throne pairs now have the safety route, including124/433. The separate censorship fallback also recognizes the actual Illest titles. No new acoustic/decoder result is invented from this audit.
+
+**Validation:** all 84 functional tests and the full `--ui-self-test` passed; source compilation and both embedded JavaScript syntax checks passed. AST comparison confirms only `_album_track_slot_route_key` and `merge_equivalent_tracks` changed from v0.5.50; UI/bridge, optimizer, Ignore and original-file operations are identical.
+
+**Independent review:** final source SHA256 `b2bec16029feb50f0dd8675ce41b26617e0d2f12ce21e75d8e7d48695f49e854` approved with no remaining findings. Reviewer independently reran five route/native-pipeline tests and reconstructed all actual metadata route counts. A minor full-mask candidate-expansion finding was reproduced with a failing test and fixed: empty/fully masked titles supply no censorship-routing evidence on either side. Do not interpret routing tests as original-audio verification.
+
+**Exact next action:** fresh Analyze using v0.5.51 and the original folders with saved Ignore preserved. Illest124/433 must appear in comparison diagnostics with same_album_track_slot and masked_title reasons, its primary comparison must proceed, and actual native boundary evidence must determine effective duration. Continue to flag native Windows acceptance and real Illest silence verification as pending until the user's new run confirms them. Preserve the exact v0.5.48 retention highlighting rule.
+
 ## Current checkpoint - 2026-10-20, MCC v0.5.50 - Under construction ⚠️
 
 **Canonical source:** `Music Collection Cleaner v0.05.50.pyw` on `karpuzikov/MCC/main`, based on the reviewed/published v0.5.48 source. The uploaded new log reports v0.5.49; no v0.05.49 source was available on main or locally, so the new version deliberately advances to v0.5.50. Historical sources remain.
