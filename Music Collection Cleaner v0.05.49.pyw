@@ -5443,7 +5443,7 @@ def _comparison_decision_details(
         mastering_failed = [name for name, passed in mastering_checks.items() if not passed]
         rejection_reasons.append("strict failed: " + ", ".join(strict_failed))
         rejection_reasons.append("mastering failed: " + ", ".join(mastering_failed))
-    elif not content_gate_pass:
+    elif not content_gate_pass and not verified_large_padding_pcm:
         rejection_reasons.append("acoustic content gate failed: unmatched fingerprint content is not silence")
     if preliminary_pass and not identity_confirmed and not duration_version:
         rejection_reasons.append(str((pcm_verification or {}).get("reason") or
