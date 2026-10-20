@@ -1977,7 +1977,7 @@ def _album_track_slot_route_key(track: "Track") -> Optional[Tuple[str, int]]:
     # Metadata only routes comparisons; Deluxe and Deluxe Edition describe
     # the same album family. Censored track titles still need acoustic testing.
     album_title = re.sub(
-        r"\\s*[\\[(]\\s*deluxe(?:\\s+edition)?\\s*[\\])]\\s*$",
+        r"\s*[\[(]\s*deluxe(?:\s+edition)?\s*[\])]\s*$",
         "", track.album or "", flags=re.I,
     )
     album = re.sub(r"[^a-z0-9]+", "", normalize_title(album_title))
