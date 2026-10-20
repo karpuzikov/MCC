@@ -1,6 +1,6 @@
 # Music Collection Cleaner (MCC)
 
-**Version: 0.5.54 - Under construction ⚠️**
+**Version: 0.5.55 - Under construction ⚠️**
 
 Music Collection Cleaner compares existing music releases with new ones, finds the best combination of editions, and helps preserve every wanted unique recording while removing unnecessary redundancy.
 
@@ -10,11 +10,11 @@ For MCC, the user supplies Windows WebView2 screenshots for visual review when r
 
 ## Download and run
 
-**[Music Collection Cleaner v0.05.54.pyw](Music%20Collection%20Cleaner%20v0.05.54.pyw)** - latest single-file Windows Python application. **Under construction ⚠️** until actual Windows WebView2 testing. Earlier source versions remain available.
+**[Music Collection Cleaner v0.05.55.pyw](Music%20Collection%20Cleaner%20v0.05.55.pyw)** - latest single-file Windows Python application. **Under construction ⚠️** until actual Windows WebView2 testing. Earlier source versions remain available.
 
-Open with Python 3 on Windows 11 (or run from a console with `python "Music Collection Cleaner v0.05.54.pyw"`). The application checks or installs supported dependencies. The GUI uses Microsoft Edge WebView2 through pywebview; it is not a terminal-based replacement.
+Open with Python 3 on Windows 11 (or run from a console with `python "Music Collection Cleaner v0.05.55.pyw"`). The application checks or installs supported dependencies. The GUI uses Microsoft Edge WebView2 through pywebview; it is not a terminal-based replacement.
 
-Source-level regression checks: `python "Music Collection Cleaner v0.05.54.pyw" --ui-self-test`. `--self-test` additionally requires a packaged standalone EXE.
+Source-level regression checks: `python "Music Collection Cleaner v0.05.55.pyw" --ui-self-test`. `--self-test` additionally requires a packaged standalone EXE.
 
 ## What it does
 
@@ -28,6 +28,15 @@ Source-level regression checks: `python "Music Collection Cleaner v0.05.54.pyw" 
 - Explicitly **Copy OLD + NEW** or **Move OLD + NEW** retained releases into the selected destination; Undo for supported completed moves.
 - Log comparisons, validate incomplete/corrupt inputs, choose I/O worker counts with drive awareness, and manage spawned subprocesses.
 
+
+## v0.5.55 - Stronger mastering / vocal-instrumental safety (Under construction ⚠️)
+
+The 2026-10-21 v0.5.54 comparison log found the Graduation (JP) / Stronger single pair but rejected its 6.279 fingerprint score. An unrelated full-length comparison between the vocal and *instrumental* versions of Touch the Sky had a similar score of 6.287. Therefore **do not** widen a fingerprint-only acceptance threshold to 6.5: that would risk merging distinct performances.
+
+- Added a **positive-only decoded PCM mastering confirmation** for narrow near-complete Chromaprint candidates (score <=6.5, good >=0.895, excellent >=0.40, median <=6, p90 <=11, overlap and whole-coverage >=0.995, and original <=8-second effective-duration bound).
+- FFmpeg decodes stereo at 8 kHz read-only. After fine alignment, 0.5-second windows across the entire overlap must meet waveform-correlation requirements (10th percentile >=0.95, median >=0.975 and >=95% windows >=0.95). Errors and ambiguous comparisons stay separate. Existing fingerprint-confirmed matches are never vetoed. No title, barcode or Instrumental metadata is used as a matching shortcut.
+- Includes synthetic voiced/remastered and instrumental negative-control regression, inverse-order checks, recorded Stronger/Touch the Sky similarity profiles, and decision-audit consistency checks.
+- Original FLAC/ALAC from the Stronger pair were **not** supplied this turn; the log and spectrogram images do not prove the PCM test will pass in the real collection. Fresh Analyze, full Python `--ui-self-test`, actual decoded recordings, Windows GUI and plan/Copy/Move/Undo remain **NOT RUN**. Do not treat this as a verified automatic duplicate classification until a real scan.
 
 ## v0.5.54 - Full-overlap alternate mastering detection (Under construction ⚠️)
 
