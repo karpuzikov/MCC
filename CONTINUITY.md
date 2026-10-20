@@ -1,5 +1,23 @@
 # Music Collection Cleaner - Continuity Handoff
 
+## Current checkpoint - 2026-10-21, MCC v0.5.54 - Under construction ⚠️
+
+**Current source:** [Music Collection Cleaner v0.05.54.pyw](Music%20Collection%20Cleaner%20v0.05.54.pyw) on `main`. Original v0.5.53 source preserved. Backend only: no interface, source media, existing settings, Actions or existing fingerprint vector generation changed. Global SOFTWARE_RULES.md and UI_UX_RULES.md are identical to their canonical userscripts mirrors (verified this turn).
+
+**Direct new evidence:** User supplied two 3279x? spectrogram screenshots and a full 6.8 MB run log `Music Collection Cleaner Comparison 2026-10-21-01-09-48.jsonl` (v0.5.53, 684 tracks, 4048 candidate/validation pairs, 2659 detailed comparisons). In the log:
+- Track 275: `Vultures 2 (Deluxe) [748777756774]/01 Slide.m4a`; 197.777778 s; group 266; selected.
+- Track 622: `SLIDE [748777739708]/01 SLIDE.flac`; 198.060408 s; group 310; selected. This is the problem duplicate.
+- Track 623: `VULTURES 2 [748777756774]/01 SLIDE.flac`; 197.777778 s; group 266; not selected; matches track 275 perfectly (score 0.0).
+- Pair 275/622 and 622/623: `REJECT`; score 5.819162, good 0.939721, excellent 0.496827, overlap 1.0, longer-file acoustic coverage 0.998733, median 6, p90 10, shift 0, length delta 0.28263 s. Primary strict and mastering checks only failed score (also strict excellent/median). Candidate routing worked; only fingerprint identity gate rejected. False duplicate retention is the consequence.
+- The user-supplied spectral images visually suggest similar temporal musical structure but do not independently establish that the decoded audio is the same performance. Original FLAC and ALAC are NOT mounted in this turn; they were previously supplied in a separate conversation and were not reprocessed here. Don't ask the user to repeat already supplied context or pretend audio verification happened.
+
+**Implementation:** v0.5.54 adds a separate high-overlap mastering profile, retaining the historic 4.02 strict/mastering caps. Guards: score <=6.0, good >=.93, excellent >=.49, median <=6, p90 <=10, overlap >=.995, **whole-recording** coverage >=.995, >=120 fingerprint frames; same existing inclusive <=8s duration rule. Audio only; not hardcoded to title, album, barcode or artist. Code paths: primary matcher shared by serial/workers, decision/audit log, silent-padding stage, existing grouping/optimizer, and embedded synthetic regression. Source creates a deterministic pseudo-fingerprint pair yielding score 5.83125, good .94125, excellent .49625, median 6 and p90 10, and checks both orders, worker parity and threshold rejects. User's measured tuple is included as a profile regression. The JSONL was independently replayed for the conservative candidate gate: six **logged** previously rejected pairs (including both SLIDE comparisons) meet the proposed high-overlap/whole-coverage bounds. This is only a replay of detailed log metrics, not a fresh runtime result; unlogged pairs were not replayed.
+
+**Verification:** GitHub source created and amended; synthetic distribution calculated locally. Python py_compile of full 900 KB application, entire `--ui-self-test`, real uploaded source-file decoding, fresh 684-track Analyze, actual duplicate group/selected release outcome, native Windows and Copy/Move/Undo: **NOT RUN**. v0.5.54 remains Under construction ⚠️. Do not label matching fully verified or app stable. No automatic Playwright request; preserve user's preference to supply Windows screenshots when ready.
+
+**Exact next action:** Fetch this v0.5.54 source and latest software/project rules. On Windows with the real source recordings, run `py -m py_compile "Music Collection Cleaner v0.05.54.pyw"` and `py "Music Collection Cleaner v0.05.54.pyw" --ui-self-test`, then re-run Analyze with logging. Verify tracks for album/deluxe/single SLIDE have the **same acoustic group ID** and that the standalone single isn't unnecessarily retained when its recording is covered, while checking unrelated recordings, the six near-profile edges and false positives. If any fail, use evidence to adjust the acoustic algorithm, not track-specific whitelists or metadata-only matching.
+
+
 ## Pending work - SLIDE across mastering variants (2026-10-20)
 
 **New user request:** Detect SLIDE from `2024-08-03 - Vultures 2 (Deluxe) [748777756774]` and `2024-08-03 - SLIDE [748777739708]` as the same recording despite mastering differences. User initially supplied `01 SLIDE.flac.png` and `01 Slide.m4a.png` spectrogram images, then the comparison JSONL, and subsequently both original audio attachments. The claim of same recording/mastering difference is user-provided, not independently measured here.
