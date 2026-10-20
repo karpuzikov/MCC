@@ -1,6 +1,6 @@
 # Music Collection Cleaner (MCC)
 
-**Version: 0.5.47 - Under construction ⚠️**
+**Version: 0.5.48 - Under construction ⚠️**
 
 Music Collection Cleaner compares existing music releases with new ones, finds the best combination of editions, and helps preserve every wanted unique recording while removing unnecessary redundancy.
 
@@ -10,11 +10,11 @@ For MCC, the user supplies Windows WebView2 screenshots for visual review when r
 
 ## Download and run
 
-**[Music Collection Cleaner v0.05.47.pyw](Music%20Collection%20Cleaner%20v0.05.47.pyw)** - latest single-file Windows Python application. **Under construction ⚠️** until actual Windows WebView2 testing. Earlier source versions remain available.
+**[Music Collection Cleaner v0.05.48.pyw](Music%20Collection%20Cleaner%20v0.05.48.pyw)** - latest single-file Windows Python application. **Under construction ⚠️** until actual Windows WebView2 testing. Earlier source versions remain available.
 
-Open with Python 3 on Windows 11 (or run from a console with `python "Music Collection Cleaner v0.05.47.pyw"`). The application checks or installs supported dependencies. The GUI uses Microsoft Edge WebView2 through pywebview; it is not a terminal-based replacement.
+Open with Python 3 on Windows 11 (or run from a console with `python "Music Collection Cleaner v0.05.48.pyw"`). The application checks or installs supported dependencies. The GUI uses Microsoft Edge WebView2 through pywebview; it is not a terminal-based replacement.
 
-Source-level regression checks: `python "Music Collection Cleaner v0.05.47.pyw" --ui-self-test`. `--self-test` additionally requires a packaged standalone EXE.
+Source-level regression checks: `python "Music Collection Cleaner v0.05.48.pyw" --ui-self-test`. `--self-test` additionally requires a packaged standalone EXE.
 
 ## What it does
 
@@ -28,6 +28,13 @@ Source-level regression checks: `python "Music Collection Cleaner v0.05.47.pyw" 
 - Explicitly **Copy OLD + NEW** or **Move OLD + NEW** retained releases into the selected destination; Undo for supported completed moves.
 - Log comparisons, validate incomplete/corrupt inputs, choose I/O worker counts with drive awareness, and manage spawned subprocesses.
 
+
+## v0.5.48 - Highlight the tracks that retain the release (Under construction ⚠️)
+
+- Highlight the tracks that are the reason the release is retained. Tracks covered by another retained release stay unhighlighted; copies on discarded releases do not cancel highlights. Discarded duplicate releases have none. This supersedes v0.5.47's all-scanned song-presence interpretation.
+- The essential count and Changes retention titles follow those same tracks. Useful audio-copy/version text and separate Gem checks are preserved. Ignore/Restore updates the row, count, Changes text and Gem badges together without reopening the details.
+- The saved actual plan now renders exactly 15 highlighted retention reasons and four unhighlighted covered tracks for The Life Of Pablo [602547908339], with zero highlights on its removed duplicate. All 684 rows across 104 releases agree with retained coverage.
+- All 71 functional tests, the full UI self-test, Python compilation and both embedded JavaScript syntax checks passed on Linux. Actual Windows visual acceptance remains pending user-supplied screenshots. This is a display correction using logged groups, not a new acoustic measurement.
 
 ## v0.5.47 - Remove highlights from shared songs (Under construction ⚠️)
 

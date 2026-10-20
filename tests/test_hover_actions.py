@@ -4,6 +4,7 @@ from html.parser import HTMLParser
 import json
 import os
 from pathlib import Path
+import re
 import shutil
 import subprocess
 import unittest
@@ -13,7 +14,7 @@ from test_audio_safety import mcc
 
 
 ROOT = Path(__file__).resolve().parents[1]
-SOURCE = Path(os.environ.get('MCC_TEST_SOURCE', str(ROOT / 'Music Collection Cleaner v0.05.47.pyw')))
+SOURCE = Path(os.environ.get('MCC_TEST_SOURCE', str(ROOT / 'Music Collection Cleaner v0.05.48.pyw')))
 NODE = shutil.which('node')
 
 
@@ -51,7 +52,8 @@ class Buttons(HTMLParser):
 class HoverActions(unittest.TestCase):
     def run_js(self, script, data):
         result = subprocess.run([NODE, '-e', script], input=json.dumps(data),
-                                capture_output=True, text=True, check=True)
+                                capture_output=True, text=True)
+        self.assertEqual(result.returncode,0,result.stderr)
         return json.loads(result.stdout)
 
     def test_copy_and_version_status_is_preserved_without_generic_needed_label(self):
@@ -76,7 +78,7 @@ process.stdout.write(JSON.stringify(input.tracks.map(t=>status(t,{kind:'retained
             with self.subTest(track=track):
                 self.assertEqual(actual,expected)
 
-    def test_shared_song_is_not_highlighted_even_with_distinct_audio_groups(self):
+    def test_only_other_retained_coverage_cancels_retention_highlights(self):
         a=[mcc.Track(1,Path('A/common.flac'),1,title='Common',artist='Artist',duration=120,group_id=0),
            mcc.Track(1,Path('A/needed.flac'),2,title='Needed',artist='Artist',duration=120,group_id=1)]
         b=[mcc.Track(2,Path('B/common.flac'),1,title='Common',artist='Artist',duration=120,group_id=0),
@@ -90,12 +92,12 @@ process.stdout.write(JSON.stringify(input.tracks.map(t=>status(t,{kind:'retained
              patch.object(mcc,'_assign_release_map_display_groups'):
             state=mcc._release_map_state_for_ui(snapshots,None,set(),set(),set(),True,False,False,False)
         for node in state['nodes']:
-            self.assertEqual(node['uniqueCount'],0)
+            self.assertEqual(node['uniqueCount'],1)
             self.assertFalse(node['tracks'][0]['unique'])
             self.assertTrue(node['tracks'][0]['coveredBy'])
-            # Song presence controls the highlight; distinct audio groups
-            # remain separate optimizer obligations and version details.
-            self.assertFalse(node['tracks'][1]['unique'])
+            # Each distinct recording is a reason its release is retained.
+            # A similar title is informative, not verified coverage.
+            self.assertTrue(node['tracks'][1]['unique'])
             self.assertEqual(node['tracks'][1]['unverifiedEditions'],1)
 
         # Cached snapshot annotations cannot highlight excluded/covered rows.
@@ -110,47 +112,105 @@ process.stdout.write(JSON.stringify(input.tracks.map(t=>status(t,{kind:'retained
         self.assertTrue(all(node['uniqueCount']==0 for node in state['nodes']))
         self.assertFalse(any(t['unique'] for node in state['nodes'] for t in node['tracks']))
 
+    def test_retained_carriers_change_highlights_but_discarded_copies_do_not(self):
+        a=[mcc.Track(1,Path('A/shared.flac'),1,title='Shared',artist='Artist',duration=120,group_id=0),
+           mcc.Track(1,Path('A/essential.flac'),2,title='Essential',artist='Artist',duration=120,group_id=1)]
+        b=[mcc.Track(2,Path('B/shared.flac'),1,title='Shared',artist='Artist',duration=120,group_id=0),
+           mcc.Track(2,Path('B/bonus.flac'),2,title='Bonus',artist='Artist',duration=120,group_id=2)]
+        c=[mcc.Track(3,Path('C/essential.flac'),1,title='Essential',artist='Artist',duration=120,group_id=1)]
+        releases=[mcc.Release(rid,'recycle',Path(name),name,tracks=tracks)
+                  for rid,name,tracks in [(1,'A',a),(2,'B',b),(3,'C',c)]]
+        for retained,expected in [({1,2},['Essential']),({1},['Shared','Essential'])]:
+            with self.subTest(retained=retained):
+                snapshots=mcc.build_decision_snapshot(releases,a+b+c,retained,
+                    [mcc.ReleaseDecision(r.rid,'ADD' if r.rid in retained else 'SKIP','Plan') for r in releases])
+                nodes={n['id']:n for n in self.ui_state(snapshots)['nodes']}
+                rows=self.render_track_rows(list(nodes.values()))
+                for node,rendered in zip(nodes.values(),rows):
+                    titles=(expected if node['id']==1 else ['Bonus'] if node['id']==2 and 2 in retained else [])
+                    self.assert_highlighted_rows(node,rendered,titles)
+                self.assertEqual(nodes[1]['tracks'][1]['audioMatchEditions'],1)
+                self.assertFalse(nodes[1]['tracks'][1]['isGem'])
+
     def ui_state(self,snapshots):
         with patch.object(mcc,'_load_pattern_categories',return_value={}), \
              patch.object(mcc,'_load_app_settings',return_value={}), \
              patch.object(mcc,'_assign_release_map_display_groups'):
             return mcc._release_map_state_for_ui(snapshots,None,set(),set(),set(),True,False,False,False)
 
-    def test_actual_bully_album_rows_are_not_all_highlighted(self):
-        fixture=json.loads((ROOT/'tests/fixtures/bully_song_presence.json').read_text())
-        state=self.ui_state(fixture['snapshots'])
-        standard=next(n for n in state['nodes'] if n['id']==100)
-        deluxe=next(n for n in state['nodes'] if n['id']==102)
-        self.assertEqual([t['title'] for t in standard['tracks'] if t['unique']],[])
-        self.assertEqual([t['title'] for t in deluxe['tracks'] if t['unique']],['OK (feat. Don Toliver)'])
-        self.assertEqual(standard['uniqueCount'],0)
-        self.assertEqual(deluxe['uniqueCount'],1)
-        for index in range(18):
-            self.assertFalse(standard['tracks'][index]['unique'])
-            self.assertFalse(deluxe['tracks'][index]['unique'])
-            self.assertEqual(standard['tracks'][index]['groupId'],fixture['snapshots'][1]['tracklist'][index]['group_id'])
-        # Mission Control is also on its discarded single. Physical song
-        # presence still rules out a collection-wide uniqueness highlight.
-        self.assertFalse(deluxe['tracks'][19]['unique'])
+    def render_track_rows(self,nodes):
         html=map_html()
         code=html[html.index('  let tracks="";',html.index('function openDetails(')):
                   html.index('  let ignoreRelease="";',html.index('function openDetails('))]
         status=html[html.index('function exclusionStatus('):html.index('function closeDetails(')]
-        rendered=self.run_js(r'''
+        return self.run_js(r'''
 const input=JSON.parse(require('fs').readFileSync(0,'utf8'));
 const status=new Function(input.status+'\nreturn trackStatus;')();
 const render=new Function('n','state','activeTrack','esc','versionsForTrack','remixesForTrack','liveForTrack','trackStatus',input.code+'\nreturn tracks;');
 const esc=value=>String(value).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;');
 process.stdout.write(JSON.stringify(input.nodes.map(n=>render(n,{editable:false},null,esc,()=>[],()=>[],()=>[],status))));
-''',{'code':code,'status':status,'nodes':[standard,deluxe]})
-        for rows,expected in zip(rendered,[0,1]):
-            # Execute the real row HTML producer: the corrected flag must
-            # actually remove the amber CSS class, not merely change a label.
-            import re
-            classes=re.findall(r'<div class="(track[^"]*)"',rows)
-            self.assertEqual(sum('unique' in value.split() for value in classes),expected)
-            self.assertNotIn('Needed recording',rows)
-            self.assertIn('Also listed on',rows)
+''',{'code':code,'status':status,'nodes':nodes})
+
+    def assert_highlighted_rows(self,node,rows,expected_titles):
+        self.assertEqual([t['title'] for t in node['tracks'] if t['unique']],expected_titles)
+        self.assertEqual(node['uniqueCount'],len(expected_titles))
+        classes=re.findall(r'<div class="(track[^"]*)"',rows)
+        self.assertEqual(len(classes),len(node['tracks']))
+        highlighted=[t['title'] for t,css in zip(node['tracks'],classes) if 'unique' in css.split()]
+        self.assertEqual(highlighted,expected_titles)
+        self.assertNotIn('Needed recording',rows)
+
+    def test_actual_pablo_highlights_exactly_the_15_retention_reason_tracks(self):
+        fixture=json.loads((ROOT/'tests/fixtures/pablo_retention_highlights.json').read_text())
+        state=self.ui_state(fixture['snapshots'])
+        nodes={n['id']:n for n in state['nodes']}
+        target=nodes[64]
+        expected=['Ultralight Beam','Father Stretch My Hands Pt. 1','Pt. 2','Famous',
+                  'Feedback','Highlights','Freestyle 4','Waves','FML','Real Friends',
+                  'Wolves','30 Hours','No More Parties In LA','Facts (Charlie Heat Version)','Fade']
+        rows=self.render_track_rows([target,nodes[65],nodes[16]])
+        self.assert_highlighted_rows(target,rows[0],expected)
+        self.assert_highlighted_rows(nodes[65],rows[1],[t['title'] for t in fixture['snapshots'][2]['tracklist'] if t['unique_to_release']])
+        self.assert_highlighted_rows(nodes[16],rows[2],[])
+        covered=[t for t in target['tracks'] if t['title'] not in expected]
+        self.assertEqual([t['title'] for t in covered],['Low Lights','I Love Kanye',"Frank's Track",'Siiiiiiiiilver Surffffeeeeer Intermission'])
+        self.assertTrue(all(t['coveredBy'] and not t['unique'] for t in covered))
+        self.assertTrue(any(t['unique'] and t['audioMatchEditions'] for t in target['tracks']))
+        self.assertIn('Same audio on',rows[0])
+        self.assertIn('Also listed on',rows[0])
+        self.assertIn('Also on:',rows[0])
+        html=map_html()
+        code=html[html.index('function uniqueAddedTitles('):html.index('function changedNodes(')]
+        result=self.run_js(r'''
+const input=JSON.parse(require('fs').readFileSync(0,'utf8'));
+const evaluate=new Function('n','replacementMap',input.code+'\nreturn {titles:uniqueAddedTitles(n),reason:changeReason(n,"added")};');
+process.stdout.write(JSON.stringify(evaluate(input.node,()=>({}))));
+''',{'code':code,'node':target})
+        self.assertEqual(result['titles'],expected)
+        self.assertEqual(result['reason'],'Retained for: Ultralight Beam; Father Stretch My Hands Pt. 1; Pt. 2; +12 more')
+
+    def test_actual_bully_highlights_follow_logged_retention_reasons(self):
+        fixture=json.loads((ROOT/'tests/fixtures/bully_song_presence.json').read_text())
+        state=self.ui_state(fixture['snapshots'])
+        standard=next(n for n in state['nodes'] if n['id']==100)
+        deluxe=next(n for n in state['nodes'] if n['id']==102)
+        self.assertEqual(standard['uniqueCount'],18)
+        self.assertEqual(deluxe['uniqueCount'],20)
+        for index in range(18):
+            self.assertTrue(standard['tracks'][index]['unique'])
+            self.assertTrue(deluxe['tracks'][index]['unique'])
+            self.assertEqual(standard['tracks'][index]['groupId'],fixture['snapshots'][1]['tracklist'][index]['group_id'])
+        # The logged acoustic groups remain distinct. Display metadata must
+        # not silently override the actual reasons for retaining a release.
+        self.assertTrue(deluxe['tracks'][19]['unique'])
+        nodes=[standard,deluxe,next(n for n in state['nodes'] if n['id']==103)]
+        rendered=self.render_track_rows(nodes)
+        for node,rows in zip(nodes,rendered):
+            snapshot=next(s for s in fixture['snapshots'] if s['release_id']==node['id'])
+            expected=[t['title'] for t in snapshot['tracklist'] if t['unique_to_release']]
+            self.assert_highlighted_rows(node,rows,expected)
+        self.assertIn('Also listed on',rendered[0])
+        self.assertIn('Also listed on',rendered[1])
 
     def test_song_presence_respects_artist_family_and_does_not_merge_audio(self):
         def row(title,artist,gid,**extra):
@@ -165,8 +225,12 @@ process.stdout.write(JSON.stringify(input.nodes.map(n=>render(n,{editable:false}
             row('Cover','Artist B',6),row('Dance','Artist A',8),
             row('Original title','Artist A',7)])]
         state=self.ui_state(snapshots);a=next(n for n in state['nodes'] if n['id']==1)
-        self.assertEqual([t['unique'] for t in a['tracks']],[False,True,True,True,False])
+        self.assertEqual([t['unique'] for t in a['tracks']],[True,True,True,True,True])
         self.assertEqual([t['groupId'] for t in a['tracks']],[1,2,3,4,7])
+        self.assertEqual([t['unverifiedEditions'] for t in a['tracks']],[1,0,0,0,0])
+        self.assertEqual([t['audioMatchEditions'] for t in a['tracks']],[0,0,0,0,1])
+        discarded=next(n for n in state['nodes'] if n['id']==2)
+        self.assertFalse(any(t['unique'] for t in discarded['tracks']))
 
     def test_unverified_listing_cannot_keep_a_unique_gem_badge(self):
         snapshots=[dict(release_id=1,name='A',action='KEEP',tracklist=[dict(
@@ -174,9 +238,97 @@ process.stdout.write(JSON.stringify(input.nodes.map(n=>render(n,{editable:false}
             dict(release_id=2,name='B',action='SKIP',tracklist=[dict(
             title='Song',artist='Artist',group_id=-1,included=False,excluded=True)])]
         state=self.ui_state(snapshots);a=next(n for n in state['nodes'] if n['id']==1)
-        self.assertFalse(a['tracks'][0]['unique'])
+        self.assertTrue(a['tracks'][0]['unique'])
         self.assertFalse(a['tracks'][0]['isGem'])
         self.assertFalse(a['isGem'])
+
+    def test_ignore_restore_delta_keeps_rows_count_changes_and_gems_in_sync(self):
+        tracks=[mcc.Track(1,Path('A/song.flac'),1,title='Song',artist='Artist',duration=120,group_id=0),
+                mcc.Track(2,Path('B/song.flac'),1,title='Song',artist='Artist',duration=120,group_id=0),
+                mcc.Track(1,Path('A/rare.flac'),2,title='Rare',artist='Artist',duration=120,group_id=1)]
+        releases=[mcc.Release(1,'recycle',Path('A'),'A',tracks=[tracks[0],tracks[2]]),
+                  mcc.Release(2,'recycle',Path('B'),'B',tracks=[tracks[1]])]
+        snapshots=mcc.build_decision_snapshot(releases,tracks,{1},
+            [mcc.ReleaseDecision(1,'ADD','Plan'),mcc.ReleaseDecision(2,'SKIP','Duplicate')])
+        session=dict(snapshots=snapshots,releases=releases,tracks=tracks,groups={0:[0,1],1:[2]},selected={1},allow_apply=True)
+        tree=ast.parse(SOURCE.read_text(encoding='utf-8-sig'))
+        launch=next(n for n in tree.body if isinstance(n,ast.FunctionDef) and n.name=='launch_webview_release_map')
+        bridge_class=next(n for n in launch.body if isinstance(n,ast.ClassDef) and n.name=='ReleaseMapBridge')
+        namespace=dict(vars(mcc),session=session)
+        # Run the actual bridge, with persistence replaced by in-memory rules.
+        def ignore(track,all_tracks):
+            for item in all_tracks:
+                if item.group_id==track.group_id:item.manual_skip_rule='fixture:'+str(track.group_id)
+        def restore(rule,all_tracks):
+            for item in all_tracks:
+                if item.manual_skip_rule==rule:item.manual_skip_rule=''
+        namespace.update(add_persistent_track_skip=ignore,remove_persistent_track_skip=restore)
+        exec(compile(ast.Module(body=[bridge_class],type_ignores=[]),str(SOURCE),'exec'),namespace)
+        payloads=[]
+        with patch.object(mcc,'_load_pattern_categories',return_value={}), \
+             patch.object(mcc,'_load_app_settings',return_value={}), \
+             patch.object(mcc,'_assign_release_map_display_groups'):
+            bridge=namespace['ReleaseMapBridge']()
+            initial=json.loads(json.dumps(bridge._ui_state))
+            for index,count,gem in [(0,1,True),(2,0,False),(0,1,False),(2,2,True)]:
+                payload=json.loads(bridge.toggleTrack(index));payloads.append(payload)
+                nodes={n['id']:n for n in bridge._ui_state['nodes']}
+                self.assertEqual(nodes[1]['uniqueCount'],count)
+                self.assertEqual(nodes[1]['isGem'],gem)
+                self.assertEqual(nodes[1]['gemTitles'],['Rare'] if gem else [])
+                self.assertFalse(any(t['unique'] or t['isGem'] for t in nodes[2]['tracks']))
+                self.assertEqual({t['index'] for t in payload['tracks']},{0,1} if index==0 else {2})
+                for n in nodes.values():
+                    for t in n['tracks']:
+                        if t['manualSkip']:self.assertFalse(t['unique'] or t['isGem'])
+                rows=self.render_track_rows([nodes[1]])[0]
+                self.assert_highlighted_rows(nodes[1],rows,[t['title'] for t in nodes[1]['tracks'] if t['unique']])
+                self.assertEqual(rows.count('class="trackGem"'),int(gem))
+        html=map_html()
+        policy=html[html.index('function uniqueAddedTitles('):html.index('function changedNodes(')]
+        toggle=html[html.index('function receiveTrackToggle('):html.index('function receiveReleaseToggle(')]
+        status=html[html.index('function exclusionStatus('):html.index('function closeDetails(')]
+        results=self.run_js(r'''
+const input=JSON.parse(require('fs').readFileSync(0,'utf8'));
+const state=input.state,selectedId=1,current=state.nodes.find(n=>n.id===selectedId);
+let replacementCache=null;
+const essential={textContent:' · 2 essential',hidden:false};
+const reason={textContent:''},releaseRow={dataset:{},querySelector:()=>reason,setAttribute:()=>{},getAttribute:()=>''};
+const rowEls=new Map([['1',releaseRow]]);
+const rows=current.tracks.map(t=>{
+  const classes=new Set(['track','unique']);
+  const row={dataset:{index:t.index},hasGem:t.isGem,status:{},button:{setAttribute:()=>{}},
+    classList:{toggle:(c,on)=>on?classes.add(c):classes.delete(c)},classes};
+  row.querySelector=s=>s==='.status'?row.status:s==='.ignoreTrack'?row.button:
+    s==='.trackGem'?(row.hasGem?{remove:()=>row.hasGem=false}:null):
+    s==='.versionsCell'?{insertAdjacentHTML:()=>row.hasGem=true}:null;
+  return row;
+});
+const document={getElementById:id=>id==='essentialCount'?essential:null,querySelectorAll:()=>rows};
+const getNode=id=>state.nodes.find(n=>Number(n.id)===Number(id));
+const applyRootPatch=()=>{},receiveState=()=>{throw Error('Unexpected full-state fallback')};
+const changeKind=()=> 'added',replacementMap=()=>({}),paintReanalyzeHighlight=()=>{};
+const trackStatus=new Function(input.status+'\nreturn trackStatus;')();
+eval(input.policy+'\n'+input.toggle);
+const results=[];
+for(const p of input.payloads){
+  receiveTrackToggle(JSON.stringify(p));
+  results.push({count:current.uniqueCount,hidden:essential.hidden,label:essential.textContent,
+    titles:uniqueAddedTitles(current),reason:reason.textContent,gem:current.isGem,
+    rows:rows.map(r=>({index:r.dataset.index,highlight:r.classes.has('unique'),gem:r.hasGem}))});
+}
+process.stdout.write(JSON.stringify(results));
+''',{'state':initial,'payloads':payloads,'policy':policy,'toggle':toggle,'status':status})
+        for result,count,titles,gem in zip(results,[1,0,1,2],[['Rare'],[],['Song'],['Song','Rare']],[True,False,False,True]):
+            self.assertEqual(result['count'],count)
+            self.assertEqual(result['hidden'],count==0)
+            self.assertEqual(result['label'],' · '+str(count)+' essential')
+            self.assertEqual(result['titles'],titles)
+            self.assertEqual(result['gem'],gem)
+            self.assertEqual([r['highlight'] for r in result['rows']],['Song' in titles,'Rare' in titles])
+            self.assertEqual([r['gem'] for r in result['rows']],[False,gem])
+            if titles:self.assertEqual(result['reason'],'Retained for: '+'; '.join(titles))
+            else:self.assertIn('Re-Analyze',result['reason'])
 
     def test_one_ignore_action_preserves_saved_categories_and_restore(self):
         html = map_html()

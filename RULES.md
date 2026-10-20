@@ -5,6 +5,15 @@ Last updated: 2026-10-20
 This file is the project-specific rulebook for the Discography Builder and Duplicate / Edition Analyzer.
 The account-wide `SOFTWARE_RULES.md` baseline always applies. This file may add stricter project-specific requirements but must never weaken or override a newer global rule or a newer explicit user instruction. When project rules conflict with the global baseline, the stricter/newer requirement wins.
 
+## MCC v0.5.48 - Highlight the tracks that retain the release (2026-10-20)
+
+- User-approved rule: **Highlight the tracks that are the reason the release is retained.** Tracks covered by another retained release stay unhighlighted. Copies on discarded releases do not cancel highlighting. A discarded duplicate release has no highlighted tracks. This supersedes v0.5.47's all-scanned-song-presence rule and v0.5.46's generic Needed recording status wording.
+- Use the actual included wanted coverage supplied only by this release within the retained plan. Excluded, recording-Ignored, manually removed and other-retained-covered rows remain unhighlighted, including stale cached annotations. Metadata listings alone cannot establish coverage. Essential count, Changes retention titles and actual track-row highlight use the same flag.
+- Preserve useful Same audio on / Also listed on (audio unverified) / Also on retained release text. Global copy/version information remains informative; it does not veto a retention highlight. Keep Gem's separate global no-copy/no-other-version checks so a necessary recording with copies elsewhere does not become a false Gem.
+- Concrete regression: The Life Of Pablo [602547908339] has 15 retention-reason tracks highlighted, four tracks covered by the other retained edition unhighlighted, and zero highlighted rows on its removed duplicate. Test actual generated row CSS and titles, not only counts or wording. Correct prior tests that encoded v0.5.47's rejected meaning rather than merging distinct acoustic groups by metadata.
+- Recording Ignore/Restore must update retention row CSS, essential count, Changes text and Gem badges immediately across affected copies. Recompute cached display annotations with the same serializer, then patch only affected DOM rows/metadata in place so scroll and focus remain intact. Optimizer changes still require Re-Analyze.
+- Keep this UI correction narrow: no audio matching, optimizer, source operations, saved Ignore, dependencies, new controls, global mirrored rules or Actions changes. v0.5.48 remains Under construction pending native Windows acceptance using user-supplied screenshots only.
+
 ## MCC v0.5.47 - Song presence controls yellow highlighting (2026-10-20)
 
 - User rejected v0.5.46: renaming rows Needed recording while keeping shared songs yellow did not implement the request. Supersede v0.5.46's highlight/status interpretation below. Remove the generic label and restore the useful Same audio / Also listed (audio unverified) text.
