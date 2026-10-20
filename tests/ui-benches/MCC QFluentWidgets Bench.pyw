@@ -1,0 +1,97 @@
+"""MCC compact dark QFluentWidgets UI test bench. No library files are touched."""
+import sys
+from PySide6.QtCore import Qt
+from PySide6.QtWidgets import QApplication, QHBoxLayout, QVBoxLayout, QWidget, QLabel, QFrame, QSplitter, QTreeWidget, QTreeWidgetItem, QHeaderView
+from qfluentwidgets import (FluentWindow, NavigationItemPosition, FluentIcon, setTheme, Theme, PushButton, PrimaryPushButton, LineEdit, ComboBox, SwitchButton, CardWidget, BodyLabel, CaptionLabel, StrongBodyLabel)
+
+class Bench(FluentWindow):
+    def __init__(self):
+        super().__init__()
+        setTheme(Theme.DARK)
+        self.setWindowTitle("MCC - QFluentWidgets Compact Bench")
+        self.resize(1180, 740)
+        self.setMinimumSize(850, 540)
+        page = QWidget()
+        page.setObjectName("workspace")
+        self.addSubInterface(page, FluentIcon.HOME, "Workspace")
+        root = QVBoxLayout(page)
+        root.setContentsMargins(14, 12, 14, 12)
+        root.setSpacing(8)
+        title = QHBoxLayout()
+        title.addWidget(StrongBodyLabel("Music Collection Cleaner  /  UI Bench"))
+        title.addStretch()
+        title.addWidget(CaptionLabel("QFluentWidgets  •  Dark"))
+        root.addLayout(title)
+        inputs = QHBoxLayout()
+        for label, value in [("OLD", "D:\\Music\\Existing"), ("NEW", "D:\\Music\\Incoming")]:
+            col = QVBoxLayout()
+            col.setSpacing(3)
+            col.addWidget(CaptionLabel(label))
+            edit = LineEdit()
+            edit.setText(value)
+            edit.setClearButtonEnabled(True)
+            col.addWidget(edit)
+            inputs.addLayout(col, 1)
+        root.addLayout(inputs)
+        options = QHBoxLayout()
+        for label in ("Save Remixes", "Save Live"):
+            options.addWidget(BodyLabel(label))
+            options.addWidget(SwitchButton())
+        options.addStretch()
+        analyze = PrimaryPushButton(FluentIcon.SEARCH, "Analyze")
+        analyze.clicked.connect(lambda: self.status.setText("Demo only - no filesystem changes"))
+        options.addWidget(analyze)
+        root.addLayout(options)
+        self.status = CaptionLabel("Ready  •  Demo data  •  No audio scanned")
+        root.addWidget(self.status)
+        splitter = QSplitter(Qt.Horizontal)
+        tree = QTreeWidget()
+        tree.setHeaderLabels(["Release / Track", "Status", "Quality"])
+        tree.header().setSectionResizeMode(0, QHeaderView.Stretch)
+        tree.setRootIsDecorated(True)
+        tree.setAlternatingRowColors(True)
+        for release, tracks in [
+            ("808s & Heartbreak [602557134230]", ["Pinocchio Story", "Heartless", "Love Lockdown"]),
+            ("808s & Heartbreak [JP - UICD-9058]", ["Pinocchio Story (Freestyle Live from Singapore)", "Heartless"]),
+            ("Discovery [CD]", ["One More Time", "Digital Love"])]:
+            parent = QTreeWidgetItem([release, "Review", "CD"])
+            tree.addTopLevelItem(parent)
+            for track in tracks:
+                parent.addChild(QTreeWidgetItem([track, "Acoustic match" if "Pinocchio" in track else "Included", "Lossless"]))
+        tree.expandAll()
+        splitter.addWidget(tree)
+        details = QFrame()
+        details.setFrameShape(QFrame.StyledPanel)
+        right = QVBoxLayout(details)
+        right.setContentsMargins(12, 10, 12, 10)
+        right.setSpacing(7)
+        right.addWidget(StrongBodyLabel("Release details"))
+        right.addWidget(BodyLabel("808s & Heartbreak - Japanese edition"))
+        right.addWidget(CaptionLabel("2 tracks  •  1 matching recording  •  Demo"))
+        right.addWidget(BodyLabel("Acoustic evidence is authoritative."))
+        right.addWidget(BodyLabel("Live labels affect retention, not identity."))
+        right.addStretch()
+        actions = QHBoxLayout()
+        for name in ("Keep", "Ignore", "Compare"):
+            button = PushButton(name)
+            button.clicked.connect(lambda _=False, n=name: self.status.setText(n + " - demo only"))
+            actions.addWidget(button)
+        right.addLayout(actions)
+        splitter.addWidget(details)
+        splitter.setSizes([760, 330])
+        root.addWidget(splitter, 1)
+        footer = QHBoxLayout()
+        footer.addWidget(CaptionLabel("Selected: 0  •  Excluded: 0  •  Changes: 0"))
+        footer.addStretch()
+        for label in ("Copy OLD + NEW", "Move OLD + NEW"):
+            button = PushButton(label)
+            button.clicked.connect(lambda _=False, n=label: self.status.setText(n + " disabled in test bench"))
+            footer.addWidget(button)
+        root.addLayout(footer)
+
+if __name__ == "__main__":
+    app = QApplication(sys.argv)
+    setTheme(Theme.DARK)
+    window = Bench()
+    window.show()
+    sys.exit(app.exec())
