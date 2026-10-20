@@ -28,19 +28,19 @@ class AlbumIdentity(unittest.TestCase):
                 self.assertTrue(mcc._definitive_acoustic_identity(profile[:7]))
                 self.assertTrue(mcc._fingerprint_profile_identity(profile[:7], profile[7]))
 
-    def test_logged_changed_vocals_do_not_become_authoritative(self):
-        negatives = [
-            ('Wolves', (.293289,.9971,1,0,.983430,0,0), 5.65),
-            ('Touch The Sky instrumental', (6.364501,.918119,.999472,-1,.413101,6,10),10.975),
-            ('CARNIVAL instrumental', (3.386471,.938978,1,0,.796594,3,9),15.425),
-            ('Jail alternate', (4.801263,.845474,1,0,.673263,3,12),13.8),
-            ('I Love It edit', (1.486166,.984190,1,0,.946640,1,4),6.125),
+    def test_calibrated_profiles_use_the_primary_limit_without_secondary_vetoes(self):
+        profiles = [
+            ('Wolves', (.293289,.9971,1,0,.983430,0,0), 5.65,True),
+            ('Touch The Sky instrumental', (6.364501,.918119,.999472,-1,.413101,6,10),10.975,False),
+            ('CARNIVAL instrumental', (3.386471,.938978,1,0,.796594,3,9),15.425,True),
+            ('Jail alternate', (4.801263,.845474,1,0,.673263,3,12),13.8,False),
+            ('I Love It edit', (1.486166,.984190,1,0,.946640,1,4),6.125,True),
         ]
-        for title, sim, worst in negatives:
+        for title, sim, worst,expected in profiles:
             with self.subTest(title=title):
-                self.assertFalse(mcc._fingerprint_profile_identity(sim,worst))
+                self.assertEqual(mcc._fingerprint_profile_identity(sim,worst),expected)
         forever=(1.911344,1,1,-3,.980454,2,4)
-        self.assertFalse(mcc._fingerprint_profile_identity(forever,3.35,advisory_conflict=True))
+        self.assertTrue(mcc._fingerprint_profile_identity(forever,3.35,advisory_conflict=True))
 
     def test_uniform_mastering_and_small_local_variation_share_a_group(self):
         original = fp()
@@ -48,11 +48,11 @@ class AlbumIdentity(unittest.TestCase):
                          for i, value in enumerate(original))
         self.assertTrue(mcc.fingerprint_auto_match_values(original, 200, mastered, 200.1)[0])
 
-    def test_localized_changed_section_stays_separate(self):
+    def test_localized_section_does_not_veto_a_passing_primary_comparison(self):
         original = fp(count=4000)
         changed = tuple(value ^ (63 if 2000 <= i < 2040 else 0)
                         for i, value in enumerate(original))
-        self.assertFalse(mcc.fingerprint_auto_match_values(original, 498, changed, 498)[0])
+        self.assertTrue(mcc.fingerprint_auto_match_values(original, 498, changed, 498)[0])
 
     def test_love_lockdown_three_copy_triangle_keeps_all_equivalent(self):
         original = fp()
@@ -66,29 +66,27 @@ class AlbumIdentity(unittest.TestCase):
             mcc.merge_equivalent_tracks(tracks)
         self.assertEqual(len({track.group_id for track in tracks}), 1)
 
-    def test_known_clean_explicit_mastering_requires_independent_audio(self):
+    def test_clean_explicit_labels_do_not_require_secondary_audio_confirmation(self):
         original = fp()
         clean = mcc.Track(1, Path('clean.flac'), 1, title='Forever', explicit='clean',
                           duration=200, fingerprint=original)
         explicit = mcc.Track(2, Path('explicit.flac'), 1, title='Forever', explicit='explicit',
                              duration=200, fingerprint=tuple(v ^ 3 for v in original))
         with patch.object(mcc, '_compare_workers', return_value=1), \
-             patch.object(mcc._PCMIdentityVerifier, 'verify', return_value={'passed':False, 'reason':'changed vocal'}):
+             patch.object(mcc._PCMIdentityVerifier, 'verify', side_effect=AssertionError('No secondary identity check')):
             mcc.merge_equivalent_tracks([clean, explicit])
-        self.assertNotEqual(clean.group_id, explicit.group_id)
+        self.assertEqual(clean.group_id, explicit.group_id)
 
-    def test_weaker_pcm_edge_cannot_split_consistent_fingerprint_pair(self):
+    def test_all_passing_fingerprint_edges_have_equal_authority(self):
         original=fp()
         tracks=[mcc.Track(i,Path(f'{i}.flac'),1,title='Song',duration=duration,
                           fingerprint=tuple(value^mask for value in original))
                 for i,mask,duration in ((0,0,200.6),(1,1,200.4),(2,15,200.3))]
-        def decoded(a,b,sim):
-            return {'passed':{a.release_id,b.release_id}=={1,2},'reason':'controlled PCM evidence'}
         with patch.object(mcc,'_compare_workers',return_value=1), \
-             patch.object(mcc._PCMIdentityVerifier,'verify',side_effect=decoded):
+             patch.object(mcc._PCMIdentityVerifier,'verify',side_effect=AssertionError('No secondary identity check')):
             mcc.merge_equivalent_tracks(tracks)
         self.assertEqual(tracks[0].group_id,tracks[1].group_id)
-        self.assertNotEqual(tracks[0].group_id,tracks[2].group_id)
+        self.assertEqual(tracks[0].group_id,tracks[2].group_id)
 
     def test_verified_silent_padding_normalizes_group_duration_and_log(self):
         original = fp()

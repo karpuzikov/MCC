@@ -16,7 +16,7 @@ import wave
 
 
 ROOT = Path(__file__).resolve().parents[1]
-SOURCE = Path(os.environ.get('MCC_TEST_SOURCE', str(ROOT / 'Music Collection Cleaner v0.05.48.pyw')))
+SOURCE = Path(os.environ.get('MCC_TEST_SOURCE', str(ROOT / 'Music Collection Cleaner v0.05.50.pyw')))
 loader = importlib.machinery.SourceFileLoader('mcc_padding_subject', str(SOURCE))
 spec = importlib.util.spec_from_loader(loader.name, loader)
 mcc = importlib.util.module_from_spec(spec)
@@ -121,6 +121,21 @@ class SilencePaddingVerification(unittest.TestCase):
                 self.assertTrue(result['passed'], result)
                 self.assertEqual(result['alignment_lag_samples'], 80000 if reverse else -80000)
                 self.assertEqual(result['effective_durations_seconds'], [4.0, 4.0])
+
+    def test_three_minute_prefix_uses_chromaprint_frame_timing(self):
+        base=self.write_audio('base-long.wav',seconds=12)
+        padded=self.write_audio('prefix-long.wav',prefix=180.059375,seconds=12)
+        # Realistic default-Chromaprint counts: duration contains startup delay;
+        # duration/fingerprint_count is not the duration of a fingerprint item.
+        base.fingerprint=(123456789,)*76
+        padded.fingerprint=(0,)*1454+base.fingerprint
+        for first,second,shift in [(padded,base,1454),(base,padded,-1454)]:
+            with self.subTest(shift=shift):
+                result=self.verify(first,second,shift)
+                self.assertTrue(result['passed'],result)
+                self.assertAlmostEqual(abs(result['alignment_lag_samples'])/8000,180.059375,places=4)
+                self.assertLessEqual(abs(result['effective_durations_seconds'][0]-result['effective_durations_seconds'][1]),.0021)
+                self.assertEqual(result['effective_durations_seconds'], [12.0, 12.0])
 
     def test_offset_and_silent_ends_preserve_silence_on_the_shared_timeline(self):
         first = self.write_audio('first.wav', prefix=1.25, tail=1.75)

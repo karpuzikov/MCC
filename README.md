@@ -1,6 +1,6 @@
 # Music Collection Cleaner (MCC)
 
-**Version: 0.5.48 - Under construction ⚠️**
+**Version: 0.5.50 - Under construction ⚠️**
 
 Music Collection Cleaner compares existing music releases with new ones, finds the best combination of editions, and helps preserve every wanted unique recording while removing unnecessary redundancy.
 
@@ -10,16 +10,16 @@ For MCC, the user supplies Windows WebView2 screenshots for visual review when r
 
 ## Download and run
 
-**[Music Collection Cleaner v0.05.48.pyw](Music%20Collection%20Cleaner%20v0.05.48.pyw)** - latest single-file Windows Python application. **Under construction ⚠️** until actual Windows WebView2 testing. Earlier source versions remain available.
+**[Music Collection Cleaner v0.05.50.pyw](Music%20Collection%20Cleaner%20v0.05.50.pyw)** - latest single-file Windows Python application. **Under construction ⚠️** until actual Windows WebView2 testing. Earlier source versions remain available.
 
-Open with Python 3 on Windows 11 (or run from a console with `python "Music Collection Cleaner v0.05.48.pyw"`). The application checks or installs supported dependencies. The GUI uses Microsoft Edge WebView2 through pywebview; it is not a terminal-based replacement.
+Open with Python 3 on Windows 11 (or run from a console with `python "Music Collection Cleaner v0.05.50.pyw"`). The application checks or installs supported dependencies. The GUI uses Microsoft Edge WebView2 through pywebview; it is not a terminal-based replacement.
 
-Source-level regression checks: `python "Music Collection Cleaner v0.05.48.pyw" --ui-self-test`. `--self-test` additionally requires a packaged standalone EXE.
+Source-level regression checks: `python "Music Collection Cleaner v0.05.50.pyw" --ui-self-test`. `--self-test` additionally requires a packaged standalone EXE.
 
 ## What it does
 
 - Analyze two pools: the existing library (OLD) and candidate additions (NEW).
-- Identify recordings acoustically, independently of titles; verify uncertain fingerprint matches against decoded audio automatically.
+- Identify recordings through acoustic fingerprints, independently of titles; a successful comparison decides identity.
 - Preserve unique wanted recordings; apply Remix, Live, Explicit/Clean and Personal Picks rules.
 - Compare original, expanded, Deluxe, Special and other editions, including strict acoustic-superset detection.
 - Prefer high-quality sources and CD rip logs among truly equivalent choices; use dynamic range only as an eligible final mastering tie-break.
@@ -28,6 +28,14 @@ Source-level regression checks: `python "Music Collection Cleaner v0.05.48.pyw" 
 - Explicitly **Copy OLD + NEW** or **Move OLD + NEW** retained releases into the selected destination; Undo for supported completed moves.
 - Log comparisons, validate incomplete/corrupt inputs, choose I/O worker counts with drive awareness, and manage spawned subprocesses.
 
+
+## v0.5.50 - Calibrated mastering fingerprint threshold (Under construction ⚠️)
+
+- The 16 actual Watch the Throne CD/WEB comparisons have a maximum mean Hamming distance of 4.014241 bits per 32-bit item. Rounded upward, the new effective cap is 4.02 for both normal and mastering matches; the former 5.0/7.5 limits cannot bypass it.
+- A successful fingerprint comparison receives no later local-window, decoded-audio or metadata veto. Existing duration, inclusion/Ignore and source-safety rules remain. Corrected long-silence alignment timing for the existing duration normalization.
+- All 16 recorded fingerprint profiles fit the new cap. Fresh Analyze is required to verify new groups and the long Illest padding against actual media; the log contains neither original audio nor raw fingerprint vectors. UI/Ignore behavior and the optimizer remain unchanged.
+
+- All 79 functional tests, full UI self-test, compilation, both JavaScript syntax checks and independent review passed. Native Windows acceptance and real Illest padding validation await a fresh Analyze.
 
 ## v0.5.48 - Highlight the tracks that retain the release (Under construction ⚠️)
 

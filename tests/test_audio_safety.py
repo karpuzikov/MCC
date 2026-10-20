@@ -17,7 +17,7 @@ from unittest.mock import patch
 import wave
 
 ROOT = Path(__file__).resolve().parents[1]
-SOURCE = Path(os.environ.get('MCC_TEST_SOURCE', str(ROOT / 'Music Collection Cleaner v0.05.48.pyw')))
+SOURCE = Path(os.environ.get('MCC_TEST_SOURCE', str(ROOT / 'Music Collection Cleaner v0.05.50.pyw')))
 loader = importlib.machinery.SourceFileLoader('mcc_test_subject', str(SOURCE))
 spec = importlib.util.spec_from_loader(loader.name, loader)
 mcc = importlib.util.module_from_spec(spec)
@@ -95,23 +95,23 @@ class AcousticSafety(unittest.TestCase):
         self.assertTrue(decisions[0]['details']['decision_consistent'])
         self.assertIsNone(decisions[0]['details']['decoded_audio_verification'])
 
-    def test_changed_verse_is_not_a_mastering_match(self):
+    def test_primary_fingerprint_match_cannot_be_vetoed_by_a_changed_section(self):
         original = fp()
         changed = tuple(value ^ (0xffffffff if 400 <= i < 490 else 0)
                         for i, value in enumerate(original))
         match, _ = mcc.fingerprint_auto_match_values(original, 126, changed, 126)
-        self.assertFalse(match)
+        self.assertTrue(match)
 
     def test_near_perfect_mislabeled_pinocchio_still_matches(self):
         original = fp()
         changed = tuple(v ^ (1 if i % 30 == 0 else 0) for i, v in enumerate(original))
         self.assertTrue(mcc.fingerprint_auto_match_values(original, 361.6, changed, 361.6)[0])
 
-    def test_carbon_copy_cannot_hide_a_short_replaced_section(self):
+    def test_local_fingerprint_difference_does_not_add_another_gate(self):
         original = fp(count=4000)
         changed = list(original)
         for i in range(2000, 2020): changed[i] ^= 0xffffffff
-        self.assertFalse(mcc.fingerprint_auto_match_values(original, 498, tuple(changed), 498)[0])
+        self.assertTrue(mcc.fingerprint_auto_match_values(original, 498, tuple(changed), 498)[0])
 
     def test_default_live_label_does_not_defeat_matching_cd(self):
         a = mcc.Track(1, Path('digital.flac'), 1, title='Pinocchio Story',
@@ -227,7 +227,7 @@ class AcousticSafety(unittest.TestCase):
         self.assertEqual(b.excluded_by_pattern,'Explicit>Clean')
         self.assertEqual(groups[a.group_id],[0])
 
-    def test_tiny_exact_fingerprint_needs_independent_confirmation(self):
+    def test_too_few_fingerprint_items_cannot_produce_a_primary_match(self):
         tracks=[mcc.Track(i,Path('missing'+str(i)+'.wav'),i,title='Song',duration=4,
                           fingerprint=(1,2,3)) for i in (1,2)]
         with tempfile.TemporaryDirectory() as td:
@@ -363,7 +363,7 @@ class PCMVerification(unittest.TestCase):
         result=self.verify(a,b)
         self.assertFalse(result['passed'],result)
 
-    def test_pcm_rejected_endpoints_do_not_share_a_recording_group(self):
+    def test_decoded_waveforms_cannot_veto_passing_fingerprints(self):
         tracks=[]
         for index,coefficient in enumerate((0,.15,.30)):
             rng=random.Random(314);data=[]
@@ -377,23 +377,27 @@ class PCMVerification(unittest.TestCase):
             with wave.open(str(path),'wb') as dst:
                 dst.setnchannels(2);dst.setsampwidth(2);dst.setframerate(8000)
                 dst.writeframes(struct.pack('<'+'h'*len(data),*data))
-            # Deliberately uncertain fingerprints exercise decoded evidence.
-            # One-bit variants now correctly qualify as consistent identity.
+            # All variants pass the primary comparison. Decoded waveforms
+            # cannot override that result under the current user policy.
             mask = (0, 7, 56)[index]
             tracks.append(mcc.Track(index+1,path,1,title='Song',duration=8,
                           fingerprint=tuple(value^mask for value in fp())))
         path=self.root/'chain.jsonl'
         with patch.object(mcc,'_compare_workers',return_value=1):
             mcc.merge_equivalent_tracks(tracks,comparison_log_path=path)
-        self.assertNotEqual(tracks[0].group_id,tracks[2].group_id)
+        self.assertEqual(tracks[0].group_id,tracks[2].group_id)
         decisions=[json.loads(line) for line in path.read_text().splitlines()
                    if json.loads(line)['record_type']=='comparison']
         self.assertTrue(all(row['details']['decision_consistent'] for row in decisions))
         for row in decisions:
-            if row['decision']=='REJECT':
-                self.assertNotEqual(tracks[row['track_a_index']].group_id,tracks[row['track_b_index']].group_id)
+            if row['decision']=='MATCH':
+                self.assertEqual(tracks[row['track_a_index']].group_id,tracks[row['track_b_index']].group_id)
+            else:
+                # Accepted links through another copy are not vetoed by
+                # a different pair falling outside the primary score cap.
+                self.assertFalse(row['details']['strict_pass'] or row['details']['mastering_pass'])
 
-    def test_pipeline_requires_pcm_and_logs_its_actual_verdict(self):
+    def test_pipeline_logs_fingerprint_authority_without_pcm_confirmation(self):
         a = self.write_audio('original.wav')
         b = self.write_audio('mastered.wav', gain=.6, delay=81)
         c = self.write_audio('vocal.wav', vocal=True)
@@ -403,14 +407,15 @@ class PCMVerification(unittest.TestCase):
         path=self.root/'comparison.jsonl'
         groups, _, _ = mcc.merge_equivalent_tracks([a,b,c], comparison_log_path=path)
         self.assertEqual(a.group_id,b.group_id)
-        self.assertNotEqual(a.group_id,c.group_id)
+        self.assertEqual(a.group_id,c.group_id)
         rows=[json.loads(line) for line in path.read_text().splitlines()]
         decisions=[row for row in rows if row['record_type']=='comparison']
         self.assertTrue(all(row['details']['decision_consistent'] for row in decisions))
         confirmed=next(row for row in decisions if {row['track_a_index'],row['track_b_index']}=={0,1})
-        self.assertTrue(confirmed['details']['decoded_audio_verification']['passed'])
+        self.assertIsNone(confirmed['details']['decoded_audio_verification'])
+        self.assertTrue(confirmed['details']['fingerprint_identity_authoritative'])
         self.assertEqual(confirmed['decision'],'MATCH')
-        self.assertEqual(len(groups),2)
+        self.assertEqual(len(groups),1)
 
 
 if __name__ == '__main__':

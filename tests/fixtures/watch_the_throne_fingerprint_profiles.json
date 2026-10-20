@@ -1,0 +1,458 @@
+{
+  "source_log": "Music Collection Cleaner Comparison 2026-10-20-15-00-07(1).jsonl",
+  "source_log_sha256": "f013c57c731ee1d3742e9cbf4dc22f7f8394e02ad50b7b2385d1e0d855b8a01a",
+  "logged_app_version": "0.5.49",
+  "description": "Actual logged comparison metrics only; no original audio or raw fingerprint vectors.",
+  "pairs": [
+    {
+      "title": "No Church in the Wild (ft. Frank Ocean & The-Dream)",
+      "indices": [
+        112,
+        421
+      ],
+      "durations": [
+        272.506667,
+        272.508549
+      ],
+      "fingerprint_frames": [
+        2180,
+        2180
+      ],
+      "similarity": [
+        0.454587,
+        1.0,
+        1.0,
+        0,
+        1.0,
+        0.0,
+        1
+      ],
+      "local_worst": 0.75,
+      "previous_decision": "MATCH",
+      "previous_reason": []
+    },
+    {
+      "title": "Lift Off (ft. Beyoncé)",
+      "indices": [
+        113,
+        422
+      ],
+      "durations": [
+        266.253333,
+        266.248685
+      ],
+      "fingerprint_frames": [
+        2129,
+        2129
+      ],
+      "similarity": [
+        0.538281,
+        1.0,
+        1.0,
+        0,
+        0.999061,
+        0.0,
+        2
+      ],
+      "local_worst": 2.275,
+      "previous_decision": "REJECT",
+      "previous_reason": [
+        "Unmatched decoded intro/outro contains audio"
+      ]
+    },
+    {
+      "title": "Niggas in Paris",
+      "indices": [
+        114,
+        423
+      ],
+      "durations": [
+        219.333333,
+        219.322608
+      ],
+      "fingerprint_frames": [
+        1750,
+        1750
+      ],
+      "similarity": [
+        1.699429,
+        0.999429,
+        1.0,
+        0,
+        0.953714,
+        1.0,
+        4
+      ],
+      "local_worst": 4.9,
+      "previous_decision": "REJECT",
+      "previous_reason": [
+        "Unmatched decoded intro/outro contains audio"
+      ]
+    },
+    {
+      "title": "Otis (ft. Otis Redding)",
+      "indices": [
+        115,
+        424
+      ],
+      "durations": [
+        178.213333,
+        178.224059
+      ],
+      "fingerprint_frames": [
+        1418,
+        1418
+      ],
+      "similarity": [
+        1.369535,
+        1.0,
+        1.0,
+        0,
+        0.995063,
+        1.0,
+        3
+      ],
+      "local_worst": 1.925,
+      "previous_decision": "MATCH",
+      "previous_reason": []
+    },
+    {
+      "title": "Gotta Have It",
+      "indices": [
+        116,
+        425
+      ],
+      "durations": [
+        140.746667,
+        140.746667
+      ],
+      "fingerprint_frames": [
+        1115,
+        1115
+      ],
+      "similarity": [
+        2.372197,
+        1.0,
+        1.0,
+        0,
+        0.896861,
+        2.0,
+        6
+      ],
+      "local_worst": 4.625,
+      "previous_decision": "REJECT",
+      "previous_reason": [
+        "Unmatched decoded intro/outro contains audio"
+      ]
+    },
+    {
+      "title": "New Day",
+      "indices": [
+        117,
+        426
+      ],
+      "durations": [
+        272.853333,
+        272.853333
+      ],
+      "fingerprint_frames": [
+        2182,
+        2182
+      ],
+      "similarity": [
+        0.610449,
+        1.0,
+        1.0,
+        0,
+        0.995417,
+        0.0,
+        2
+      ],
+      "local_worst": 2.475,
+      "previous_decision": "REJECT",
+      "previous_reason": [
+        "Decoded audio differs inside aligned recording"
+      ]
+    },
+    {
+      "title": "That's My Bitch",
+      "indices": [
+        118,
+        427
+      ],
+      "durations": [
+        202.56,
+        202.56585
+      ],
+      "fingerprint_frames": [
+        1615,
+        1615
+      ],
+      "similarity": [
+        4.014241,
+        0.93808,
+        1.0,
+        0,
+        0.771517,
+        3.0,
+        9
+      ],
+      "local_worst": 10.6,
+      "previous_decision": "REJECT",
+      "previous_reason": [
+        "Decoded audio differs inside aligned recording"
+      ]
+    },
+    {
+      "title": "Welcome to the Jungle",
+      "indices": [
+        119,
+        428
+      ],
+      "durations": [
+        174.133333,
+        174.127483
+      ],
+      "fingerprint_frames": [
+        1385,
+        1385
+      ],
+      "similarity": [
+        0.470036,
+        1.0,
+        1.0,
+        0,
+        1.0,
+        0.0,
+        1
+      ],
+      "local_worst": 0.825,
+      "previous_decision": "MATCH",
+      "previous_reason": []
+    },
+    {
+      "title": "Who Gon Stop Me",
+      "indices": [
+        120,
+        429
+      ],
+      "durations": [
+        256.706667,
+        256.697868
+      ],
+      "fingerprint_frames": [
+        2052,
+        2052
+      ],
+      "similarity": [
+        2.44883,
+        0.993665,
+        1.0,
+        0,
+        0.919591,
+        2.0,
+        5
+      ],
+      "local_worst": 6.925,
+      "previous_decision": "REJECT",
+      "previous_reason": [
+        "Unmatched decoded intro/outro contains audio"
+      ]
+    },
+    {
+      "title": "Murder to Excellence",
+      "indices": [
+        121,
+        430
+      ],
+      "durations": [
+        300.96,
+        300.968798
+      ],
+      "fingerprint_frames": [
+        2409,
+        2409
+      ],
+      "similarity": [
+        2.097551,
+        1.0,
+        1.0,
+        0,
+        0.972603,
+        2.0,
+        4
+      ],
+      "local_worst": 3.5,
+      "previous_decision": "REJECT",
+      "previous_reason": [
+        "Unmatched decoded intro/outro contains audio"
+      ]
+    },
+    {
+      "title": "Made in America (ft. Frank Ocean)",
+      "indices": [
+        122,
+        431
+      ],
+      "durations": [
+        292.066667,
+        292.066667
+      ],
+      "fingerprint_frames": [
+        2337,
+        2337
+      ],
+      "similarity": [
+        0.376123,
+        1.0,
+        1.0,
+        0,
+        1.0,
+        0.0,
+        1
+      ],
+      "local_worst": 0.675,
+      "previous_decision": "MATCH",
+      "previous_reason": []
+    },
+    {
+      "title": "Why I Love You (ft. Mr Hudson)",
+      "indices": [
+        123,
+        432
+      ],
+      "durations": [
+        201.373333,
+        199.205011
+      ],
+      "fingerprint_frames": [
+        1605,
+        1587
+      ],
+      "similarity": [
+        0.705104,
+        1.0,
+        1.0,
+        0,
+        1.0,
+        1.0,
+        2
+      ],
+      "local_worst": 1.125,
+      "previous_decision": "MATCH",
+      "previous_reason": []
+    },
+    {
+      "title": "Illest Motherfucker Alive",
+      "indices": [
+        124,
+        433
+      ],
+      "durations": [
+        503.32,
+        323.260635
+      ],
+      "fingerprint_frames": [
+        4044,
+        2589
+      ],
+      "similarity": [
+        2.025106,
+        1.0,
+        1.0,
+        1454,
+        0.98764,
+        2.0,
+        4
+      ],
+      "local_worst": 2.7,
+      "previous_decision": "REJECT",
+      "previous_reason": [
+        "separate version: length differs by 180.06s (threshold 8s)"
+      ]
+    },
+    {
+      "title": "H•A•M",
+      "indices": [
+        125,
+        434
+      ],
+      "durations": [
+        275.733333,
+        275.733333
+      ],
+      "fingerprint_frames": [
+        2206,
+        2206
+      ],
+      "similarity": [
+        0.898005,
+        1.0,
+        1.0,
+        0,
+        0.996827,
+        1.0,
+        2
+      ],
+      "local_worst": 2.525,
+      "previous_decision": "REJECT",
+      "previous_reason": [
+        "Decoded audio differs inside aligned recording"
+      ]
+    },
+    {
+      "title": "Primetime",
+      "indices": [
+        126,
+        435
+      ],
+      "durations": [
+        199.24,
+        199.24
+      ],
+      "fingerprint_frames": [
+        1588,
+        1588
+      ],
+      "similarity": [
+        0.443325,
+        1.0,
+        1.0,
+        0,
+        1.0,
+        0.0,
+        1
+      ],
+      "local_worst": 0.85,
+      "previous_decision": "MATCH",
+      "previous_reason": []
+    },
+    {
+      "title": "The Joy (ft. Curtis Mayfield)",
+      "indices": [
+        127,
+        436
+      ],
+      "durations": [
+        317.92,
+        315.593651
+      ],
+      "fingerprint_frames": [
+        2546,
+        2528
+      ],
+      "similarity": [
+        0.351266,
+        1.0,
+        1.0,
+        0,
+        1.0,
+        0.0,
+        1
+      ],
+      "local_worst": 0.675,
+      "previous_decision": "MATCH",
+      "previous_reason": []
+    }
+  ]
+}
