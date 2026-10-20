@@ -677,6 +677,7 @@ FP_HIGH_OVERLAP_EXCELLENT_FRACTION = 0.49
 FP_HIGH_OVERLAP_MEDIAN_MAX = 6.0
 FP_HIGH_OVERLAP_P90_MAX = 10
 FP_HIGH_OVERLAP_MIN_OVERLAP = 0.995
+FP_HIGH_OVERLAP_MIN_COVERAGE = 0.995
 FP_HIGH_OVERLAP_MIN_FRAMES = 120
 
 FP_SILENCE_MIN_FRAMES = 120
@@ -2057,13 +2058,26 @@ def _fingerprint_local_score_limit(sim) -> float:
     return min(6.0, max(2.0, 2.5 * float(sim[0]) + 0.25)) if sim else 2.0
 
 
-def _fingerprint_high_overlap_checks(sim, fingerprint_items: int) -> Dict[str, bool]:
+def _fingerprint_acoustic_coverage(fp1, fp2, sim) -> float:
+    """Fraction of the longer fingerprint aligned after the chosen time shift."""
+    if not sim or not fp1 or not fp2:
+        return 0.0
+    shift = int(sim[3])
+    a0, b0 = max(shift, 0), max(-shift, 0)
+    aligned = max(0, min(len(fp1) - a0, len(fp2) - b0))
+    return aligned / max(1, len(fp1), len(fp2))
+
+
+def _fingerprint_high_overlap_checks(
+    sim, fingerprint_items: int, acoustic_coverage: float = 0.0
+) -> Dict[str, bool]:
     """Require full-track, low-distance mastering evidence, not metadata."""
     if not sim:
         return {"similarity": False}
     score, good, overlap, _shift, excellent, median, p90 = sim
     return {
         "overlap": overlap >= FP_HIGH_OVERLAP_MIN_OVERLAP,
+        "whole_recording_coverage": acoustic_coverage >= FP_HIGH_OVERLAP_MIN_COVERAGE,
         "score": 0 <= score <= FP_HIGH_OVERLAP_SCORE,
         "good_fraction": good >= FP_HIGH_OVERLAP_GOOD_FRACTION,
         "excellent_fraction": excellent >= FP_HIGH_OVERLAP_EXCELLENT_FRACTION,
@@ -2075,7 +2089,8 @@ def _fingerprint_high_overlap_checks(sim, fingerprint_items: int) -> Dict[str, b
 
 def _fingerprint_profile_identity(sim, worst_window_score=None,
                                   advisory_conflict: bool = False,
-                                  fingerprint_items: int = 0) -> bool:
+                                  fingerprint_items: int = 0,
+                                  acoustic_coverage: float = 0.0) -> bool:
     """The primary Chromaprint comparison is final; later evidence cannot veto it.
 
     Legacy local-score/advisory arguments remain accepted for cached profiles.
@@ -2090,7 +2105,8 @@ def _fingerprint_profile_identity(sim, worst_window_score=None,
                  and good >= FP_MASTERING_GOOD_FRACTION and median <= FP_MASTERING_MEDIAN_MAX
                  and p90 <= FP_MASTERING_P90_MAX)
     high_overlap_mastering = all(
-        _fingerprint_high_overlap_checks(sim, fingerprint_items).values()
+        _fingerprint_high_overlap_checks(
+            sim, fingerprint_items, acoustic_coverage).values()
     )
     return bool(strict or mastering or high_overlap_mastering)
 
@@ -4463,7 +4479,8 @@ def _fingerprint_candidate_match_values(
     sim = sim if sim is not None else fingerprint_similarity(fp1, fp2)
     matched = bool(min(len(fp1), len(fp2)) >= 20
                    and _fingerprint_profile_identity(
-                       sim, fingerprint_items=min(len(fp1), len(fp2)))
+                       sim, fingerprint_items=min(len(fp1), len(fp2)),
+                       acoustic_coverage=_fingerprint_acoustic_coverage(fp1, fp2, sim))
                    and not _duration_version_conflict(duration1, duration2))
     return matched, sim
 
@@ -5336,7 +5353,8 @@ def _comparison_decision_details(
     strict_pass = all(strict_checks.values())
     mastering_pass = all(mastering_checks.values())
     high_overlap_checks = _fingerprint_high_overlap_checks(
-        sim, min(len(fp1), len(fp2))
+        sim, min(len(fp1), len(fp2)),
+        _fingerprint_acoustic_coverage(fp1, fp2, sim)
     )
     high_overlap_pass = all(high_overlap_checks.values())
     preliminary_pass = strict_pass or mastering_pass or high_overlap_pass
@@ -6030,6 +6048,7 @@ def merge_equivalent_tracks(
                         "median_max": FP_HIGH_OVERLAP_MEDIAN_MAX,
                         "p90_max": FP_HIGH_OVERLAP_P90_MAX,
                         "overlap_min": FP_HIGH_OVERLAP_MIN_OVERLAP,
+                        "whole_recording_coverage_min": FP_HIGH_OVERLAP_MIN_COVERAGE,
                         "minimum_frames": FP_HIGH_OVERLAP_MIN_FRAMES,
                         "evidence": "2026-10-21 SLIDE pair + conservative multi-metric bounds; native audio regression pending",
                     },
@@ -6321,7 +6340,9 @@ def merge_equivalent_tracks(
             if (not _duration_version_conflict(tracks[a].duration,tracks[b].duration)
                     or not _fingerprint_profile_identity(
                         sim, fingerprint_items=min(len(tracks[a].fingerprint),
-                                                   len(tracks[b].fingerprint)))):
+                                                   len(tracks[b].fingerprint)),
+                        acoustic_coverage=_fingerprint_acoustic_coverage(
+                            tracks[a].fingerprint, tracks[b].fingerprint, sim))):
                 continue
             if not _unmatched_fingerprint_is_silence(
                     tracks[a].fingerprint,tracks[b].fingerprint,int(sim[3])):
@@ -17263,16 +17284,22 @@ def _high_overlap_mastering_regression_self_test() -> None:
     finally:
         _init_compare_worker(previous)
     evidence = (5.819162, 0.939721, 1.0, 0, 0.496827, 6.0, 10)
-    if not _fingerprint_profile_identity(evidence, fingerprint_items=1576):
+    if not _fingerprint_profile_identity(
+            evidence, fingerprint_items=1576, acoustic_coverage=0.998733):
         raise RuntimeError("Actual logged SLIDE statistics were rejected.")
     for offset, changed in ((0, 6.001), (1, 0.929), (2, 0.994),
                             (4, 0.489), (5, 6.1), (6, 11)):
         invalid = list(evidence)
         invalid[offset] = changed
-        if _fingerprint_profile_identity(tuple(invalid), fingerprint_items=1576):
+        if _fingerprint_profile_identity(
+                tuple(invalid), fingerprint_items=1576, acoustic_coverage=0.998733):
             raise RuntimeError("High-overlap mastering accepted a weakened fingerprint.")
-    if _fingerprint_profile_identity(evidence, fingerprint_items=119):
+    if _fingerprint_profile_identity(
+            evidence, fingerprint_items=119, acoustic_coverage=0.998733):
         raise RuntimeError("High-overlap mastering accepted a too-short fingerprint.")
+    if _fingerprint_profile_identity(
+            evidence, fingerprint_items=1576, acoustic_coverage=0.994):
+        raise RuntimeError("High-overlap mastering accepted missing musical content.")
 
 
 def _ui_contract_self_test() -> None:
