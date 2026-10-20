@@ -6432,6 +6432,8 @@ def merge_equivalent_tracks(
         # Fingerprint low complexity is only a routing hint. Independently
         # decode every proposed boundary before excluding it from the 8s rule.
         for _pair_index,a,b,_matched,sim in sorted(comparison_results):
+            if (a, b) in verified_large_silence_pairs:
+                continue  # Do not replace the independently verified proof.
             if (not _duration_version_conflict(tracks[a].duration,tracks[b].duration)
                     or not _definitive_acoustic_identity(sim)):
                 continue
