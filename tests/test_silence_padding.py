@@ -4,6 +4,7 @@ from functools import lru_cache
 import hashlib
 import importlib.machinery
 import importlib.util
+import json
 import math
 import os
 from pathlib import Path
@@ -16,7 +17,7 @@ import wave
 
 
 ROOT = Path(__file__).resolve().parents[1]
-SOURCE = Path(os.environ.get('MCC_TEST_SOURCE', str(ROOT / 'Music Collection Cleaner v0.05.51.pyw')))
+SOURCE = Path(os.environ.get('MCC_TEST_SOURCE', str(ROOT / 'Music Collection Cleaner v0.05.52.pyw')))
 loader = importlib.machinery.SourceFileLoader('mcc_padding_subject', str(SOURCE))
 spec = importlib.util.spec_from_loader(loader.name, loader)
 mcc = importlib.util.module_from_spec(spec)
@@ -51,7 +52,7 @@ class SilencePaddingVerification(unittest.TestCase):
         self.temp.cleanup()
 
     def write_audio(self, name, prefix=0, tail=0, tail_kind='silence', rate=8000,
-                    seconds=4, silent_body=False, edge_samples=0):
+                    seconds=4, silent_body=False, edge_samples=0, prefix_noise_peak=0):
         samples = array('h')
         for i in range(round(tail * rate)):
             value = 0
@@ -73,11 +74,24 @@ class SilencePaddingVerification(unittest.TestCase):
         if sys.byteorder != 'little':
             samples.byteswap()
         path = self.root / name
+        prefix_frames = round(prefix * rate)
+        if prefix_noise_peak:
+            # Low-RMS, high-frequency quantization-scale noise survives native
+            # measurement while being suppressed by the 8 kHz alignment cache.
+            pattern = array('h')
+            for value in [prefix_noise_peak, -prefix_noise_peak] + [1, -1] * 63:
+                pattern.extend((value, value))
+            if sys.byteorder != 'little':
+                pattern.byteswap()
+            prefix_data = (pattern.tobytes() * (prefix_frames // 128)
+                           + pattern.tobytes()[:4 * (prefix_frames % 128)])
+        else:
+            prefix_data = b'\0' * (4 * prefix_frames)
         with wave.open(str(path), 'wb') as out:
             out.setnchannels(2)
             out.setsampwidth(2)
             out.setframerate(rate)
-            out.writeframes(b'\0' * (4 * round(prefix * rate))
+            out.writeframes(prefix_data
                             + body_samples(rate, seconds, silent_body) + samples.tobytes())
         duration = prefix + seconds + tail
         return mcc.Track(1, path, 1, duration=duration, sample_rate=rate, channels=2,
@@ -91,7 +105,7 @@ class SilencePaddingVerification(unittest.TestCase):
         for key in ('passed', 'method', 'reason', 'alignment_lag_samples',
                     'effective_durations_seconds', 'padding_seconds'):
             self.assertIn(key, result)
-        self.assertEqual(result['method'], 'decoded-boundary-silence-v1')
+        self.assertEqual(result['method'], 'decoded-boundary-silence-v2')
         return result
 
     def test_ten_and_thirty_second_silent_tails_are_measured_without_changing_audio(self):
@@ -169,6 +183,70 @@ class SilencePaddingVerification(unittest.TestCase):
                           title=base.album, tracks=[base], release_type='album',
                           source_medium='Digital Media')
         self.assertEqual(mcc.optimize_collection([cd, web], {}), {10})
+
+    def test_actual_illest_native_measurement_is_near_silent_padding(self):
+        fixture = json.loads((ROOT / 'tests/fixtures/illest_native_padding_measurement.json').read_text())
+        measured = fixture['padding_verification']['boundary_spans'][0]['native_measurement']['levels']
+        self.assertTrue(mcc._padding_levels_are_quiet(measured),
+                        'The actual native RMS 1.19 / peak 5 LSB must qualify as near silence')
+        self.assertFalse(mcc._padding_levels_are_quiet([{'rms_lsb': 3, 'peak_lsb': 5}]))
+        self.assertFalse(mcc._padding_levels_are_quiet([{'rms_lsb': .01, 'peak_lsb': 10000}]))
+        self.assertFalse(mcc._padding_levels_are_quiet([]))
+
+    def test_native_quantization_scale_noise_does_not_block_silent_prefix(self):
+        base = self.write_audio('base-noise.wav', rate=44100)
+        for peak, expected in [(5, True), (9, False)]:
+            padded = self.write_audio('noise-%s.wav' % peak, prefix=10,
+                                      prefix_noise_peak=peak, rate=44100)
+            for first, second, shift in [(padded, base, 80), (base, padded, -80)]:
+                with self.subTest(peak=peak, shift=shift):
+                    result = self.verify(first, second, shift)
+                    self.assertEqual(result['passed'], expected, result)
+                    if expected:
+                        self.assertLessEqual(abs(result['effective_durations_seconds'][0]
+                                                - result['effective_durations_seconds'][1]), .0021)
+
+    def test_full_pipeline_illest_near_silent_prefix_retains_only_cd(self):
+        from test_audio_safety import fp
+        base = self.write_audio('13 Illest Motherf***** Alive.wav', seconds=12, rate=44100)
+        padded = self.write_audio('13 Illest Motherfucker Alive.wav', prefix=180.059375,
+                                  seconds=12, rate=44100, prefix_noise_peak=5)
+        base.fingerprint = fp(count=76)
+        padded.fingerprint = (0,) * 1454 + tuple(value ^ (0x08400000 if i % 10 < 6 else 0)
+                                               for i, value in enumerate(base.fingerprint))
+        base.title, padded.title = 'Illest Motherf***** Alive', 'Illest Motherfucker Alive'
+        base.album, padded.album = 'Watch The Throne (Deluxe)', 'Watch the Throne (Deluxe Edition)'
+        base.release_id, padded.release_id = 55, 10
+        before = [hashlib.sha256(t.path.read_bytes()).digest() for t in (padded, base)]
+        with patch.object(mcc, 'FP_SHADOW_SAMPLE_SIZE', 0), \
+             patch.object(mcc, '_compare_workers', return_value=1):
+            mcc.merge_equivalent_tracks([padded, base])
+        self.assertEqual(padded.group_id, base.group_id, 'Near-silent Illest prefix must normalize')
+        self.assertEqual([padded.duration, base.duration], [192.059375, 12])
+        self.assertEqual(before, [hashlib.sha256(t.path.read_bytes()).digest() for t in (padded, base)])
+        cd = mcc.Release(10, 'existing', self.root / 'CD', title=padded.album, tracks=[padded],
+                         release_type='album', source_medium='CD', has_cue=True, has_rip_log=True)
+        web = mcc.Release(55, 'recycle', self.root / 'WEB', title=base.album, tracks=[base],
+                          release_type='album', source_medium='Digital Media')
+        self.assertEqual(mcc.optimize_collection([cd, web], {}), {10})
+
+    def test_proven_prefix_padding_keeps_audible_residual_in_eight_second_rule(self):
+        from test_audio_safety import fp
+        for tail, same in [(.01, True), (8, True), (8.001, False)]:
+            base = self.write_audio('base-residual.wav', seconds=12)
+            padded = self.write_audio('residual-%s.wav' % tail, prefix=20,
+                                      seconds=12, tail=tail, tail_kind='audible')
+            base.title = padded.title = 'Song'
+            base.release_id, padded.release_id = 1, 2
+            base.fingerprint = fp(count=76)
+            padded.fingerprint = (0,) * 162 + base.fingerprint + (0,) * max(1, round(tail * 8))
+            with self.subTest(tail=tail), patch.object(mcc, '_compare_workers', return_value=1):
+                mcc.merge_equivalent_tracks([base, padded])
+                self.assertEqual(base.group_id == padded.group_id, same)
+                # The audible tail is retained. Only the proven 20-second
+                # prefix is removed, even when the residual exceeds eight.
+                self.assertAlmostEqual(padded.identity_duration_seconds, 12 + tail, places=3)
+                self.assertEqual(padded.duration, 32 + tail)
 
     def test_offset_and_silent_ends_preserve_silence_on_the_shared_timeline(self):
         first = self.write_audio('first.wav', prefix=1.25, tail=1.75)

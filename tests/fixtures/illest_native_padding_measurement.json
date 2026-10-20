@@ -1,0 +1,122 @@
+{
+  "source_log_sha256": "3bc892218f1f8bc8ed3045d81826b9874c888f8dcf73fecd7a01ca9141becb58",
+  "source_app_version": "0.5.51",
+  "track_indices": [
+    124,
+    433
+  ],
+  "durations_seconds": [
+    503.32,
+    323.260635
+  ],
+  "similarity": [
+    2.025106,
+    1.0,
+    1.0,
+    1454,
+    0.98764,
+    2.0,
+    4
+  ],
+  "fingerprint_frames": [
+    4044,
+    2589
+  ],
+  "original_decision": "REJECT",
+  "padding_verification": {
+    "passed": false,
+    "method": "decoded-boundary-silence-v1",
+    "reason": "Unmatched native-rate intro/outro contains audio",
+    "alignment_lag_samples": 1440555,
+    "effective_durations_seconds": [
+      503.32,
+      323.260625
+    ],
+    "padding_seconds": [
+      0.0,
+      0.0
+    ],
+    "silence_rms_limit_lsb": 2.0,
+    "silence_peak_limit_lsb": 4.0,
+    "boundary_spans": [
+      {
+        "track_index": 0,
+        "boundary": "prefix",
+        "start_seconds": 0.0,
+        "end_seconds": 180.069375,
+        "verified_samples": 0,
+        "retained_boundary_samples": 16,
+        "cache_levels": [
+          {
+            "rms_lsb": 0.0011782908022125564,
+            "peak_lsb": 1,
+            "centered_rms_lsb": 0.0011782899842609346
+          },
+          {
+            "rms_lsb": 0.0008331774164542356,
+            "peak_lsb": 1,
+            "centered_rms_lsb": 0.0008331771272647166
+          }
+        ],
+        "native_measurement": {
+          "sample_rate": 44100,
+          "channels": 2,
+          "samples_per_channel": 7940971,
+          "levels": [
+            {
+              "channel": 1,
+              "rms_lsb": 1.1859008626001588,
+              "peak_lsb": 5.000152325504758
+            },
+            {
+              "channel": 2,
+              "rms_lsb": 1.1866632285092729,
+              "peak_lsb": 5.000152325504758
+            }
+          ]
+        }
+      }
+    ],
+    "decoded_durations_seconds": [
+      503.32,
+      323.260625
+    ],
+    "native_source_formats": [
+      {
+        "sample_rate": 44100,
+        "channels": 2
+      },
+      {
+        "sample_rate": 44100,
+        "channels": 2
+      }
+    ],
+    "aligned_duration_seconds": 323.250625,
+    "aligned_levels": [
+      [
+        {
+          "rms_lsb": 9888.939687873906,
+          "peak_lsb": 32768,
+          "centered_rms_lsb": 9888.93952466449
+        },
+        {
+          "rms_lsb": 10064.214861154018,
+          "peak_lsb": 32768,
+          "centered_rms_lsb": 10064.214716246603
+        }
+      ],
+      [
+        {
+          "rms_lsb": 9445.828978465686,
+          "peak_lsb": 32768,
+          "centered_rms_lsb": 9445.827922604813
+        },
+        {
+          "rms_lsb": 9607.518973013459,
+          "peak_lsb": 31900,
+          "centered_rms_lsb": 9607.51806820723
+        }
+      ]
+    ]
+  }
+}

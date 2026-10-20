@@ -1,6 +1,6 @@
 # Music Collection Cleaner (MCC)
 
-**Version: 0.5.51 - Under construction ⚠️**
+**Version: 0.5.52 - Under construction ⚠️**
 
 Music Collection Cleaner compares existing music releases with new ones, finds the best combination of editions, and helps preserve every wanted unique recording while removing unnecessary redundancy.
 
@@ -10,11 +10,11 @@ For MCC, the user supplies Windows WebView2 screenshots for visual review when r
 
 ## Download and run
 
-**[Music Collection Cleaner v0.05.51.pyw](Music%20Collection%20Cleaner%20v0.05.51.pyw)** - latest single-file Windows Python application. **Under construction ⚠️** until actual Windows WebView2 testing. Earlier source versions remain available.
+**[Music Collection Cleaner v0.05.52.pyw](Music%20Collection%20Cleaner%20v0.05.52.pyw)** - latest single-file Windows Python application. **Under construction ⚠️** until actual Windows WebView2 testing. Earlier source versions remain available.
 
-Open with Python 3 on Windows 11 (or run from a console with `python "Music Collection Cleaner v0.05.51.pyw"`). The application checks or installs supported dependencies. The GUI uses Microsoft Edge WebView2 through pywebview; it is not a terminal-based replacement.
+Open with Python 3 on Windows 11 (or run from a console with `python "Music Collection Cleaner v0.05.52.pyw"`). The application checks or installs supported dependencies. The GUI uses Microsoft Edge WebView2 through pywebview; it is not a terminal-based replacement.
 
-Source-level regression checks: `python "Music Collection Cleaner v0.05.51.pyw" --ui-self-test`. `--self-test` additionally requires a packaged standalone EXE.
+Source-level regression checks: `python "Music Collection Cleaner v0.05.52.pyw" --ui-self-test`. `--self-test` additionally requires a packaged standalone EXE.
 
 ## What it does
 
@@ -28,6 +28,15 @@ Source-level regression checks: `python "Music Collection Cleaner v0.05.51.pyw" 
 - Explicitly **Copy OLD + NEW** or **Move OLD + NEW** retained releases into the selected destination; Undo for supported completed moves.
 - Log comparisons, validate incomplete/corrupt inputs, choose I/O worker counts with drive awareness, and manage spawned subprocesses.
 
+
+## v0.5.52 - Normalize near-silent padding without losing audible duration (Under construction ⚠️)
+
+- The real v0.5.51 run compares all 16 Watch the Throne pairs. Illest's fingerprint passes, but its native three-minute prefix measures RMS 1.19 / peak 5.00015 in 16-bit sample units and is rejected by the old peak-4 limit. That leaves the entire 180-second gap as a false separate version.
+- Keep the strict RMS limit of 2 and allow near-silent peaks up to 8 sample units, with a 0.001 conversion tolerance. Only native-rate, all-channel measurements can remove padding. Audible boundaries retain their full duration and cannot cancel another boundary's verified padding; the existing inclusive 8-second duration rule then applies. Primary fingerprint thresholds remain unchanged.
+- A conservative replay of the actual native measurement removes only the recorded 180.067375-second interval, retaining its 2ms edge and all other unmeasured spans. Effective lengths 323.252625 / 323.260625 seconds differ by 0.008 seconds. All 16 pairs match; the optimizer keeps the CD and removes only WEB55, yielding 55 releases/405 tracks covering all 343 wanted groups with saved Ignore preserved. This reuses logged measurements; it is not a fresh decode of the original files.
+- All 88 functional tests, full UI self-test, compilation and both JavaScript syntax checks passed. Real FFmpeg regressions cover 44.1 kHz peak-5 noise, a three-minute noisy prefix through selection, peak-9 rejection, native high-frequency/DC/click negatives and retained audible residuals at 8 / 8.001 seconds. Run a fresh Analyze; Re-Analyze reuses old groups. Actual Windows acceptance remains pending.
+
+- Independent review approved the exact source with no findings, passed eight focused native regressions and reproduced the complete actual-measurement optimizer replay: only WEB55 removed, CD10 retained.
 
 ## v0.5.51 - Reach comparisons across edition and censored names (Under construction ⚠️)
 

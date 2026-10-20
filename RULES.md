@@ -5,6 +5,13 @@ Last updated: 2026-10-20
 This file is the project-specific rulebook for the Discography Builder and Duplicate / Edition Analyzer.
 The account-wide `SOFTWARE_RULES.md` baseline always applies. This file may add stricter project-specific requirements but must never weaken or override a newer global rule or a newer explicit user instruction. When project rules conflict with the global baseline, the stricter/newer requirement wins.
 
+## MCC v0.5.52 - Near-silent padding and retained audible boundaries (2026-10-20)
+
+- Treat the actual measured Illest prefix (native RMS 1.18590086/1.18666323, peak 5.0001523 in 16-bit sample units) as near-silent padding after fingerprint identity passes. Keep RMS <=2 and allow peak <=8, with 0.001 level-conversion tolerance. Require nonempty, finite, nonnegative levels in every native channel. Peak 9, larger RMS, isolated clicks, DC and high-frequency-only audio must not be discarded as padding.
+- Independently remove only proven quiet boundary spans from identity duration. Retain the full length of any audible boundary and retained 2ms resampler edges. An audible residual cannot invalidate another boundary's measured padding. The original inclusive <=8-second effective-duration rule and coherent groups still decide whether the retained difference is a separate version; an 8.001-second audible residual remains distinct.
+- Do not restore secondary identity vetoes or change the calibrated 4.02 fingerprint threshold. Raw durations, fingerprint vectors, original media, recording Ignore, optimizer and retention highlighting remain unchanged. Record padding method decoded-boundary-silence-v2 and measured/retained sample evidence.
+- Regressions must cover real 44.1 kHz near-zero noise, not only digital zeros: full routing, comparison, native measurement, grouping and CD-only selection. The actual native measurement fixture/replay is evidence of corrected interpretation, not a newly decoded original file. Keep v0.5.52 Under construction until native Windows acceptance; fresh Analyze required.
+
 ## MCC v0.5.51 - Candidate routing must reach edition/censored pairs (2026-10-20)
 
 - Do not silently skip an acoustic comparison because album tags say Deluxe Edition versus Deluxe or because the title uses a censorship mask. Album-slot routing uses the existing album-family normalization. The censored-title safety route also works without album/number metadata. Empty or fully masked titles provide no censorship-routing evidence. These are comparison routes only; metadata never establishes a duplicate or satisfies coverage.
