@@ -1,3 +1,21 @@
+## MCC v0.5.42 - Acoustic-first comparison / unchanged UI (2026-10-20)
+
+**Scope:** No new visible UI controls, styles or layout changes. The existing Main / Personal Picks / Classify / Release Map control contract from v0.5.41 remains in force. Acoustic grouping can now link tracks despite contradictory metadata, including policy-excluded Live/Remix copies. Renderer must present correct acoustic relationship/status while preserving their excluded retention state and existing accessibility.
+
+**Evidence:** User v0.5.41 JSONL `Music Collection Cleaner Comparison 2026-10-19-17-30-45.jsonl`: Japanese `Pinocchio Story (Freestyle Live from Singapore)` was Live-excluded with 0 fingerprint frames; same-duration ordinary-title file had 2,899 frames; no acoustic comparison. Neither title difference nor exactly matching duration proves the audio is identical.
+
+**Status and test gates:**
+- Source-only static patch structure / GitHub commit: PASS (not executable validation).
+- Python compilation / full embedded self-test including Pinocchio synthetic fixture: **NOT RUN**.
+- Browser Edge Playwright, screenshots and side-by-side inspection: **NOT RUN** for v0.5.42.
+- Native Windows WebView2 at 100%/125%, hover, focus, keyboard, resizing, scrolling and dialogs: **NOT RUN**.
+- Real-file fingerprint & acoustic comparison of both Pinocchio files, and controls for wrong labels/false positives: **NOT RUN**.
+- Disposable Copy/Move/Undo, crash recovery and cross-volume refusal: **NOT RUN**.
+
+**Acceptance requirement:** After fresh clone in `S:\\test\\MCC`, run `py -m py_compile "Music Collection Cleaner v0.05.42.pyw"`, `py "Music Collection Cleaner v0.05.42.pyw" --ui-self-test`, `py tests\\visual_qa.py --browser edge`. Capture screenshots and inspect `report.json`. Scan both physical 808s & Heartbreak editions with Save Live OFF and ON, inspect populated fingerprints and acoustic verdicts, then inspect Release Map relationship and optimization retention. Never infer MATCH only from duration/title. The latest app remains **v0.5.42 - Under construction ⚠️** until actual Windows verification. Do not modify GitHub Actions.
+
+---
+
 ## MCC v0.5.41 - Screenshot audit implementation / Visual QA Gate (2026-10-19)
 
 **Input evidence:** User supplied 12 actual Windows WebView2 screenshot views of v0.5.40, spanning Ready/Activity, Personal Picks (~40 rules), Classify patterns, Changes, Full map, release details across widths, hover actions, multi-version badges, rejected release with missing replacements, and full-size 1280px-width track panel. This is stronger visual evidence than the old mocked browser fixture; however **v0.5.41 has NOT been displayed or visually accepted by user**. The prior v0.5.40 Windows `py "Music Collection Cleaner v0.05.40.pyw" --ui-self-test` **PASSED**. The Playwright run for v0.5.40 **FAILED** with startup check expecting `.releaseRow` during the initial `Changes` view, although the real page rendered and contained `.changeRow`. That is a test-harness defect, not evidence that the GUI failed to render. Native WebView2 use on v0.5.40 is evidenced by screenshots, but no systematic interaction or accessibility tests were provided.
