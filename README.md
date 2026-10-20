@@ -1,6 +1,6 @@
 # Music Collection Cleaner (MCC)
 
-**Version: 0.5.41 - Under construction ⚠️**
+**Version: 0.5.42 - Under construction ⚠️**
 
 Music Collection Cleaner compares existing music releases with new ones, finds the best combination of editions, and helps preserve every wanted unique recording while removing unnecessary redundancy.
 
@@ -21,11 +21,11 @@ On other platforms, install Playwright Chromium or use `--browser system` for an
 
 ## Download and run
 
-**[Music Collection Cleaner v0.05.41.pyw](Music%20Collection%20Cleaner%20v0.05.41.pyw)** - latest single-file Windows Python application. **Under construction ⚠️** until actual Windows WebView2 testing. Earlier source versions remain available.
+**[Music Collection Cleaner v0.05.42.pyw](Music%20Collection%20Cleaner%20v0.05.42.pyw)** - latest single-file Windows Python application. **Under construction ⚠️** until actual Windows WebView2 testing. Earlier source versions remain available.
 
-Open with Python 3 on Windows 11 (or run from a console with `python "Music Collection Cleaner v0.05.41.pyw"`). The application checks or installs supported dependencies. The GUI uses Microsoft Edge WebView2 through pywebview; it is not a terminal-based replacement.
+Open with Python 3 on Windows 11 (or run from a console with `python "Music Collection Cleaner v0.05.42.pyw"`). The application checks or installs supported dependencies. The GUI uses Microsoft Edge WebView2 through pywebview; it is not a terminal-based replacement.
 
-Source-level regression checks: `python "Music Collection Cleaner v0.05.41.pyw" --ui-self-test`. `--self-test` additionally requires a packaged standalone EXE.
+Source-level regression checks: `python "Music Collection Cleaner v0.05.42.pyw" --ui-self-test`. `--self-test` additionally requires a packaged standalone EXE.
 
 ## What it does
 
@@ -39,6 +39,14 @@ Source-level regression checks: `python "Music Collection Cleaner v0.05.41.pyw" 
 - Explicitly **Copy OLD + NEW** or **Move OLD + NEW** retained releases into the selected destination; Undo for supported completed moves.
 - Log comparisons, validate incomplete/corrupt inputs, choose I/O worker counts with drive awareness, and manage spawned subprocesses.
 
+
+## v0.5.42 - Acoustic identity before metadata exclusions (Under construction ⚠️)
+
+- **P0 regression:** In the user's v0.5.41 comparison log, `Pinocchio Story` (361.6 s, 2,899 fingerprint frames) and `Pinocchio Story (Freestyle Live from Singapore)` (361.6 s, **0 fingerprint frames**) were **not compared**: Save Live OFF removed the latter from fingerprint analysis. The files' actual acoustic equivalence is **NOT VERIFIED** without their audio.
+- All readable files now participate in local full-audio Chromaprint fingerprint generation and bounded acoustic candidate routing, even when excluded from *retention* by Remix/Live/Skip/Explicit>Clean. Version metadata can be logged as disagreement but can no longer veto a candidate before acoustic comparison.
+- Full-audio identity groups can include excluded copies; only wanted copies contribute optimizer groups and retention obligations. Original audio, existing policy choices, Copy/Move/Undo, and UI layout remain unchanged.
+- New `--ui-self-test` regression exercises a synthetic near-identical remaster with asymmetric Live descriptor, a completely wrong filename/title, and an acoustically different same-title file. Runtime PASS/FAIL is **NOT RUN** on this checkpoint.
+- **Required:** Python compile, `--ui-self-test`, Playwright, native Windows WebView2 and disposable file-operation tests. Rescan the two physical Pinocchio audio files and inspect the new JSONL for both populated fingerprints and a verified `MATCH` before claiming they are duplicates. No GitHub Actions changes.
 
 ## v0.5.41 - UI audit corrections / safer Move (Under construction ⚠️)
 
