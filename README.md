@@ -1,6 +1,6 @@
 # Music Collection Cleaner (MCC)
 
-**Version: 0.5.42 - Under construction ⚠️**
+**Version: 0.5.43 - Under construction ⚠️**
 
 Music Collection Cleaner compares existing music releases with new ones, finds the best combination of editions, and helps preserve every wanted unique recording while removing unnecessary redundancy.
 
@@ -10,16 +10,16 @@ For MCC, the user supplies Windows WebView2 screenshots for visual review when r
 
 ## Download and run
 
-**[Music Collection Cleaner v0.05.42.pyw](Music%20Collection%20Cleaner%20v0.05.42.pyw)** - latest single-file Windows Python application. **Under construction ⚠️** until actual Windows WebView2 testing. Earlier source versions remain available.
+**[Music Collection Cleaner v0.05.43.pyw](Music%20Collection%20Cleaner%20v0.05.43.pyw)** - latest single-file Windows Python application. **Under construction ⚠️** until actual Windows WebView2 testing. Earlier source versions remain available.
 
-Open with Python 3 on Windows 11 (or run from a console with `python "Music Collection Cleaner v0.05.42.pyw"`). The application checks or installs supported dependencies. The GUI uses Microsoft Edge WebView2 through pywebview; it is not a terminal-based replacement.
+Open with Python 3 on Windows 11 (or run from a console with `python "Music Collection Cleaner v0.05.43.pyw"`). The application checks or installs supported dependencies. The GUI uses Microsoft Edge WebView2 through pywebview; it is not a terminal-based replacement.
 
-Source-level regression checks: `python "Music Collection Cleaner v0.05.42.pyw" --ui-self-test`. `--self-test` additionally requires a packaged standalone EXE.
+Source-level regression checks: `python "Music Collection Cleaner v0.05.43.pyw" --ui-self-test`. `--self-test` additionally requires a packaged standalone EXE.
 
 ## What it does
 
 - Analyze two pools: the existing library (OLD) and candidate additions (NEW).
-- Compare recording identity using audio fingerprints, metadata, version-family safeguards and user review when necessary.
+- Identify recordings acoustically, independently of titles; verify uncertain fingerprint matches against decoded audio automatically.
 - Preserve unique wanted recordings; apply Remix, Live, Explicit/Clean and Personal Picks rules.
 - Compare original, expanded, Deluxe, Special and other editions, including strict acoustic-superset detection.
 - Prefer high-quality sources and CD rip logs among truly equivalent choices; use dynamic range only as an eligible final mastering tie-break.
@@ -28,6 +28,16 @@ Source-level regression checks: `python "Music Collection Cleaner v0.05.42.pyw" 
 - Explicitly **Copy OLD + NEW** or **Move OLD + NEW** retained releases into the selected destination; Undo for supported completed moves.
 - Log comparisons, validate incomplete/corrupt inputs, choose I/O worker counts with drive awareness, and manage spawned subprocesses.
 
+
+## v0.5.43 - Comparison-log safety fixes (Under construction ⚠️)
+
+- Keep acoustic candidate discovery independent of titles. Near-identical fingerprints need a local-content check; other promising fingerprint matches require read-only decoded stereo-window confirmation, including short final sections and silence checks on unmatched endings. A directly rejected pair cannot merge through an intermediate match. Unavailable confirmation keeps recordings separate automatically.
+- Preserve a CD copy when only its automatic Live/Remix wording conflicts with an allowed, acoustically identical recording. Explicit saved categories, pattern Skip and recording Ignore still take precedence.
+- Every distinct acoustic version now remains a mandatory optimizer requirement; older replaceable-edit coverage cannot discard shorter Gone / Jesus Lord versions.
+- Recognize joint primary/group credits such as ¥$ and KIDS SEE GHOSTS; resolve Kanye West / Ye through a separate identity-alias relation. Featured artists keep their secondary role.
+- Schema 3 logs include decoded-audio verdicts/timing, final per-track Ignore/exclusion state, every scanned release, and dominance evidence. Planning verifies coverage against the pre-dominance wanted set.
+- Fix obsolete self-test wording/stroke assertions; `--ui-self-test` and all 26 focused audio-safety tests pass on Linux/Python 3.12.14. The suite covers generated audio, transitive matches, saved exclusions, aliases, and the complete comparison/logging path.
+- **Still required:** a fresh Windows scan of the user's actual collection and disposable native Copy/Move/Undo tests. Source media were unavailable here. UI review awaits user-supplied screenshots; no automated visual QA is requested. No GitHub Actions changed.
 
 ## v0.5.42 - Acoustic identity before metadata exclusions (Under construction ⚠️)
 
@@ -364,3 +374,4 @@ The original production **Duplicate Edition Analyzer v0.22.12** and all previous
 - [CONTINUITY.md](CONTINUITY.md) - authoritative development status, regression contracts, blockers and prior history.
 
 No extra GitHub Actions workflows or unverified EXE downloads are included.
+

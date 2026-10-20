@@ -1,5 +1,11 @@
 ## MCC visual review - user-provided screenshots only (2026-10-20)
 
+
+## v0.5.43 - Functional correction, 2026-10-20
+
+Preserve the current compact dark WebView2 controls. No new control or layout workflow: audio confirmation runs automatically within the existing Analyze progress/activity presentation. Correct the obsolete Explicit>Clean status from "excluded before audio comparison" to "excluded from selection", since excluded copies are fingerprinted. Existing source-contract checks now assert current Same audio wording and selected-links strokes instead of obsolete UI strings. Python functional/self-tests pass on Linux; this is not visual acceptance. Native Windows UI review is pending user-supplied screenshots at their discretion. Do not run/request automated visual QA. Native file operations and actual collection results remain unverified; keep 0.5.43 - Under construction ⚠️.
+
+
 The user's latest explicit directive supersedes earlier MCC Playwright/automated visual QA instructions: **do not request, schedule, or require `tests/visual_qa.py`, Playwright, automated screenshot/geometry reports, or associated commands.** The user will send actual Windows WebView2 screenshots when ready. Review those manually upon receipt. Retain earlier runner results as historical evidence only; automation is not a current requirement or user action. Functional `py_compile`, `--ui-self-test`, actual acoustic regression evidence, and disposable file-operation safety checks remain required. Pending native screenshots are not a reason to repeat a screenshot request. No UI code changes at this checkpoint.
 
 ---
@@ -330,3 +336,4 @@ Affected view: dark WebView2 Release Map, selected release detail panel and full
 ## Next action
 
 Fill the control contract and real-world screenshot/interaction matrix for every UI surface above. Fix all FAIL and NOT RUN before declaring UI verified. Preserve software behavior and target-platform compatibility.
+

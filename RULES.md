@@ -1,9 +1,19 @@
 # Discography Torrent Project - Rules
 
-Last updated: 2026-10-19
+Last updated: 2026-10-20
 
 This file is the project-specific rulebook for the Discography Builder and Duplicate / Edition Analyzer.
 The account-wide `SOFTWARE_RULES.md` baseline always applies. This file may add stricter project-specific requirements but must never weaken or override a newer global rule or a newer explicit user instruction. When project rules conflict with the global baseline, the stricter/newer requirement wins.
+
+## MCC v0.5.43 - Acoustic verification and version preservation (2026-10-20)
+
+- Chromaprint remains the discovery backbone. Titles and descriptors cannot veto acoustic candidates. Whole-track fingerprint similarity is not sufficient for non-carbon identity: use local fingerprint consistency, then independent read-only decoded stereo windows for uncertain candidates. Failed or unavailable confirmation means separate groups, with the exact reason in the comparison log. No new manual review or UI controls.
+- Preserve direct negative acoustic evidence through clustering. Rejected A/C cannot join through A/B and B/C. Decode confirmation must include short final fragments and verify unmatched intros/outros are silence; an exact fingerprint fast path must satisfy the same minimum-evidence rules as ordinary comparison.
+- A default title-derived Live/Remix exclusion may not make a verified copy unavailable when the exact same acoustic recording has an allowed edition. Reconcile only after acoustic grouping. Explicit saved category exclusions, pattern Skip, Explicit>Clean, and recording-wide Ignore remain effective; update the base exclusion state so Re-Analyze cannot undo the reconciliation.
+- Every distinct acoustic group is a separate wanted coverage obligation. The October 15 preservation rule supersedes the October 12 edit-substitution behavior: disable automatic different-length coverage substitution, clear stale coverage aliases, and retain enough whole releases for all wanted versions.
+- Count co-primary artists before deciding Compilation. Corroborate joint-act credits using actual track primary credit plus release credit, never ALBUMARTIST alone. Resolve known identity aliases separately from joint guests; an explicit feat./ft. role remains secondary. Preserve the strict >50% foreign-primary threshold and the ordinary various-performer safeguards.
+- Log final per-track acoustic/coverage IDs and exclusions after saved Ignore is applied. Include all scanned releases, including blocked/dominated/forced ones, with dominance evidence and selection flags. Verify wanted coverage against the eligible set before dominance pruning.
+- Retain **0.5.43 - Under construction ⚠️** until the user verifies a fresh real Windows scan and safe file operations. Linux functional tests and generated audio do not certify the user's actual recordings. No automated visual QA or Actions workflow changes.
 
 ## MCC visual-review workflow override - user instruction, 2026-10-20
 
@@ -1455,3 +1465,4 @@ This section is HISTORICAL. Its per-recording hard source-floor requirement is s
 - The new positive-identity principle remains: matching or close duration alone NEVER proves that two recordings are duplicates. Acoustic matching still decides identity within the seven-second tolerance. A separate recording with incompatible audio may remain distinct even with identical length.
 - Keep the UI free of amber duration-difference badges when all normal alternative versions have duration differences <=7 seconds. Do not alter Remix/Live exclusion behavior or overwrite other project requirements.
 - Tests must explicitly distinguish 7.0s (allowed) from 7.01s (Version), plus 0.6s, 4.23s, 17.52s, identical fingerprints, transitive groups, missing duration and manual review.
+
