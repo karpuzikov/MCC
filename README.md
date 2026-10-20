@@ -4,20 +4,9 @@
 
 Music Collection Cleaner compares existing music releases with new ones, finds the best combination of editions, and helps preserve every wanted unique recording while removing unnecessary redundancy.
 
-## Mandatory Visual QA Gate (developer tests)
+## UI review
 
-Automated UI regression runner: [tests/visual_qa.py](tests/visual_qa.py). It uses the current MCC Release Map HTML/CSS/JS with synthetic Noisia, saved categories, long track titles and a mocked desktop bridge; it never reads or changes music.
-
-On Windows (Edge installed):
-
-```powershell
-py -m pip install playwright
-py tests\visual_qa.py --browser edge
-```
-
-On other platforms, install Playwright Chromium or use `--browser system` for an installed Chromium. The runner produces screenshots and `report.json` in isolated `Documents/Karpuzikov Tools/Music Collection Cleaner/testing/visual-qa-<timestamp>/`. It verifies geometry, hover, keyboard focus, full-path selection, duplicated controls, escape and album-group disclosure at minimum/normal/large viewport plus 125% CSS zoom.
-
-**Release blocking:** Passing this browser-only QA is necessary but NOT sufficient. A reviewer must inspect and compare generated screenshots and perform actual Windows WebView2 interaction/visual acceptance on representative release scans. Required `py_compile`, `--ui-self-test`, actual GUI and Copy/Move/Undo acceptance remain independently required. Never claim UI changes fixed or stable while any native test is NOT RUN. No GitHub Actions workflow was changed.
+For MCC, the user supplies Windows WebView2 screenshots for visual review when ready. Do not ask the user to run Playwright or `tests/visual_qa.py`; no automated visual QA commands are part of the current testing workflow. Functional and acoustic regression checks remain required. Earlier visual-runner notes below are historical, not current instructions.
 
 ## Download and run
 
