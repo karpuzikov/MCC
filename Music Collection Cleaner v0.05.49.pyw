@@ -16925,6 +16925,55 @@ def _candidate_router_regression_self_test() -> None:
             or shared >= max(12, FP_CANDIDATE_WEAK_SHARED_TOKENS // 2)
         ):
             raise RuntimeError("Candidate router would discard a viable route.")
+    # Watch the Throne (Deluxe Edition) / (Deluxe): the album slot is
+    # the same even when the track title is censored, and the raw 180-second
+    # difference cannot suppress an independent acoustic comparison.
+    throne_full = Track(
+        -54001, Path("13 Illest Motherfucker Alive.m4a"), 13,
+        title="Illest Motherfucker Alive", album="Watch the Throne (Deluxe Edition)",
+        duration=503.32,
+    )
+    throne_masked = Track(
+        -54002, Path("13 Illest Motherf_____ Alive.flac"), 13,
+        title="Illest Motherf***** Alive", album="Watch The Throne (Deluxe)",
+        duration=323.260635,
+    )
+    if (_album_track_slot_route_key(throne_full)
+            != _album_track_slot_route_key(throne_masked)
+            or not masked_title_compatible(
+                throne_full.display_title, throne_masked.display_title)):
+        raise RuntimeError("Watch the Throne masked title / Deluxe alias not routed.")
+    if not _duration_version_conflict(throne_full.duration, throne_masked.duration):
+        raise RuntimeError("Raw long-silence duration was silently discarded.")
+
+    # A guessed low-rate silent prefix is never authority to merge recordings.
+    # The production path must require native-rate padding proof AND a full
+    # independent decoded-audio comparison before changing identity duration.
+    with tempfile.TemporaryDirectory(prefix="mcc-pad-regression-") as temp:
+        long_path = Path(temp) / "long.pcm"
+        short_path = Path(temp) / "short.pcm"
+        active_pcm = b"\\x40\\x00\\x40\\x00" * 8000
+        long_path.write_bytes(b"\\x00\\x00\\x00\\x00" * (10 * 8000) + active_pcm)
+        short_path.write_bytes(active_pcm)
+
+        class StubPaddingVerifier(_PCMIdentityVerifier):
+            def _decode(self, track, pinned):
+                return track.path
+
+        padded = Track(-54003, long_path, 1, title="Song", duration=11.0,
+                       fingerprint=tuple([0x12345678] * 88))
+        unpadded = Track(-54004, short_path, 1, title="Song", duration=1.0,
+                         fingerprint=tuple([0x12345678] * 8))
+        with StubPaddingVerifier() as verifier:
+            estimate = verifier.decoded_leading_silence_guess(padded, unpadded)
+            if (not estimate
+                    or abs(estimate["estimated_leading_silence_seconds"][0] - 10.0) > .001
+                    or estimate["shift_frames"] != 80):
+                raise RuntimeError("Long leading digital silence was not located.")
+            long_path.write_bytes(active_pcm * 11)
+            if verifier.decoded_leading_silence_guess(padded, unpadded) is not None:
+                raise RuntimeError("An audible intro was incorrectly treated as padding.")
+
     # Any pair visited in the duration stage falls inside the same 45-sec
     # gate already imposed in the far-rare route; the former per-pair
     # considered_pairs set therefore was strictly redundant.
