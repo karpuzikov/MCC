@@ -1,5 +1,11 @@
 # Music Collection Cleaner - Continuity Handoff
 
+## MCC test workflow correction - 2026-10-20 (supersedes older visual QA instructions)
+
+**User explicitly directed:** "FORGET ABOUT VISUAL QA! I'VE SAID THAT I WILL SEND YOU SCREENSHOTS!" Do not request or require Playwright, `tests/visual_qa.py`, automated browser screenshots, reports or geometry checks, and never include visual QA commands in instructions to the user. User will supply native Windows WebView2 screenshots when they choose; inspect/compare them after receipt, not before. Prior recorded automation requirements remain historical only and must not be repeated as current MCC next actions. Persisted in `RULES.md` under `MCC visual-review workflow override`. No app source/version change associated with this instruction.
+
+**Current verification plan:** Focus on `py_compile`, `--ui-self-test` (functional and acoustic tests), real v0.5.42 Pinocchio JSONL comparison with both fingerprints, and safe disposable Copy/Move/Undo tests. UI screenshot assessment is pending user-provided screenshots, not an automation gate or a requested command. Software status remains `v0.5.42 - Under construction ⚠️` because required functional/acoustic and filesystem checks are unfinished. Do not modify GitHub Actions.
+
 ## Current checkpoint - 2026-10-20, MCC v0.5.42 - Under construction ⚠️
 
 ### Acoustic-first identification correction (P0; SOURCE COMMITTED, NATIVE UNVERIFIED)
