@@ -5,6 +5,15 @@ Last updated: 2026-10-20
 This file is the project-specific rulebook for the Discography Builder and Duplicate / Edition Analyzer.
 The account-wide `SOFTWARE_RULES.md` baseline always applies. This file may add stricter project-specific requirements but must never weaken or override a newer global rule or a newer explicit user instruction. When project rules conflict with the global baseline, the stricter/newer requirement wins.
 
+## MCC v0.5.55 - Positive-only PCM mastering confirmation (2026-10-21)
+
+- User's v0.5.54 JSONL reports a rejected 2007 Graduation JP ALAC `Stronger` track 68 versus standalone single FLAC track 384. The pair was ROUTED and compared: score 6.279023, good .900320, excellent .417534, median 6, p90 10, overlap 1, acoustic coverage .998401, duration gap .426666 seconds. Acoustic groups 67 and 292 both selected. Another Graduation FLAC track 372 matches the JP album at score .763316; the Stronger FLAC from the Essential 5 EP matches the single at score 0.
+- **False positive control:** Touch The Sky vocal 330 / Instrumental 367 scores 6.287454, good .920593, excellent .429328, p90 10, coverage .99736. Do not merely raise fingerprint thresholds to absorb the Stronger pair; matching backing music can be misleading.
+- Add *only positive independent PCM proof* for borderline full-length fingerprints (score <=6.5, good >=.895, excellent >=.40, median <=6, p90 <=11, >=.995 overlap and whole-recording coverage, >=120 frames, and effective duration difference <=8s). Require actual decoded stereo waveform correlation across the full aligned track, not tags/names. The 8 kHz decoder and alignment are read-only; the matching thresholds require p10 >=.95, median >=.975 and >=95% of sampled windows >=.95. Any error or inadequate proof remains rejected.
+- Never veto prior strict/mastering/high-overlap fingerprint identities with this confirmation. Never hardcode Stronger, SLIDE, Touch the Sky, UPC/barcode, artist name or title; the listed track IDs/metrics are test evidence only. Distinct instrumentals and different performances must remain distinct.
+- Log PCM attempt/outcome and avoid reporting a rejected strict profile as a final rejection when independent PCM proves identity. Preserve worker/serial results, grouping, optimization, Ignore and Copy/Move/Undo.
+- Backend-only v0.5.55 is **Under construction ⚠️** until original audio, full self-test, native Windows Analyze, retained-release results and regression controls execute; screenshots alone cannot verify waveform correlation. Leave v0.5.54 and earlier intact.
+
 ## MCC v0.5.54 - Full-length mastering variants (2026-10-21)
 
 - New user requirement: detect recordings with the same arrangement/audio but different mastering, including standalone SLIDE FLAC versus album SLIDE ALAC, and treat confirmed copies as one recording group and duplicates across releases.
