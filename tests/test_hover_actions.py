@@ -7,10 +7,13 @@ from pathlib import Path
 import shutil
 import subprocess
 import unittest
+from unittest.mock import patch
+
+from test_audio_safety import mcc
 
 
 ROOT = Path(__file__).resolve().parents[1]
-SOURCE = Path(os.environ.get('MCC_TEST_SOURCE', str(ROOT / 'Music Collection Cleaner v0.05.45.pyw')))
+SOURCE = Path(os.environ.get('MCC_TEST_SOURCE', str(ROOT / 'Music Collection Cleaner v0.05.46.pyw')))
 NODE = shutil.which('node')
 
 
@@ -50,6 +53,62 @@ class HoverActions(unittest.TestCase):
         result = subprocess.run([NODE, '-e', script], input=json.dumps(data),
                                 capture_output=True, text=True, check=True)
         return json.loads(result.stdout)
+
+    def test_highlight_status_explains_retention_not_title_based_duplicates(self):
+        html=map_html()
+        code=html[html.index('function exclusionStatus('):html.index('function closeDetails(')]
+        cases=[
+            ({'unique':True,'audioMatchEditions':0,'unverifiedEditions':1},'Needed recording'),
+            ({'unique':True,'audioMatchEditions':2,'unverifiedEditions':1},'Needed recording'),
+            ({'unique':True,'audioMatchEditions':0,'unverifiedEditions':0},'Needed recording'),
+            ({'unique':False,'coveredBy':['Retained Deluxe']},'Also on: Retained Deluxe'),
+            ({'unique':True,'coveredBy':['Retained Deluxe']},'Also on: Retained Deluxe'),
+            ({'unique':False,'excluded':True,'isLive':True},'Excluded: Live'),
+            ({'unique':True,'excluded':True,'isLive':True},'Excluded: Live'),
+            ({'unique':True,'manualSkip':True,'groupId':5},'Ignored recording everywhere'),
+        ]
+        statuses=self.run_js(r'''
+const input=JSON.parse(require('fs').readFileSync(0,'utf8'));
+const status=new Function(input.code+'\nreturn trackStatus;')();
+process.stdout.write(JSON.stringify(input.tracks.map(t=>status(t,{kind:'retained'}))));
+''',{'code':code,'tracks':[track for track,_ in cases]})
+        for (track,expected),actual in zip(cases,statuses):
+            with self.subTest(track=track):
+                self.assertEqual(actual,expected)
+
+    def test_highlights_follow_retention_coverage_not_similar_titles(self):
+        a=[mcc.Track(1,Path('A/common.flac'),1,title='Common',artist='Artist',duration=120,group_id=0),
+           mcc.Track(1,Path('A/needed.flac'),2,title='Needed',artist='Artist',duration=120,group_id=1)]
+        b=[mcc.Track(2,Path('B/common.flac'),1,title='Common',artist='Artist',duration=120,group_id=0),
+           mcc.Track(2,Path('B/needed.flac'),2,title='Needed',artist='Artist',duration=120,group_id=2)]
+        releases=[mcc.Release(1,'existing',Path('Album A'),'Album A',tracks=a),
+                  mcc.Release(2,'recycle',Path('Album B'),'Album B',tracks=b)]
+        snapshots=mcc.build_decision_snapshot(releases,a+b,{1,2},
+            [mcc.ReleaseDecision(1,'KEEP','needed'),mcc.ReleaseDecision(2,'ADD','needed')])
+        with patch.object(mcc,'_load_pattern_categories',return_value={}), \
+             patch.object(mcc,'_load_app_settings',return_value={}), \
+             patch.object(mcc,'_assign_release_map_display_groups'):
+            state=mcc._release_map_state_for_ui(snapshots,None,set(),set(),set(),True,False,False,False)
+        for node in state['nodes']:
+            self.assertEqual(node['uniqueCount'],1)
+            self.assertFalse(node['tracks'][0]['unique'])
+            self.assertTrue(node['tracks'][0]['coveredBy'])
+            # Same title/length, distinct acoustic groups: it still justifies
+            # retaining this release until an audio match is established.
+            self.assertTrue(node['tracks'][1]['unique'])
+            self.assertEqual(node['tracks'][1]['unverifiedEditions'],1)
+
+        # Cached snapshot annotations cannot highlight excluded/covered rows.
+        for snapshot in snapshots:
+            for row in snapshot['tracklist']:
+                row['unique_to_release']=True
+            snapshot['tracklist'][1]['excluded']=True
+        with patch.object(mcc,'_load_pattern_categories',return_value={}), \
+             patch.object(mcc,'_load_app_settings',return_value={}), \
+             patch.object(mcc,'_assign_release_map_display_groups'):
+            state=mcc._release_map_state_for_ui(snapshots,None,set(),set(),set(),True,False,False,False)
+        self.assertTrue(all(node['uniqueCount']==0 for node in state['nodes']))
+        self.assertFalse(any(t['unique'] for node in state['nodes'] for t in node['tracks']))
 
     def test_one_ignore_action_preserves_saved_categories_and_restore(self):
         html = map_html()

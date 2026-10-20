@@ -5,6 +5,13 @@ Last updated: 2026-10-20
 This file is the project-specific rulebook for the Discography Builder and Duplicate / Edition Analyzer.
 The account-wide `SOFTWARE_RULES.md` baseline always applies. This file may add stricter project-specific requirements but must never weaken or override a newer global rule or a newer explicit user instruction. When project rules conflict with the global baseline, the stricter/newer requirement wins.
 
+## MCC v0.5.46 - Retention track highlights (2026-10-20)
+
+- Latest user definition: highlight tracks that justify retaining the selected release. Keep a single meaning for the track highlight, essential count and status: included wanted recording coverage supplied only by this release within the retained plan. Excluded, recording-Ignored and other-retained-covered tracks are not highlighted, even if a cached annotation is stale.
+- Highlighted row status says Needed recording. Do not replace its retention reason with Also listed on ... or Same audio on ... counts across all scanned releases. Those older v0.5.28 status instructions below are superseded. Similar-title/duration listings do not prove duplicate audio; preserve related groups in the existing Versions details without changing matching or optimizer coverage.
+- An acoustically distinct required version remains highlighted even if its title/length resembles another edition. A verified copy on another retained release is not highlighted. Copies in discarded releases do not supply the current retained plan. Preserve the separate Gem meaning and accessibility/Ignore/manual-removal behavior.
+- Keep this UI correction narrow: no new controls, menus, dependencies, audio writes, global mirrored rule changes or Actions changes. v0.5.46 remains Under construction pending native Windows acceptance.
+
 ## MCC v0.5.45 - Equivalent album recordings and Ignore (2026-10-20)
 
 - User authorized fixing all five reported album-selection issues and duplicate hover actions while AFK. Preserve complete-release CD preference, all wanted acoustic recordings, saved Ignore and source-file safety. No title/album whitelist may force a duplicate decision.

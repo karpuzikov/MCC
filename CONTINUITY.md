@@ -1,6 +1,20 @@
 # Music Collection Cleaner - Continuity Handoff
 
-## Current checkpoint - 2026-10-20, MCC v0.5.45 - Under construction ⚠️
+## Current checkpoint - 2026-10-20, MCC v0.5.46 - Under construction ⚠️
+
+**Canonical source:** `Music Collection Cleaner v0.05.46.pyw` on `karpuzikov/MCC/main`; v0.5.45 and all older sources remain. Preserve the single-file dark WebView2 app, source media, Copy/Move/Undo, saved exclusions and the no-automated-visual-QA override. No global mirrored rules or Actions workflows changed.
+
+**User report:** screenshot `image(20261020-065718).png` from actual Windows v0.5.45 shows BULLY `[656465138828]` with all 18 tracks highlighted while many statuses say Also listed on N editions (audio unverified). User defines highlight as tracks that justify retention and identifies the apparent contradiction.
+
+**Root cause:** `build_decision_snapshot` already computes `unique_to_release` from this release's eligible groups minus the other selected releases' groups. The UI then replaced that retention reason with full-scan title/artist/length metadata edition counts. Those counts include unverified/rejected different audio groups and do not establish acoustic identity. In the previously supplied v0.5.44 log, all 18 BULLY644..661 versus Deluxe663..680 pairings were REJECTs, so the app considered all 18 recording groups needed; this is previous-log evidence, not fresh v0.5.45 audio verification. Example KING644/663 mean5.395604/local8.025; THIS A MUST645/664 mean4.528719/local5.4; LAST BREATH660/679 differs8.746599s. Do not force-merge or declare equivalence from screenshot/title metadata.
+
+**Fix:** highlighted rows now say Needed recording. Other-retained covered rows say Also on with their actual carrier; exclusion/Ignore status takes precedence. UI serialization independently prevents highlights and essential-count contributions from excluded, ignored, manually removed or other-retained-covered cached rows. The same flag still drives row highlight, essential count and Changes retention reasons. Alternative groups remain inspectable in the existing Versions details. Acoustic thresholds/identity groups, optimizer and source data are unchanged.
+
+**Validation:** both new regressions were observed failing before the fix. All 65 functional tests, full `--ui-self-test`, Python compilation, both embedded-JavaScript syntax checks and diff whitespace checks pass on Linux. Snapshot-to-UI regression covers a verified shared group (unhighlighted), genuinely distinct same-title groups (highlighted), and stale cached coverage/exclusion flags (unhighlighted/count zero). Functional JavaScript checks cover retention reason, other-retained copies, exclusions and recording Ignore. Independent review approved the source/test diff with no actionable findings and independently passed all 65 tests, the focused hover/status suite and the full self-test.
+
+**Exact next action:** run v0.5.46 and inspect Release Map. This is a display correction; it does not retroactively change BULLY's audio groups. If actual equivalence remains disputed, audit a new v0.5.45/v0.5.46 JSONL and the relevant source audio/fingerprints before changing matching policy. Native Windows v0.5.46 screenshot acceptance and real audio classification remain unverified. Keep Under construction until user acceptance; no automated visual QA requests.
+
+## Prior checkpoint - 2026-10-20, MCC v0.5.45 - Under construction ⚠️
 
 **Canonical source:** `Music Collection Cleaner v0.05.45.pyw` on `karpuzikov/MCC/main`; historical versions remain. User authorized all fixes while AFK. This checkpoint supersedes the earlier active-version and next-action instructions below. No global mirrored rule files or Actions workflows changed; no automated visual QA.
 

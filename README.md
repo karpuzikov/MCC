@@ -1,6 +1,6 @@
 # Music Collection Cleaner (MCC)
 
-**Version: 0.5.45 - Under construction ⚠️**
+**Version: 0.5.46 - Under construction ⚠️**
 
 Music Collection Cleaner compares existing music releases with new ones, finds the best combination of editions, and helps preserve every wanted unique recording while removing unnecessary redundancy.
 
@@ -10,11 +10,11 @@ For MCC, the user supplies Windows WebView2 screenshots for visual review when r
 
 ## Download and run
 
-**[Music Collection Cleaner v0.05.45.pyw](Music%20Collection%20Cleaner%20v0.05.45.pyw)** - latest single-file Windows Python application. **Under construction ⚠️** until actual Windows WebView2 testing. Earlier source versions remain available.
+**[Music Collection Cleaner v0.05.46.pyw](Music%20Collection%20Cleaner%20v0.05.46.pyw)** - latest single-file Windows Python application. **Under construction ⚠️** until actual Windows WebView2 testing. Earlier source versions remain available.
 
-Open with Python 3 on Windows 11 (or run from a console with `python "Music Collection Cleaner v0.05.45.pyw"`). The application checks or installs supported dependencies. The GUI uses Microsoft Edge WebView2 through pywebview; it is not a terminal-based replacement.
+Open with Python 3 on Windows 11 (or run from a console with `python "Music Collection Cleaner v0.05.46.pyw"`). The application checks or installs supported dependencies. The GUI uses Microsoft Edge WebView2 through pywebview; it is not a terminal-based replacement.
 
-Source-level regression checks: `python "Music Collection Cleaner v0.05.45.pyw" --ui-self-test`. `--self-test` additionally requires a packaged standalone EXE.
+Source-level regression checks: `python "Music Collection Cleaner v0.05.46.pyw" --ui-self-test`. `--self-test` additionally requires a packaged standalone EXE.
 
 ## What it does
 
@@ -28,6 +28,13 @@ Source-level regression checks: `python "Music Collection Cleaner v0.05.45.pyw" 
 - Explicitly **Copy OLD + NEW** or **Move OLD + NEW** retained releases into the selected destination; Undo for supported completed moves.
 - Log comparisons, validate incomplete/corrupt inputs, choose I/O worker counts with drive awareness, and manage spawned subprocesses.
 
+
+## v0.5.46 - Track highlights explain retention (Under construction ⚠️)
+
+- Highlight only included recordings needed from this retained release. Verified copies covered by another retained release, exclusions and saved Ignore cannot contribute a highlight or essential count, including stale cached annotations.
+- Highlighted rows say **Needed recording**. The old **Also listed on ... (audio unverified)** status came from title/performer/length metadata, not an acoustic duplicate match, and obscured the reason for retention. Related recording groups remain in the existing Versions details.
+- Preserve acoustic matching, optimizer selection, source media and controls. Same-title recordings in different audio groups remain required until matching evidence establishes a duplicate. This UI correction does not certify BULLY's standard/Deluxe recordings as identical.
+- All 65 functional tests, compilation, both embedded JavaScript syntax checks and the complete `--ui-self-test` pass on Linux. Actual v0.5.46 Windows visual acceptance remains pending user screenshots; no automated visual QA or Actions changes.
 
 ## v0.5.45 - Equivalent album recordings and one Ignore action (Under construction ⚠️)
 
