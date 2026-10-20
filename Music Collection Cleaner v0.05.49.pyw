@@ -4670,12 +4670,10 @@ class _PCMIdentityVerifier:
                         if len(samples) % 2:
                             return None
                         frames = len(samples) // 2
-                        # Only a boundary long enough to explain the duration
-                        # difference matters; avoid scanning an entire recording.
-                        scan_limit = min(frames, int(
-                            (difference + DURATION_VERSION_MAX_SAME_SECONDS)
-                            * self.rate,
-                        ))
+                        # Both releases may have substantial leading silence.
+                        # Scan up to the first audible frame, never a duration-
+                        # based cutoff that could conceal a shared padded start.
+                        scan_limit = frames
                         leading = 0
                         while (leading < scan_limit
                                and abs(samples[2 * leading]) <= 4
