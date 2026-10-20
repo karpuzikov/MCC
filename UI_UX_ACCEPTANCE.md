@@ -1,3 +1,9 @@
+## MCC visual review - user-provided screenshots only (2026-10-20)
+
+The user's latest explicit directive supersedes earlier MCC Playwright/automated visual QA instructions: **do not request, schedule, or require `tests/visual_qa.py`, Playwright, automated screenshot/geometry reports, or associated commands.** The user will send actual Windows WebView2 screenshots when ready. Review those manually upon receipt. Retain earlier runner results as historical evidence only; automation is not a current requirement or user action. Functional `py_compile`, `--ui-self-test`, actual acoustic regression evidence, and disposable file-operation safety checks remain required. Pending native screenshots are not a reason to repeat a screenshot request. No UI code changes at this checkpoint.
+
+---
+
 ## MCC v0.5.42 - Acoustic-first comparison / unchanged UI (2026-10-20)
 
 **Scope:** No new visible UI controls, styles or layout changes. The existing Main / Personal Picks / Classify / Release Map control contract from v0.5.41 remains in force. Acoustic grouping can now link tracks despite contradictory metadata, including policy-excluded Live/Remix copies. Renderer must present correct acoustic relationship/status while preserving their excluded retention state and existing accessibility.
