@@ -5,6 +5,15 @@ Last updated: 2026-10-20
 This file is the project-specific rulebook for the Discography Builder and Duplicate / Edition Analyzer.
 The account-wide `SOFTWARE_RULES.md` baseline always applies. This file may add stricter project-specific requirements but must never weaken or override a newer global rule or a newer explicit user instruction. When project rules conflict with the global baseline, the stricter/newer requirement wins.
 
+## MCC v0.5.54 - Full-length mastering variants (2026-10-21)
+
+- New user requirement: detect recordings with the same arrangement/audio but different mastering, including standalone SLIDE FLAC versus album SLIDE ALAC, and treat confirmed copies as one recording group and duplicates across releases.
+- v0.5.53 comparison JSONL from 2026-10-21 identifies album ALAC 275 and standalone FLAC 622: fingerprint score 5.819162; good 0.939721; excellent 0.496827; overlap 1.0; full aligned coverage 0.998733; duration difference 0.282630 seconds; median 6; p90 10; both rejected by the 4.02 mastering score cap. Album ALAC 275 and VULTURES 2 FLAC 623 match exactly. No original audio was decoded in this checkpoint.
+- Preserve the historical strict/mastering limits of 4.02; use a separate, narrow *audio-only* high-overlap mastering profile. Require score <=6, good >=0.93, excellent >=0.49, median <=6, p90 <=10, fingerprint overlap >=0.995, whole-recording aligned coverage >=0.995, at least 120 fingerprint items, and original <=8-second effective-duration difference. Metadata never creates a match; no SLIDE/barcode special cases.
+- Do not confuse fingerprint overlap relative to the shorter file with whole-recording coverage relative to the longer file. Preserve distinct edits/versions, existing identity authority, duration conflict, deterministic grouping, Ignore/Restore, retention optimization and all source media.
+- Add regression on measured SLIDE statistics and an independent deterministic synthetic waveform-fingerprint distribution, both comparison directions, serial/worker agreement, negative threshold guards and 8-second boundary. Baseline strict/mastering decisions must remain intact.
+- Keep v0.5.54 **Under construction ⚠️**: full Python/UI self-tests and genuine audio comparison, Windows WebView2 and release retention need actual execution. Do not claim the user's two original audio files were decoded or that the new matching behavior has been observed in a fresh collection Analyze. No Actions or UI modifications.
+
 ## MCC v0.5.53 - Dock release details beside the list (2026-10-20)
 
 - Latest explicit user request: the side panel must squeeze/reflow the release list rather than slide over and cover it. This supersedes the older v0.5.29 overlay/stable-board-width requirement and its side-switching drawer behavior.
