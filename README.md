@@ -1,6 +1,6 @@
 # Music Collection Cleaner (MCC)
 
-**Version: 0.5.53 - Under construction ⚠️**
+**Version: 0.5.54 - Under construction ⚠️**
 
 Music Collection Cleaner compares existing music releases with new ones, finds the best combination of editions, and helps preserve every wanted unique recording while removing unnecessary redundancy.
 
@@ -10,11 +10,11 @@ For MCC, the user supplies Windows WebView2 screenshots for visual review when r
 
 ## Download and run
 
-**[Music Collection Cleaner v0.05.53.pyw](Music%20Collection%20Cleaner%20v0.05.53.pyw)** - latest single-file Windows Python application. **Under construction ⚠️** until actual Windows WebView2 testing. Earlier source versions remain available.
+**[Music Collection Cleaner v0.05.54.pyw](Music%20Collection%20Cleaner%20v0.05.54.pyw)** - latest single-file Windows Python application. **Under construction ⚠️** until actual Windows WebView2 testing. Earlier source versions remain available.
 
-Open with Python 3 on Windows 11 (or run from a console with `python "Music Collection Cleaner v0.05.53.pyw"`). The application checks or installs supported dependencies. The GUI uses Microsoft Edge WebView2 through pywebview; it is not a terminal-based replacement.
+Open with Python 3 on Windows 11 (or run from a console with `python "Music Collection Cleaner v0.05.54.pyw"`). The application checks or installs supported dependencies. The GUI uses Microsoft Edge WebView2 through pywebview; it is not a terminal-based replacement.
 
-Source-level regression checks: `python "Music Collection Cleaner v0.05.53.pyw" --ui-self-test`. `--self-test` additionally requires a packaged standalone EXE.
+Source-level regression checks: `python "Music Collection Cleaner v0.05.54.pyw" --ui-self-test`. `--self-test` additionally requires a packaged standalone EXE.
 
 ## What it does
 
@@ -28,6 +28,13 @@ Source-level regression checks: `python "Music Collection Cleaner v0.05.53.pyw" 
 - Explicitly **Copy OLD + NEW** or **Move OLD + NEW** retained releases into the selected destination; Undo for supported completed moves.
 - Log comparisons, validate incomplete/corrupt inputs, choose I/O worker counts with drive awareness, and manage spawned subprocesses.
 
+
+## v0.5.54 - Full-overlap alternate mastering detection (Under construction ⚠️)
+
+- Added a third Chromaprint profile for near-complete aligned recordings that differ significantly in mastering; the original 4.02-bit strict/mastering limits remain unchanged.
+- Requires mean distance <=6.0, >=93% good items, >=49% excellent items, median <=6, p90 <=10, >=99.5% alignment overlap, >=99.5% **whole-recording coverage**, and >=120 fingerprint frames. Requires the original <=8-second effective-duration rule. Title, barcode, artist and release metadata cannot create a positive acoustic match.
+- The user-supplied 2026-10-21 v0.5.53 comparison log records SLIDE indices 275 and 622 as REJECT with score 5.819162, good fraction 0.939721, excellent 0.496827 and whole-recording coverage 0.998733. Under the new profile, these recorded statistics qualify. An in-source synthetic regression exercises comparison both directions and serial/worker paths.
+- **Verification:** JSONL metrics replayed externally; Python compilation/full self-tests, original audio decoding, re-scan, Release Map/grouping/optimizer, Windows WebView2 and Copy/Move/Undo NOT RUN. Not stable; a fresh Analyze on v0.5.54 is required to verify real collection outcomes. Original v0.5.53 retained.
 
 ## v0.5.53 - Details beside the release list (Under construction ⚠️)
 
