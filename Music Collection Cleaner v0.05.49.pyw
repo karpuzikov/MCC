@@ -16952,8 +16952,8 @@ def _candidate_router_regression_self_test() -> None:
     with tempfile.TemporaryDirectory(prefix="mcc-pad-regression-") as temp:
         long_path = Path(temp) / "long.pcm"
         short_path = Path(temp) / "short.pcm"
-        active_pcm = b"\\x40\\x00\\x40\\x00" * 8000
-        long_path.write_bytes(b"\\x00\\x00\\x00\\x00" * (10 * 8000) + active_pcm)
+        active_pcm = bytes((64, 0, 64, 0)) * 8000
+        long_path.write_bytes(bytes((0, 0, 0, 0)) * (10 * 8000) + active_pcm)
         short_path.write_bytes(active_pcm)
 
         class StubPaddingVerifier(_PCMIdentityVerifier):
