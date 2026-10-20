@@ -1,6 +1,24 @@
 # Music Collection Cleaner - Continuity Handoff
 
-## Current checkpoint - 2026-10-20, MCC v0.5.46 - Under construction ⚠️
+## Current checkpoint - 2026-10-20, MCC v0.5.47 - Under construction ⚠️
+
+**Canonical source:** `Music Collection Cleaner v0.05.47.pyw` on `karpuzikov/MCC/main`; historical sources remain. Preserve the single-file compact dark WebView2 application, source audio, Copy/Move/Undo and saved exclusions. No global mirrored rules, dependencies or Actions workflows changed; no automated visual QA.
+
+**Latest correction:** user rejected v0.5.46's Needed recording label and retained highlighting on common BULLY/Deluxe songs. The prior fix addressed wording while retaining the wrong visual meaning. User explicitly wants shared songs unhighlighted and useful copy/version status restored. This supersedes v0.5.46's interpretation; do not reintroduce acoustic-essential highlighting or the generic label.
+
+**New actual evidence:** screenshots `image(20261020-071921).png` and `image(20261020-071926).png`; v0.5.46 log `Music Collection Cleaner Comparison 2026-10-20-10-10-41.jsonl`, SHA256 `c2a6a49e5922e17fb8abf8ac50ad9ad4a48545f4a3731800303db7e20e0da8a3`: 3,971 rows, 684 tracks, 104 releases, 64 retained releases/448 physical tracks/444 included tracks, 400 wanted acoustic groups all covered. BULLY100 has 18 tracks and Deluxe102 has 20; the shared 18 remain separate acoustic groups and were all yellow under the incorrect UI rule.
+
+**Implementation:** `_release_map_song_key` is a UI-only key using base title, primary artist with known aliases and separate normal/remix/live families (special families retain named titles). A full-scan song-carrier index and actual equal-group carrier index prevent yellow when the song or audio is present on any other release, including a discarded/excluded one. No duration restriction on this display relationship. Keep inclusion/manual-Ignore/current-coverage guards. The same corrected flag drives row CSS, the unique count and Changes preview; Gem also requires this uniqueness. Restore Same audio / Also listed (audio unverified) status text; equal group IDs alone support Same audio. No change to acoustic groups, selection, coverage or source files.
+
+**Concrete replay:** using all 684 logged tracks, BULLY100 has zero highlighted tracks; Deluxe102 highlights only OK(feat.DonToliver). All 18 shared songs are unhighlighted in both. Mission Control is also on discarded single103, so it is unhighlighted on Deluxe. A path-free 39-row fixture copied from the actual scan is saved at `tests/fixtures/bully_song_presence.json`; tests run the actual HTML row producer and assert 0/1 amber unique CSS classes plus restored useful text. Do not merely rename a status or change a counter while leaving row CSS unchanged.
+
+**Earlier fixes now verified in the user's real log:** all five targeted WEB album IDs37/39/45/47/53 are unselected; CD0/2/5/6/9 remain. Gone47/346 MATCH after native 44.1 kHz boundary-silence proof removes 29.306625 s padding; effective duration difference 0.000042 s. BigBrother78/382 MATCH after native boundary-silence proof removes 300.293375 s padding, and recording-wide Ignore applies to both (two final manual exclusions). The log has 2 padding candidates / 2 passes. These are actual logged decoder results, unlike earlier conditional metric replays. BULLY equivalence remains a separate unverified audio question; this UI correction never forces metadata-based deduplication.
+
+**Validation:** new shared-song/actual-BULLY/status tests failed against v0.5.46 before the fix. All 68 functional tests, full `--ui-self-test`, compilation, both embedded-JavaScript syntax checks and diff checks pass on Linux. Includes different audio groups/lengths, aliases, artist/family separation, discarded copies, true unique tracks, changed titles with verified equal audio, excluded unknown listings, actual row CSS, saved Ignore and false-Gem protection. Independent review passed all 68 tests and the full self-test, independently reconstructed the complete 104-release/684-track UI state, verified all 39 fixture rows and the actual row CSS, and found no actionable findings. Actual v0.5.47 native visual acceptance remains pending user screenshots.
+
+**Exact next action:** run v0.5.47 and inspect the same BULLY and Deluxe details. Shared songs must be unhighlighted and their useful status text preserved. Opening the existing decision map applies this display rule without needing a new acoustic scan; Re-Analyze/Analyze is not necessary solely for the UI correction. If actual matching/selection remains disputed, audit the relevant audio/comparison evidence independently. Retain Under construction until user acceptance; no automated visual QA requests.
+
+## Prior checkpoint - 2026-10-20, MCC v0.5.46 - Under construction ⚠️
 
 **Canonical source:** `Music Collection Cleaner v0.05.46.pyw` on `karpuzikov/MCC/main`; v0.5.45 and all older sources remain. Preserve the single-file dark WebView2 app, source media, Copy/Move/Undo, saved exclusions and the no-automated-visual-QA override. No global mirrored rules or Actions workflows changed.
 

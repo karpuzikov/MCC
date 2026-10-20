@@ -1,6 +1,6 @@
 # Music Collection Cleaner (MCC)
 
-**Version: 0.5.46 - Under construction ⚠️**
+**Version: 0.5.47 - Under construction ⚠️**
 
 Music Collection Cleaner compares existing music releases with new ones, finds the best combination of editions, and helps preserve every wanted unique recording while removing unnecessary redundancy.
 
@@ -10,11 +10,11 @@ For MCC, the user supplies Windows WebView2 screenshots for visual review when r
 
 ## Download and run
 
-**[Music Collection Cleaner v0.05.46.pyw](Music%20Collection%20Cleaner%20v0.05.46.pyw)** - latest single-file Windows Python application. **Under construction ⚠️** until actual Windows WebView2 testing. Earlier source versions remain available.
+**[Music Collection Cleaner v0.05.47.pyw](Music%20Collection%20Cleaner%20v0.05.47.pyw)** - latest single-file Windows Python application. **Under construction ⚠️** until actual Windows WebView2 testing. Earlier source versions remain available.
 
-Open with Python 3 on Windows 11 (or run from a console with `python "Music Collection Cleaner v0.05.46.pyw"`). The application checks or installs supported dependencies. The GUI uses Microsoft Edge WebView2 through pywebview; it is not a terminal-based replacement.
+Open with Python 3 on Windows 11 (or run from a console with `python "Music Collection Cleaner v0.05.47.pyw"`). The application checks or installs supported dependencies. The GUI uses Microsoft Edge WebView2 through pywebview; it is not a terminal-based replacement.
 
-Source-level regression checks: `python "Music Collection Cleaner v0.05.46.pyw" --ui-self-test`. `--self-test` additionally requires a packaged standalone EXE.
+Source-level regression checks: `python "Music Collection Cleaner v0.05.47.pyw" --ui-self-test`. `--self-test` additionally requires a packaged standalone EXE.
 
 ## What it does
 
@@ -28,6 +28,13 @@ Source-level regression checks: `python "Music Collection Cleaner v0.05.46.pyw" 
 - Explicitly **Copy OLD + NEW** or **Move OLD + NEW** retained releases into the selected destination; Undo for supported completed moves.
 - Log comparisons, validate incomplete/corrupt inputs, choose I/O worker counts with drive awareness, and manage spawned subprocesses.
 
+
+## v0.5.47 - Remove highlights from shared songs (Under construction ⚠️)
+
+- Yellow track highlighting now means the song is present only on this release in the scanned collection. Another listed version of that song prevents the highlight even if its acoustic group or duration differs. The unique count and Changes track previews use that same flag.
+- Restore **Same audio on ...** / **Also listed on ... (audio unverified)** status text. Remove the generic Needed recording label. Only verified equal audio-group IDs support Same audio; title-based song presence does not alter recording identity or optimizer coverage.
+- Replay of the new v0.5.46 log shows no highlighted tracks on BULLY and only **OK (feat. Don Toliver)** highlighted on Deluxe. Their 18 shared songs are unhighlighted; Mission Control is also on its discarded single and is unhighlighted. Tests execute the real row HTML producer and check its actual highlight CSS classes.
+- Preserve distinct audio versions, selection, saved Ignore, source media and all existing controls. Shared/unknown listings also prevent a false unique Gem badge. All 68 functional tests, full `--ui-self-test`, compilation and embedded JavaScript syntax checks pass on Linux. Native v0.5.47 Windows acceptance remains pending; no automated visual QA or Actions changes.
 
 ## v0.5.46 - Track highlights explain retention (Under construction ⚠️)
 

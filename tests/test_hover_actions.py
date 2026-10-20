@@ -13,7 +13,7 @@ from test_audio_safety import mcc
 
 
 ROOT = Path(__file__).resolve().parents[1]
-SOURCE = Path(os.environ.get('MCC_TEST_SOURCE', str(ROOT / 'Music Collection Cleaner v0.05.46.pyw')))
+SOURCE = Path(os.environ.get('MCC_TEST_SOURCE', str(ROOT / 'Music Collection Cleaner v0.05.47.pyw')))
 NODE = shutil.which('node')
 
 
@@ -54,13 +54,13 @@ class HoverActions(unittest.TestCase):
                                 capture_output=True, text=True, check=True)
         return json.loads(result.stdout)
 
-    def test_highlight_status_explains_retention_not_title_based_duplicates(self):
+    def test_copy_and_version_status_is_preserved_without_generic_needed_label(self):
         html=map_html()
         code=html[html.index('function exclusionStatus('):html.index('function closeDetails(')]
         cases=[
-            ({'unique':True,'audioMatchEditions':0,'unverifiedEditions':1},'Needed recording'),
-            ({'unique':True,'audioMatchEditions':2,'unverifiedEditions':1},'Needed recording'),
-            ({'unique':True,'audioMatchEditions':0,'unverifiedEditions':0},'Needed recording'),
+            ({'unique':False,'audioMatchEditions':0,'unverifiedEditions':1},'Also listed on 1 edition (audio unverified)'),
+            ({'unique':False,'audioMatchEditions':2,'unverifiedEditions':1},'Same audio on 2 editions; Also listed on 1 edition (audio unverified)'),
+            ({'unique':True,'audioMatchEditions':0,'unverifiedEditions':0},'Unique to this release'),
             ({'unique':False,'coveredBy':['Retained Deluxe']},'Also on: Retained Deluxe'),
             ({'unique':True,'coveredBy':['Retained Deluxe']},'Also on: Retained Deluxe'),
             ({'unique':False,'excluded':True,'isLive':True},'Excluded: Live'),
@@ -76,7 +76,7 @@ process.stdout.write(JSON.stringify(input.tracks.map(t=>status(t,{kind:'retained
             with self.subTest(track=track):
                 self.assertEqual(actual,expected)
 
-    def test_highlights_follow_retention_coverage_not_similar_titles(self):
+    def test_shared_song_is_not_highlighted_even_with_distinct_audio_groups(self):
         a=[mcc.Track(1,Path('A/common.flac'),1,title='Common',artist='Artist',duration=120,group_id=0),
            mcc.Track(1,Path('A/needed.flac'),2,title='Needed',artist='Artist',duration=120,group_id=1)]
         b=[mcc.Track(2,Path('B/common.flac'),1,title='Common',artist='Artist',duration=120,group_id=0),
@@ -90,12 +90,12 @@ process.stdout.write(JSON.stringify(input.tracks.map(t=>status(t,{kind:'retained
              patch.object(mcc,'_assign_release_map_display_groups'):
             state=mcc._release_map_state_for_ui(snapshots,None,set(),set(),set(),True,False,False,False)
         for node in state['nodes']:
-            self.assertEqual(node['uniqueCount'],1)
+            self.assertEqual(node['uniqueCount'],0)
             self.assertFalse(node['tracks'][0]['unique'])
             self.assertTrue(node['tracks'][0]['coveredBy'])
-            # Same title/length, distinct acoustic groups: it still justifies
-            # retaining this release until an audio match is established.
-            self.assertTrue(node['tracks'][1]['unique'])
+            # Song presence controls the highlight; distinct audio groups
+            # remain separate optimizer obligations and version details.
+            self.assertFalse(node['tracks'][1]['unique'])
             self.assertEqual(node['tracks'][1]['unverifiedEditions'],1)
 
         # Cached snapshot annotations cannot highlight excluded/covered rows.
@@ -109,6 +109,74 @@ process.stdout.write(JSON.stringify(input.tracks.map(t=>status(t,{kind:'retained
             state=mcc._release_map_state_for_ui(snapshots,None,set(),set(),set(),True,False,False,False)
         self.assertTrue(all(node['uniqueCount']==0 for node in state['nodes']))
         self.assertFalse(any(t['unique'] for node in state['nodes'] for t in node['tracks']))
+
+    def ui_state(self,snapshots):
+        with patch.object(mcc,'_load_pattern_categories',return_value={}), \
+             patch.object(mcc,'_load_app_settings',return_value={}), \
+             patch.object(mcc,'_assign_release_map_display_groups'):
+            return mcc._release_map_state_for_ui(snapshots,None,set(),set(),set(),True,False,False,False)
+
+    def test_actual_bully_album_rows_are_not_all_highlighted(self):
+        fixture=json.loads((ROOT/'tests/fixtures/bully_song_presence.json').read_text())
+        state=self.ui_state(fixture['snapshots'])
+        standard=next(n for n in state['nodes'] if n['id']==100)
+        deluxe=next(n for n in state['nodes'] if n['id']==102)
+        self.assertEqual([t['title'] for t in standard['tracks'] if t['unique']],[])
+        self.assertEqual([t['title'] for t in deluxe['tracks'] if t['unique']],['OK (feat. Don Toliver)'])
+        self.assertEqual(standard['uniqueCount'],0)
+        self.assertEqual(deluxe['uniqueCount'],1)
+        for index in range(18):
+            self.assertFalse(standard['tracks'][index]['unique'])
+            self.assertFalse(deluxe['tracks'][index]['unique'])
+            self.assertEqual(standard['tracks'][index]['groupId'],fixture['snapshots'][1]['tracklist'][index]['group_id'])
+        # Mission Control is also on its discarded single. Physical song
+        # presence still rules out a collection-wide uniqueness highlight.
+        self.assertFalse(deluxe['tracks'][19]['unique'])
+        html=map_html()
+        code=html[html.index('  let tracks="";',html.index('function openDetails(')):
+                  html.index('  let ignoreRelease="";',html.index('function openDetails('))]
+        status=html[html.index('function exclusionStatus('):html.index('function closeDetails(')]
+        rendered=self.run_js(r'''
+const input=JSON.parse(require('fs').readFileSync(0,'utf8'));
+const status=new Function(input.status+'\nreturn trackStatus;')();
+const render=new Function('n','state','activeTrack','esc','versionsForTrack','remixesForTrack','liveForTrack','trackStatus',input.code+'\nreturn tracks;');
+const esc=value=>String(value).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;');
+process.stdout.write(JSON.stringify(input.nodes.map(n=>render(n,{editable:false},null,esc,()=>[],()=>[],()=>[],status))));
+''',{'code':code,'status':status,'nodes':[standard,deluxe]})
+        for rows,expected in zip(rendered,[0,1]):
+            # Execute the real row HTML producer: the corrected flag must
+            # actually remove the amber CSS class, not merely change a label.
+            import re
+            classes=re.findall(r'<div class="(track[^"]*)"',rows)
+            self.assertEqual(sum('unique' in value.split() for value in classes),expected)
+            self.assertNotIn('Needed recording',rows)
+            self.assertIn('Also listed on',rows)
+
+    def test_song_presence_respects_artist_family_and_does_not_merge_audio(self):
+        def row(title,artist,gid,**extra):
+            return dict(title=title,artist=artist,group_id=gid,coverage_group_id=gid,
+                        included=True,excluded=False,unique_to_release=True,**extra)
+        snapshots=[dict(release_id=1,name='A',action='KEEP',tracklist=[
+            row('Shared','Kanye West',1),row('Alone','Kanye West',2),
+            row('Cover','Artist A',3),row('Dance (Club Remix)','Artist A',4,is_remix=True),
+            row('Alternate title','Artist A',7)]),
+            dict(release_id=2,name='B',action='SKIP',tracklist=[
+            row('Shared (feat. Guest)','Ye',5,duration_seconds=180),
+            row('Cover','Artist B',6),row('Dance','Artist A',8),
+            row('Original title','Artist A',7)])]
+        state=self.ui_state(snapshots);a=next(n for n in state['nodes'] if n['id']==1)
+        self.assertEqual([t['unique'] for t in a['tracks']],[False,True,True,True,False])
+        self.assertEqual([t['groupId'] for t in a['tracks']],[1,2,3,4,7])
+
+    def test_unverified_listing_cannot_keep_a_unique_gem_badge(self):
+        snapshots=[dict(release_id=1,name='A',action='KEEP',tracklist=[dict(
+            title='Song',artist='Artist',group_id=1,included=True,unique_to_release=True)]),
+            dict(release_id=2,name='B',action='SKIP',tracklist=[dict(
+            title='Song',artist='Artist',group_id=-1,included=False,excluded=True)])]
+        state=self.ui_state(snapshots);a=next(n for n in state['nodes'] if n['id']==1)
+        self.assertFalse(a['tracks'][0]['unique'])
+        self.assertFalse(a['tracks'][0]['isGem'])
+        self.assertFalse(a['isGem'])
 
     def test_one_ignore_action_preserves_saved_categories_and_restore(self):
         html = map_html()

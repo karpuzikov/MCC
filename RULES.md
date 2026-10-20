@@ -5,6 +5,14 @@ Last updated: 2026-10-20
 This file is the project-specific rulebook for the Discography Builder and Duplicate / Edition Analyzer.
 The account-wide `SOFTWARE_RULES.md` baseline always applies. This file may add stricter project-specific requirements but must never weaken or override a newer global rule or a newer explicit user instruction. When project rules conflict with the global baseline, the stricter/newer requirement wins.
 
+## MCC v0.5.47 - Song presence controls yellow highlighting (2026-10-20)
+
+- User rejected v0.5.46: renaming rows Needed recording while keeping shared songs yellow did not implement the request. Supersede v0.5.46's highlight/status interpretation below. Remove the generic label and restore the useful Same audio / Also listed (audio unverified) text.
+- Yellow means a song is present only on this scanned release. Use a UI-only song-presence index across all scanned releases, including discarded/excluded listings, based on base song title and primary artist (including known identity aliases). Different acoustic group IDs, mastering or duration do not make a song visually unique. Keep normal, Remix and Live families separate; special families retain their named identity titles. Actual equal-group carriers also prevent a highlight when titles disagree.
+- Included eligible rows on a retained release may highlight only if no other song listing or verified acoustic carrier exists elsewhere. Exclusions, recording Ignore, manual release removal and coverage by other retained releases still prevent a highlight. Unique count, Changes track previews, actual row CSS and Gem eligibility must remain consistent. The header labels this count unique, not essential.
+- Song-presence metadata is presentation only. Never use it to merge acoustic groups, satisfy coverage, drop a release, bypass the 8-second rule or claim identical audio. Keep all optimizer/audio decisions and source-file operations intact. Same audio status uses actual equal group IDs; other song listings remain explicitly audio unverified.
+- No new controls, menus, dependencies, global mirrored rules or Actions changes. Keep v0.5.47 Under construction pending actual Windows acceptance, using user-supplied screenshots only.
+
 ## MCC v0.5.46 - Retention track highlights (2026-10-20)
 
 - Latest user definition: highlight tracks that justify retaining the selected release. Keep a single meaning for the track highlight, essential count and status: included wanted recording coverage supplied only by this release within the retained plan. Excluded, recording-Ignored and other-retained-covered tracks are not highlighted, even if a cached annotation is stale.
