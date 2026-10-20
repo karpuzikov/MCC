@@ -5,6 +5,13 @@ Last updated: 2026-10-19
 This file is the project-specific rulebook for the Discography Builder and Duplicate / Edition Analyzer.
 The account-wide `SOFTWARE_RULES.md` baseline always applies. This file may add stricter project-specific requirements but must never weaken or override a newer global rule or a newer explicit user instruction. When project rules conflict with the global baseline, the stricter/newer requirement wins.
 
+## MCC visual-review workflow override - user instruction, 2026-10-20
+
+- **No automated visual QA for MCC.** Do not ask the user to install, run, debug or report results from Playwright, `tests/visual_qa.py`, browser visual snapshots, or automated geometry/screenshot runners. Do not include those commands in future test instructions, continuation prompts, release checklists or required user steps.
+- **Screenshots are supplied by the user at their discretion.** User will provide actual Windows WebView2 screenshots for UI review. Review and compare those screenshots when received; do not pressure the user for them or substitute invented visual test results. Until screenshots are reviewed, say UI visual acceptance is pending user screenshots rather than demanding automated tests.
+- Functional correctness checks remain necessary: Python compilation, automated functional/self-tests, regression tests, acoustic/optimizer verification, and safe disposable filesystem tests. Do not equate functional testing with visual QA or drop source-data safety requirements.
+- This is the user's explicit newer MCC-specific override to earlier visual QA commands/requirements in global and historical project documentation. Do not alter canonical globally mirrored `SOFTWARE_RULES.md` or `UI_UX_RULES.md`, and do not erase historical prior test evidence; this section controls the current MCC workflow.
+
 ## MCC acoustic fingerprints are authoritative - mandatory, 2026-10-19
 
 - **Primary identity evidence:** Full-audio Chromaprint/AcoustID-compatible fingerprints are the foundation for discovering and identifying identical recordings across releases. File names, track titles, artist/release tags and descriptors are supplementary hints that may be wrong, contradictory or entirely absent. None may override conclusive acoustic evidence. An AcoustID identifier is not equivalent to a local Chromaprint vector; ensure local acoustic comparison rather than assuming an external lookup took place.
