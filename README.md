@@ -4,6 +4,12 @@
 
 Music Collection Cleaner compares existing music releases with new ones, finds the best combination of editions, and helps preserve every wanted unique recording while removing unnecessary redundancy.
 
+## Experimental full-app framework branches - not complete (2026-10-21)
+
+The requested deliverables are **two fully functioning** dark-theme MCC variants, not read-only screenshot mockups. Earlier preview-only files failed the user's double-click test. New *engine-connected* builds exist at [QFluentWidgets branch](https://github.com/karpuzikov/MCC/tree/test/qfluentwidgets-dark/experiments) and [Flet branch](https://github.com/karpuzikov/MCC/tree/test/flet-dark/experiments). Each branch includes its current `MCC_[Framework]_v0.05.56.pyw` plus a downloadable `run-preview.bat` bootstrapping runtime/dependencies.
+
+**Limitations:** Although both native main windows reuse the real v0.5.56 MCC analyzer, each still uses the original WebView2 Release Map rather than a full native GUI port. The new double-click bootstraps were committed but **not tested on Windows after the user's failure report**. Treat them as unfinished test builds; refer to the branch's own `CONTINUITY.md` for specifics. Keep `main` untouched until parity/OS acceptance passes.
+
 ## UI review
 
 For MCC, the user supplies Windows WebView2 screenshots for visual review when ready. Do not ask the user to run Playwright or `tests/visual_qa.py`; no automated visual QA commands are part of the current testing workflow. Functional and acoustic regression checks remain required. Earlier visual-runner notes below are historical, not current instructions.
