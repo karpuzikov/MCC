@@ -1,3 +1,13 @@
+## Two MCC framework variants - actual Windows acceptance pending (2026-10-21)
+
+**Contract**: Deliver two complete working dark MCC 0.5.56 apps, native QFluentWidgets and Flet, with full feature and measurement parity, NOT just screenshot mockups. Both must launch from a **Windows double-click** with no manual Python/pip setup. Preserve fixed release positions on docked details, responsive widths, scrolling, keyboard accessibility, data safety, Undo and app settings.
+
+- Previous read-only preview builds: USER REPORTED FAILURE; neither started by double-click.
+- Current `test/qfluentwidgets-dark` and `test/flet-dark` source: engine-connected main window, original WebView2 Release Map reused in subprocess. GUI backend integration authored; native full-map migration still incomplete.
+- New `experiments/run-preview.bat` installers and standalone bootstrap `.pyw` are on each branch. GitHub file presence verified; Windows double-click, first-run package installs, runtime exceptions: **NOT RUN** since revised launchers.
+- Python compile, UI/self-tests, real 684-track analysis, identical optimizer/recording grouping, Keep/Ignore/Restore, Copy/Move/Undo, settings persistence, mouse/keyboard/hover, minimized and maximized resize, native layout screenshots: **NOT RUN** for either framework build.
+- Production main MCC v0.5.56 source remains unchanged. Test branches stay **Under construction ⚠️**; do not announce complete or full UI parity until real Windows acceptance.
+
 ## MCC v0.5.56 - Freeze list arrangement while details are open (2026-10-21)
 
 - Evidence: two user screenshots of real Windows v0.5.55 (1241x2048), open vs closed right-hand details; Full map shrinks but previously 3-column release groups collapse to a single column. Root cause confirmed in CSS category container queries, compounded by automatic row scrolling.
