@@ -1,3 +1,11 @@
+## MCC v0.5.56 - Freeze list arrangement while details are open (2026-10-21)
+
+- Evidence: two user screenshots of real Windows v0.5.55 (1241x2048), open vs closed right-hand details; Full map shrinks but previously 3-column release groups collapse to a single column. Root cause confirmed in CSS category container queries, compounded by automatic row scrolling.
+- Scope: preserve current 52%/720px dock and all controls; freeze pre-dock group/category/Changes column arrangement; resize widths only; remove automatic scroll; restore responsiveness on close. No new controls, no data/backend changes.
+- Embedded JS V8 syntax check: PASS. Minimal fake-DOM tests of **extracted actual JS functions** for group count preservation on dock and redraw, category grid, Changes and close/reset: PASS. These are not genuine WebView2 visual verification.
+- Full `py_compile`, `--ui-self-test`, native Windows WebView2 at user viewport/DPI, screenshot comparison with supplied v0.5.55 images, hover, click, keyboard, tab/focus, scrolling, resize, refresh and Copy/Move/Undo: NOT RUN.
+- v0.5.56 - Under construction ⚠️; not visually accepted or stable. No automatic screenshot runner requested.
+
 ## MCC v0.5.55 - Stronger positive-only decoded mastering confirmation (2026-10-21)
 
 Backend-only: no visible UI, controls, focus, layout, hover or accessibility changes. v0.5.53 docked layout preserved.
