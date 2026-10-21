@@ -1,6 +1,6 @@
 # Music Collection Cleaner (MCC)
 
-**Version: 0.5.55 - Under construction ⚠️**
+**Version: 0.5.56 - Under construction ⚠️**
 
 Music Collection Cleaner compares existing music releases with new ones, finds the best combination of editions, and helps preserve every wanted unique recording while removing unnecessary redundancy.
 
@@ -10,11 +10,11 @@ For MCC, the user supplies Windows WebView2 screenshots for visual review when r
 
 ## Download and run
 
-**[Music Collection Cleaner v0.05.55.pyw](Music%20Collection%20Cleaner%20v0.05.55.pyw)** - latest single-file Windows Python application. **Under construction ⚠️** until actual Windows WebView2 testing. Earlier source versions remain available.
+**[Music Collection Cleaner v0.05.56.pyw](Music%20Collection%20Cleaner%20v0.05.56.pyw)** - latest single-file Windows Python application. **Under construction ⚠️** until actual Windows WebView2 testing. Earlier source versions remain available.
 
-Open with Python 3 on Windows 11 (or run from a console with `python "Music Collection Cleaner v0.05.55.pyw"`). The application checks or installs supported dependencies. The GUI uses Microsoft Edge WebView2 through pywebview; it is not a terminal-based replacement.
+Open with Python 3 on Windows 11 (or run from a console with `python "Music Collection Cleaner v0.05.56.pyw"`). The application checks or installs supported dependencies. The GUI uses Microsoft Edge WebView2 through pywebview; it is not a terminal-based replacement.
 
-Source-level regression checks: `python "Music Collection Cleaner v0.05.55.pyw" --ui-self-test`. `--self-test` additionally requires a packaged standalone EXE.
+Source-level regression checks: `python "Music Collection Cleaner v0.05.56.pyw" --ui-self-test`. `--self-test` additionally requires a packaged standalone EXE.
 
 ## What it does
 
@@ -28,6 +28,12 @@ Source-level regression checks: `python "Music Collection Cleaner v0.05.55.pyw" 
 - Explicitly **Copy OLD + NEW** or **Move OLD + NEW** retained releases into the selected destination; Undo for supported completed moves.
 - Log comparisons, validate incomplete/corrupt inputs, choose I/O worker counts with drive awareness, and manage spawned subprocesses.
 
+
+## v0.5.56 - Dock details without moving releases (Under construction ⚠️)
+
+The details panel continues to occupy 52% of the main layout (maximum 720px), but opening it now **freezes the existing Release Map group column counts, category-grid arrangement and Changes grid count** before the list shrinks. Only column widths contract; group ordering and vertical list position stay unchanged. Release names truncate, not reflow into other columns. Re-rendering the board while details remain open reapplies the frozen layout; closing the panel clears it and restores the responsive full-width view. Removed the automatic release-row scroll when opening details. No new controls, no change to acoustic matching, Copy/Move/Undo or saved user preferences.
+
+Source contract checks and embedded Release Map JavaScript syntax: PASS in V8. Mock-DOM function tests of 3-column shrink, re-render, close, single-category and Changes layout: PASS. **Actual Windows WebView2 render, pointer/keyboard/resize/scroll screenshot review and Python --ui-self-test: NOT RUN**. The user-supplied screenshots document the regression in v0.5.55, not proof of v0.5.56 acceptance. Status remains Under construction ⚠️.
 
 ## v0.5.55 - Stronger mastering / vocal-instrumental safety (Under construction ⚠️)
 
