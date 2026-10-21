@@ -5,6 +5,13 @@ Last updated: 2026-10-20
 This file is the project-specific rulebook for the Discography Builder and Duplicate / Edition Analyzer.
 The account-wide `SOFTWARE_RULES.md` baseline always applies. This file may add stricter project-specific requirements but must never weaken or override a newer global rule or a newer explicit user instruction. When project rules conflict with the global baseline, the stricter/newer requirement wins.
 
+## MCC v0.5.56 - Docking must shrink releases in place (2026-10-21)
+
+- Latest user instruction: opening a Release Map details panel **must not rearrange releases**. Keep their existing category/group column distribution, order and current scroll position. The board/list shrinks horizontally to make room for the right-side details panel, rather than overlaying releases, collapsing the existing 3-column layout to 1, or automatically scrolling the selected row.
+- Capture the already rendered category grid and per-category multi-column counts **before** docking; apply those counts as width-independent inline layout locks while details are visible. Reuse the captured counts after a board DOM redraw, selection change or state update. Release the lock on close; ordinary responsive behavior may resume and must not be globally disabled. Explicit user-initiated navigation/search or view-mode changes may navigate.
+- Shrink release cells horizontally and truncate long names instead of wrapping/moving groups. Preserve category group order, keyboard/row actions, highlighted connections, scrolling, Details Close/Escape behavior, source paths, copy/move safety and acoustic backend. Do not add a splitter, resizer, alternative modes, overlays or extra controls.
+- Regression checks must assert that the details flex panel remains docked, opening does not call `scrollIntoView`, column counts stay fixed after docking and redraw, and Close restores responsive column rules. Test both Full map and Changes. Windows WebView2 visual/layout review of v0.5.56 is NOT RUN; do not claim accepted UI or stable release until verified. Keep Under construction ⚠️.
+
 ## MCC v0.5.55 - Positive-only PCM mastering confirmation (2026-10-21)
 
 - User's v0.5.54 JSONL reports a rejected 2007 Graduation JP ALAC `Stronger` track 68 versus standalone single FLAC track 384. The pair was ROUTED and compared: score 6.279023, good .900320, excellent .417534, median 6, p90 10, overlap 1, acoustic coverage .998401, duration gap .426666 seconds. Acoustic groups 67 and 292 both selected. Another Graduation FLAC track 372 matches the JP album at score .763316; the Stronger FLAC from the Essential 5 EP matches the single at score 0.
