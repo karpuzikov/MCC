@@ -1,5 +1,9 @@
 # Music Collection Cleaner - Continuity Handoff
 
+## Checkpoint 2026-10-25 - MCC v0.5.57 - Under construction ⚠️
+
+Bastille - Of the Night (WEB) (FLAC) warning in user log `Music Collection Cleaner Comparison 2026-10-25-09-50-16.jsonl`: five numbered FLAC filenames (01..05), but zero usable `TRACKNUMBER` tag values in completeness audit; `TRACKTOTAL=5` prompted false `0/5` and globally blocked Copy/Move. Cause in v0.5.56 code: acoustic router already accepts numeric filenames, but `validate_release_track_totals` did not fall back when tags were missing/invalid. v0.5.57 reuses `_track_number_for_routing` as positional fallback only when no valid tagged number or CUE number exists. Valid metadata wins. Added synthetic 5/5, missing 02 and unnumbered regression tests. Linux `--ui-self-test` PASS; Python compilation PASS. Native Windows with the user's original FLACs, full scan and actual Copy/Move/Undo NOT RUN. Existing unresolved cross-volume Move warning still applies; preserve Under construction ⚠️. No UI/algorithm/Actions changes beyond this metadata audit.
+
 
 ## Handoff 2026-10-21 - Two FULL framework versions and double-click failures (CURRENT, NOT COMPLETE)
 

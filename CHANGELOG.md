@@ -2,6 +2,12 @@
 
 Historical release notes and testing status retained from the original README.
 
+## v0.5.57 - Recognize numbered filenames for release completeness (Under construction ⚠️)
+
+- The release-completeness audit now falls back to MCC's existing filename track-number parser when `TRACKNUMBER`/`TRACK` tags are absent or invalid. It still uses valid tag numbers first; duplicate/missing numbers and conflicting declared totals remain blocking.
+- Regression: Bastille - Of the Night (WEB) (FLAC) has filenames `01` through `05` and a declared total of 5. The prior v0.5.56 log marked it `0/5` and blocked Copy/Move. A matching synthetic 5-file case now validates; gap and unnumbered cases remain blocked.
+- Python compile and `--ui-self-test`: PASS (Linux). Original FLAC tags, fresh native Windows scan, WebView2 interaction, Copy/Move/Undo: **NOT RUN**. Keep Under construction ⚠️.
+
 ## v0.5.56 - Dock details without moving releases (Under construction ⚠️)
 
 The details panel continues to occupy 52% of the main layout (maximum 720px), but opening it now **freezes the existing Release Map group column counts, category-grid arrangement and Changes grid count** before the list shrinks. Only column widths contract; group ordering and vertical list position stay unchanged. Release names truncate, not reflow into other columns. Re-rendering the board while details remain open reapplies the frozen layout; closing the panel clears it and restores the responsive full-width view. Removed the automatic release-row scroll when opening details. No new controls, no change to acoustic matching, Copy/Move/Undo or saved user preferences.
