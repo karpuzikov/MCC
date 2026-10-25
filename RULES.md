@@ -1,9 +1,13 @@
 # Discography Torrent Project - Rules
 
-Last updated: 2026-10-20
+Last updated: 2026-10-25
 
 This file is the project-specific rulebook for the Discography Builder and Duplicate / Edition Analyzer.
 The account-wide `SOFTWARE_RULES.md` baseline always applies. This file may add stricter project-specific requirements but must never weaken or override a newer global rule or a newer explicit user instruction. When project rules conflict with the global baseline, the stricter/newer requirement wins.
+
+## Category rule - Compilation (2026-10-25)
+
+A **Compilation** collects recordings by various performing artists, often grouped by theme, year, label or another organizing principle. Do **not** classify a main artist's release as Compilation just because that artist is repeatedly co-credited using `vs.`/`versus` with different collaborators. A misleading `ALBUMARTIST` tag alone is not proof against independently varied primary performers. Use the complete physical tracklist for this decision, including material excluded from wanted coverage. A tribute performed entirely by a single artist and a classical release of new recordings by one artist are not generally compilations. Where evidence supports a more specific release type (for example Soundtrack or Anthology), that type takes precedence over Compilation. Preserve other user-defined categories (EP, Single, Album) when corroborated by explicit release-type tags; do not infer type from track count alone when reliable tags are available.
 
 ## MCC v0.5.56 - Docking must shrink releases in place (2026-10-21)
 

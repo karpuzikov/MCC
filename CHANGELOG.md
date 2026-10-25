@@ -2,6 +2,13 @@
 
 Historical release notes and testing status retained from the original README.
 
+## v0.5.58 - Preserve main-artist collaborations in release categories (Under construction ⚠️)
+
+- Corrected compilation detection for credits like `Bastille vs. HAIM`: explicit `vs.`/`versus` marks collaborators, so Bastille remains a participating principal artist on all nine tracks. Previously the system treated the whole joined credit as an unrelated artist, misclassified the official Bastille CD as a compilation and warned that the discography artist was missing.
+- In `finalize_release_metadata`, use an explicit primary release-type tag when it appears on a strict majority of the physical tracks, rather than depending exclusively on the first file. This Bastille CD has 6 `ep` tags and 3 `mixtape/street` tags; it now classifies as EP, consistent with the source release's EP + Mixtape/Street label.
+- The ordinary Various Artists majority and diverse-performer guards remain active even if `ALBUMARTIST` misleadingly names one performer. No acoustic matching, source preference or UI controls changed.
+- Regression reproduces the nine credit strings/tags from the user's 2026-10-25 log and verifies release type `ep`, as well as a genuine multi-artist counterexample. Python compilation and `--ui-self-test`: PASS on Linux. Windows WebView2, actual Bastille FLAC/ALAC scan and Copy/Move/Undo: **NOT RUN**. Under construction ⚠️.
+
 ## v0.5.57 - Recognize numbered filenames for release completeness (Under construction ⚠️)
 
 - The release-completeness audit now falls back to MCC's existing filename track-number parser when `TRACKNUMBER`/`TRACK` tags are absent or invalid. It still uses valid tag numbers first; duplicate/missing numbers and conflicting declared totals remain blocking.
