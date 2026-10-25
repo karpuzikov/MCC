@@ -2,6 +2,12 @@
 
 Historical release notes and testing status retained from the original README.
 
+## v0.5.59 - Respect single-artist release categories outside the discography artist (Under construction ⚠️)
+
+- Fixed false Compilation classification when a guest or joint artist's release is stored within another artist's discography. A strict majority of tracks not naming the folder artist is insufficient by itself: the majority-other-artist rule now requires at least three distinct independent primary track-credit groups with no performer credited on a majority. True Various Artists evidence and explicit compilation tags remain effective.
+- Reproduced user log `Music Collection Cleaner Comparison 2026-10-25-13-23-36.jsonl` (v0.5.58): `Selfish` (Slum Village), `Forever` (Drake), `Alors On Danse` (Stromae) were wrongly Compilations instead of Singles, and the seven-track WEB `KIDS SEE GHOSTS` edition was wrongly Compilation instead of Album. The US CD `Kids See Ghosts` edition was already Album; both editions now classify Album.
+- Replayed classification on all 104 physical releases in that JSONL: exactly four corrections and 100 unchanged. `Cruel Summer` remained Compilation. Added embedded regressions for all five named editions and a two-track EP. Original v0.5.58 source preserved.
+- Linux `python -m py_compile` and `--ui-self-test`: PASS. Native Windows/WebView2, fresh full Analyze, Copy/Move/Undo: NOT RUN; keep **Under construction ⚠️**. No UI or acoustic matching changes.
 ## v0.5.58 - Preserve main-artist collaborations in release categories (Under construction ⚠️)
 
 - Corrected compilation detection for credits like `Bastille vs. HAIM`: explicit `vs.`/`versus` marks collaborators, so Bastille remains a participating principal artist on all nine tracks. Previously the system treated the whole joined credit as an unrelated artist, misclassified the official Bastille CD as a compilation and warned that the discography artist was missing.
