@@ -2,6 +2,12 @@
 
 Historical release notes and testing status retained from the original README.
 
+## v0.5.60 - Run audio tools under restrictive Windows Job permissions (Under construction ⚠️)
+
+- After a fresh Windows installation, FFmpeg started successfully but `AssignProcessToJobObject` failed with `[WinError 87] The parameter is incorrect`. v0.5.59 treated this *cleanup supervision* failure as an audio decoder failure, killed the child, and aborted Analyze during dependency preflight.
+- `run_hidden` now tracks every launched tool process independently, retains Job Object kill-on-close when allowed, and falls back to tracked-process cleanup on normal MCC exit when Windows blocks Job assignment. A process that refuses cleanup-Job assignment no longer causes premature preflight failure.
+- If Windows refuses `CREATE_BREAKAWAY_FROM_JOB` with error 5/87, retry once without that flag. Real executable launch/decode failures continue to block Analyze rather than producing empty analysis results. One Activity entry reports when MCC is using the fallback.
+- Added self-test with simulated WinError 87 at assignment, rejected breakaway process creation, and cleanup of an active child. Linux `python -m py_compile`, `--ui-self-test`, and `--version`: PASS. Actual Windows 11 restricted-Job launch, native WebView2, music scan and Copy/Move/Undo: **NOT RUN**; remains **Under construction ⚠️**. In fallback mode, forced termination of the MCC process bypasses normal cleanup and cannot guarantee descendant termination. No acoustic, release-category or UI layout changes.
 ## v0.5.59 - Respect single-artist release categories outside the discography artist (Under construction ⚠️)
 
 - Fixed false Compilation classification when a guest or joint artist's release is stored within another artist's discography. A strict majority of tracks not naming the folder artist is insufficient by itself: the majority-other-artist rule now requires at least three distinct independent primary track-credit groups with no performer credited on a majority. True Various Artists evidence and explicit compilation tags remain effective.
