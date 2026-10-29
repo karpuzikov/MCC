@@ -1,10 +1,13 @@
 # Discography Torrent Project - Rules
 
-Last updated: 2026-10-25
+Last updated: 2026-10-29
 
 This file is the project-specific rulebook for the Discography Builder and Duplicate / Edition Analyzer.
 The account-wide `SOFTWARE_RULES.md` baseline always applies. This file may add stricter project-specific requirements but must never weaken or override a newer global rule or a newer explicit user instruction. When project rules conflict with the global baseline, the stricter/newer requirement wins.
 
+## MCC Windows audio-tool launch restrictions (2026-10-29)
+
+Windows `Job Object` assignment/breakaway errors (including WinError 87) are not by themselves evidence that FFmpeg, FFprobe or fpcalc failed. A launched audio tool must be allowed to run when its executable/preflight succeeds even if Windows prohibits MCC's private cleanup Job. On Job assignment failure, retain exact per-process tracking and stop those children on normal MCC shutdown; attempt a no-breakaway retry only for supported process-creation errors, and preserve the original strict decoder preflight so a genuinely denied/missing/broken executable never results in a metadata-only analysis. Never terminate unrelated processes or silently omit audio scanning. Regression checks must emulate both errors and active-child cleanup. Native Windows runtime verification is still required before a stable claim.
 ## Category rule - Compilation (2026-10-25)
 
 A **Compilation** collects recordings by various performing artists, often grouped by theme, year, label or another organizing principle. Do **not** classify a main artist's release as Compilation just because that artist is repeatedly co-credited using `vs.`/`versus` with different collaborators. A misleading `ALBUMARTIST` tag alone is not proof against independently varied primary performers. Use the complete physical tracklist for this decision, including material excluded from wanted coverage. A tribute performed entirely by a single artist and a classical release of new recordings by one artist are not generally compilations. Where evidence supports a more specific release type (for example Soundtrack or Anthology), that type takes precedence over Compilation. Preserve other user-defined categories (EP, Single, Album) when corroborated by explicit release-type tags; do not infer type from track count alone when reliable tags are available.
