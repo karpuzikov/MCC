@@ -2,6 +2,12 @@
 
 Historical release notes and testing status retained from the original README.
 
+## v0.5.61 - Named dash-remixer credits cannot rescue excluded remixes (Under construction ⚠️)
+
+- Corrected the Everything Everything `MY KZ, YR BF – James Rutledge Remix` case: `ARTIST=Everything Everything;James Rutledge` names the remix producer, not a newly featured singer. With Save Remixes OFF, it must be excluded unless a separate genuine positive override exists.
+- Recognize named `- <remixer> Remix` suffixes in track titles or filename suffixes; avoid treating an artist prefix in `Artist - Song Remix` as the remixer; preserve truly added `feat.` performers and exclude already-present singers.
+- Added embedded regression tests. GitHub source write/readback verification pending; complete `--ui-self-test`, Windows 11/WebView2 execution, full 296-track scan, and file operations **NOT RUN**. Under construction ⚠️.
+
 ## v0.5.60 - Run audio tools under restrictive Windows Job permissions (Under construction ⚠️)
 
 - After a fresh Windows installation, FFmpeg started successfully but `AssignProcessToJobObject` failed with `[WinError 87] The parameter is incorrect`. v0.5.59 treated this *cleanup supervision* failure as an audio decoder failure, killed the child, and aborted Analyze during dependency preflight.
