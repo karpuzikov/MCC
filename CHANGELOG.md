@@ -2,6 +2,13 @@
 
 Historical release notes and testing status retained from the original README.
 
+## v0.5.62 - Recognize audio-proven album upgrades (Under construction ⚠️)
+
+- Fixed the Everything Everything Get to Heaven reporting bug in the October 30 v0.5.61 comparison log. OLD CD Deluxe (release 3) has 17 distinct eligible acoustic groups. Selected NEW Expanded 10th Anniversary WEB (release 19) contains the same 17 plus five new groups. Previously the difference in album-family names led to ADD instead of REPLACE / Upgrade.
+- Upgrade decisions now recognize audio-proven album editions using the existing overlap and artist guards, regardless of differing edition names. Track matching and optimization are unchanged.
+- The Release Map uses authoritative OLD predecessor IDs and acoustic containment for replacement pairing. The same old album is no longer independently counted as removed alongside an Upgrade. Copy and Move confirmation count genuine upgrades, not all replacements.
+- Built-in Python regression for the actual 17/22 case and unrelated-album negative controls added. Independently executed three extracted Release Map JavaScript tests (PASS). Actual JSONL acoustic-group subset replay finds only this OLD-to-NEW album replacement (PASS). Full Python compile and --ui-self-test, actual Windows scan and Copy/Move/Undo: **NOT RUN**. Under construction ⚠️.
+
 ## v0.5.61 - Named dash-remixer credits cannot rescue excluded remixes (Under construction ⚠️)
 
 - Corrected the Everything Everything `MY KZ, YR BF – James Rutledge Remix` case: `ARTIST=Everything Everything;James Rutledge` names the remix producer, not a newly featured singer. With Save Remixes OFF, it must be excluded unless a separate genuine positive override exists.
