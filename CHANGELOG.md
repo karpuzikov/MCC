@@ -2,6 +2,14 @@
 
 Historical release notes and testing status retained from the original README.
 
+## v0.5.65 - Artist names keep every letter and symbol (Under construction ⚠️)
+
+- Fixed: artist names were compared after deleting every character except a-z, 0-9 and `$`. Names in Cyrillic, Japanese or Arabic became an empty key (`Земфира` gave an empty string), as did symbol names such as `!!!` and `†††`, and accented names were mangled (`Beyoncé` gave `beyonc`, which did not match `Beyonce`). 13 places built the key with three different rules and disagreed with each other (`Ke$ha` was `ke$ha` in one and `keha` in another).
+- One function, `artist_name_comparison_key`, now builds every artist and credit key (primary artist, artist signature, featured and remixer credits, tag collaborators, Release Map song key). It keeps every letter, digit and symbol and ignores only case, accents, spaces and separators that file names cannot hold or taggers swap: `/ \ : * ? " < > | _ - . , '` and brackets. `AC/DC`, `AC_DC` and `ACDC` match; `!!!`, `P!nk`, `Ke$ha` and `Земфира` keep keys of their own. Names made of plain ASCII letters and digits keep their old keys.
+- Effect: the "most tracks credit other artists, review as Compilation" check and the single-artist collection check now run for non-Latin and symbol artists; before, the folder artist's empty key switched them off.
+- Known limits: `&`, `+` and `!` count as part of the name (`Florence + the Machine` differs from `Florence & the Machine`) and brackets are ignored (`Sunn O)))` equals `Sunn O`). Track titles and the code that reads featured and remixer names out of titles still see only Latin letters, so Cyrillic and Japanese titles still get an empty title key.
+- New `tests/test_artist_names.py` (7 tests; 20 failures against v0.5.64). Linux `py_compile`, ruff pyflakes rules, `--ui-self-test` and all 11 `tests/` files: PASS. Windows 11/WebView2, real-audio Analyze and Copy/Move/Undo on real folders: **NOT RUN**; remains **Under construction ⚠️**.
+
 ## v0.5.64 - Dead code removed and Copy cleanup failures reported (Under construction ⚠️)
 
 - Removed 22 functions and one constant that nothing called (601 lines; the file goes from 20,912 to 20,319 lines). Largest: `apply_automatic_plan` (a folder mover with no callers and no tests) and `report_text`; the rest were small helpers and the helpers only they used. The self-update code stays (it runs only in a packaged EXE).
