@@ -2,6 +2,15 @@
 
 Historical release notes and testing status retained from the original README.
 
+## v0.5.66 - Track titles and credit names work in any script (Under construction ⚠️)
+
+- Fixed: the keys built from track titles deleted everything except a-z and 0-9, so a Cyrillic, Japanese or Arabic title became an empty key (`Привет, мир` gave an empty string). Title-based features skip an empty key, so Explicit>Clean twins, censor-mask matching, descriptor/version grouping and Personal Picks did nothing for those libraries; a non-Latin Personal Pick was dropped on save.
+- One function, `compact_title_key`, now builds every title key (letters and digits of any script, accents and case folded, punctuation ignored). Spaced variants use the same character class. Release Map grouping and the Personal Picks duplicate check in the page script use `\p{L}\p{N}` the same way.
+- Credit-name word counting (remixer credits such as `Name's Mix` and possessive credits such as `Simon Hale's Orchestrata`) now counts words in any script. Featured-artist parsing already worked for non-Latin names since v0.5.65.
+- Latin text keeps identical keys: 15,676 key comparisons over every string constant in the program and tests found 0 differences for ASCII input against v0.5.65.
+- Known limits: titles made only of symbols (`!!!`, `÷`, `?`) still get an empty key; voiced and plain kana (が/か) and й/и fold together like accents; the "Name Mix" rule without the word Remix, the English generic-word and version-word lists, and Latin-initial possessors (`DJ's`) remain Latin-only; Indic and Thai combining vowels are partly lost in title normalization.
+- New `tests/test_non_latin_titles.py` (9 tests; 6 failures and 1 error against v0.5.65). Linux `py_compile`, ruff pyflakes rules, `--ui-self-test` and all 12 `tests/` files: PASS. Windows 11/WebView2, real-audio Analyze and Copy/Move/Undo on real folders: **NOT RUN**; remains **Under construction ⚠️**.
+
 ## v0.5.65 - Artist names keep every letter and symbol (Under construction ⚠️)
 
 - Fixed: artist names were compared after deleting every character except a-z, 0-9 and `$`. Names in Cyrillic, Japanese or Arabic became an empty key (`Земфира` gave an empty string), as did symbol names such as `!!!` and `†††`, and accented names were mangled (`Beyoncé` gave `beyonc`, which did not match `Beyonce`). 13 places built the key with three different rules and disagreed with each other (`Ke$ha` was `ke$ha` in one and `keha` in another).

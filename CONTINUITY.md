@@ -1,5 +1,11 @@
 # Music Collection Cleaner - Continuity Handoff
 
+## Checkpoint 2026-11-10 - MCC v0.5.66 - Under construction ⚠️
+
+Follow-up to v0.5.65, approved by the user: track-title keys still used `[^a-z0-9]`, so non-Latin titles got empty keys and title features silently skipped them. v0.5.66 adds `compact_title_key` (`[\W_]+` removed from `normalize_title`) and uses it for `identity_title`, descriptor/base-title keys, advisory (Explicit>Clean) keys, censor masks, album slot keys and Personal Picks; credit-name word extractors are Unicode; the page script uses `\p{L}\p{N}`. Left Latin on purpose: English version/generic word lists, `_is_named_person_mix_descriptor`, Latin-initial possessors, tag-field-name keys.
+
+Checked: 0 ASCII differences in 15,676 old-vs-new key comparisons; new `tests/test_non_latin_titles.py` fails on v0.5.65; 12 test files, `--ui-self-test`, ruff, node regex check pass. Not checked: Windows 11/WebView2, real audio. Open: symbol-only titles still get an empty key.
+
 ## Checkpoint 2026-11-10 - MCC v0.5.65 - Under construction ⚠️
 
 Reported after v0.5.64: the artist-name rule (delete every character except a-z, 0-9 and `$`) is wrong in general, because an artist name can contain any symbol. v0.5.65 replaces it. `artist_name_comparison_key` is now the only builder of artist and credit keys; `normalize_artist`, `_artist_signature`, `_featured_credit_signature`, `_primary_artist_key`, `_artist_tag_collaborators`, the remixer-credit keys, the featured-artist keys and the Release Map song key all call it. Before, 13 places used three different rules and disagreed (`Ke$ha`: `ke$ha` vs `keha`; `Beyoncé`: `beyonc` vs `beyonce`), and non-Latin or symbol-only names gave an empty key, which switched off the compilation and single-artist checks for them. Ignored when comparing: case, accents, whitespace, `_ - . , '`, brackets and the characters Windows file names cannot hold (`/ \ : * ? " < > |`); everything else is part of the name. Brackets are ignored on purpose: the feature-credit cuts leave a stray `(` behind (`Calvin Harris (feat. X)`) and the old code tolerated it. `canonical_featured_title` still runs first, so `feat.`, `ft.` and `featuring` spellings in an artist tag match each other.
