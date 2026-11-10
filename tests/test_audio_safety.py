@@ -1,5 +1,4 @@
 """Functional regressions for the October 20 comparison-log audit."""
-import contextlib
 import importlib.machinery
 import importlib.util
 import json
@@ -9,7 +8,6 @@ from pathlib import Path
 import random
 import shutil
 import struct
-import subprocess
 import sys
 import tempfile
 import unittest
@@ -199,15 +197,18 @@ class AcousticSafety(unittest.TestCase):
             selected=mcc.optimize_collection(releases,{i:[i,i+4] for i in range(4)},forced_release_ids=set())
         self.assertEqual(selected,{1})
 
+    # Since v0.5.59 the outside-majority rule needs at least 3 distinct primary performers.
     def test_featured_artist_is_not_promoted_to_co_primary(self):
         self.assertTrue(mcc._other_artist_majority(
-            ['Other Artist feat. Kanye West'] * 3, 'kanyewest', 'Other Artist;Kanye West'))
+            ['Artist '+name+' feat. Kanye West' for name in 'ABC'],
+            'kanyewest', 'Artist A;Artist B;Artist C;Kanye West'))
 
     def test_featured_alias_remains_secondary(self):
         for featured in ('Kanye West', 'Ye'):
             with self.subTest(featured=featured):
                 self.assertTrue(mcc._other_artist_majority(
-                    ['Other Artist feat. '+featured]*3, 'kanyewest', 'Other Artist;Kanye West;Ye'))
+                    ['Artist '+name+' feat. '+featured for name in 'ABC'],
+                    'kanyewest', 'Artist A;Artist B;Artist C;Kanye West;Ye'))
         self.assertFalse(mcc._other_artist_majority(
             ['Ye feat. Unrelated Guest']*3, 'kanyewest', 'Kanye West;Ye'))
         self.assertFalse(mcc._other_artist_majority(

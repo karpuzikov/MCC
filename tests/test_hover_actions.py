@@ -347,8 +347,8 @@ process.stdout.write(JSON.stringify(results));
             ('ungrouped', {'groupId': -1}, True, ['remix', 'live'], 'Ignore'),
             ('read only', {'patternKind': 'skip'}, False, [], None),
         ]
-        inputs = [{'track': {'index': 7, 'groupId': 42, **patch}, 'editable': editable}
-                  for _, patch, editable, _, _ in cases]
+        inputs = [{'track': {'index': 7, 'groupId': 42, **track_patch}, 'editable': editable}
+                  for _, track_patch, editable, _, _ in cases]
         outputs = self.run_js(r'''
 const input=JSON.parse(require('fs').readFileSync(0,'utf8'));
 const render=new Function('t','state','esc','versionsForTrack','remixesForTrack','liveForTrack',
@@ -357,7 +357,7 @@ const esc=value=>String(value).replace(/&/g,'&amp;').replace(/"/g,'&quot;').repl
 process.stdout.write(JSON.stringify(input.cases.map(item=>
   render(item.track,{editable:item.editable},esc,()=>[],()=>[],()=>[]))));
 ''', {'code': code, 'cases': inputs})
-        for (name, patch, _, expected_kinds, expected_label), rendered in zip(cases, outputs):
+        for (name, track_patch, _, expected_kinds, expected_label), rendered in zip(cases, outputs):
             with self.subTest(state=name):
                 buttons = Buttons(rendered['actions']).buttons
                 self.assertEqual([b.get('data-kind') for b in buttons if b.get('class') == 'patternMark'],
@@ -366,10 +366,10 @@ process.stdout.write(JSON.stringify(input.cases.map(item=>
                 self.assertEqual(len(ignore), int(expected_label is not None))
                 if expected_label is not None:
                     self.assertEqual(ignore[0]['text'], expected_label)
-                    scope = 'this track' if patch.get('groupId') == -1 else 'this recording everywhere'
+                    scope = 'this track' if track_patch.get('groupId') == -1 else 'this recording everywhere'
                     self.assertEqual(ignore[0]['aria-label'], expected_label + ' ' + scope)
                 badges = Buttons(rendered['badge']).buttons
-                self.assertEqual(len(badges), int(bool(patch.get('patternKind'))))
+                self.assertEqual(len(badges), int(bool(track_patch.get('patternKind'))))
                 if badges:
                     self.assertEqual(badges[0]['title'], 'Move to Personal Picks')
 

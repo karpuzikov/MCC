@@ -2,6 +2,14 @@
 
 Historical release notes and testing status retained from the original README.
 
+## v0.5.63 - Verified dependency downloads and code hygiene (Under construction ⚠️)
+
+- FFmpeg (Gyan 8.0 essentials, from the GyanD/codexffmpeg GitHub release) and Chromaprint 1.6.1 are now pinned to exact URLs and SHA-256 hashes. One helper, `_download_verified_archive`, deletes the archive and raises unless the hash matches. The FFmpeg hash is what GitHub serves today (the publisher's `.sha256` file was not reachable); update URL and hash together to upgrade.
+- Fixed the `--ui-self-test` crash in v0.5.62 (`TypeError: 'list' object is not callable`): a local list named `album_family` shadowed the module function of the same name. Fixed `Union` used in an annotation without being imported.
+- Removed the unused imports `pickle` and `textwrap`, three unused local variables, and a loop variable that shadowed the imported dataclasses `field`. The two HTTP User-Agent strings now report Music-Collection-Cleaner and the running version.
+- Tests: two stale tests now follow the documented policy (v0.5.54 audio-only high-overlap profile, v0.5.55 informational decoded-PCM verification, v0.5.59 three-primary-performer rule). New tests cover the download hash check and run the embedded `--ui-self-test`. `.gitignore` added. README no longer lists the cross-volume Move blocker, since Move already refuses cross-volume transfers.
+- Linux `py_compile`, ruff pyflakes rules, `--ui-self-test` and all eight `tests/` files: PASS. Windows 11/WebView2, real-audio fingerprint accuracy and Copy/Move/Undo on real folders: **NOT RUN**; remains **Under construction ⚠️**. No acoustic matching, classification or UI layout changes. Not done: splitting very large functions, moving the embedded HTML/JS out of the `.pyw`, and the broad `except Exception` handlers.
+
 ## v0.5.62 - Recognize audio-proven album upgrades (Under construction ⚠️)
 
 - Fixed the Everything Everything Get to Heaven reporting bug in the October 30 v0.5.61 comparison log. OLD CD Deluxe (release 3) has 17 distinct eligible acoustic groups. Selected NEW Expanded 10th Anniversary WEB (release 19) contains the same 17 plus five new groups. Previously the difference in album-family names led to ADD instead of REPLACE / Upgrade.

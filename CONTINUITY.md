@@ -1,8 +1,12 @@
-## Repository cleanup - 2026-11-10
-
-User request: clean the repository. `archive/` renamed to `version-history/`; v0.5.58-v0.5.61 moved there; root keeps only v0.5.62. v0.5.49 (previously only on branch `fix/verified-leading-silence-identity`, PR #1, superseded by v0.5.50+) saved to `version-history/` so the branch can be deleted. `tests/ui-benches/` (QFluentWidgets/Flet demo benches) removed; they remain in Git history. v0.5.62 published as a GitHub release. No application source changed; status stays Under construction ⚠️.
-
 # Music Collection Cleaner - Continuity Handoff
+
+## Checkpoint 2026-11-10 - MCC v0.5.63 - Under construction ⚠️
+
+Code review of v0.5.62 found that its embedded `--ui-self-test` crashed on a clean run (`TypeError: 'list' object is not callable`): a local list named `album_family` in `_ui_contract_self_test` shadowed the module function `album_family()` that a nested probe calls. v0.5.63 renames the local, imports `Union`, removes two unused imports, three unused locals and a loop variable that shadowed the dataclasses `field` import. No acoustic, classification or UI change.
+
+The FFmpeg and Chromaprint downloads are now pinned to exact URLs plus SHA-256 and verified by `_download_verified_archive` (the same pins and helper as Duplicate Edition Analyzer v0.22.13 in `karpuzikov/TRRNT-project`). The pins were checked by real downloads: Chromaprint 1.6.1 zip `735d6182…92a4e`, FFmpeg 8.0 essentials zip `647e467c…6fa569`. The FFmpeg hash is trust-on-first-use (Gyan's `.sha256` file returned 404), so re-verify against a publisher-signed value if one appears. Two stale tests were updated to the current documented policy, and tests were added for the hash check and the self-test; each new or updated test was shown to fail when the code it covers is broken.
+
+Verified on Linux: `py_compile`, ruff pyflakes rules, `--ui-self-test` (about 1.6 s) and all eight `tests/` files. **NOT RUN:** Windows 11/WebView2 launch, a real-audio Analyze (fingerprint accuracy was only exercised through synthetic fixtures), actual FFmpeg/Chromaprint download on Windows, and Copy/Move/Undo on real folders. Deliberately not done: splitting the very large functions, moving the embedded HTML/JS out of the `.pyw`, replacing the broad `except Exception` handlers, and the dormant self-update code (it trusts a checksum from the same release it downloads). Repository layout: the root holds only the latest `.pyw`; earlier versions live in `version-history/`; the 2026-11-10 cleanup removed `tests/ui-benches/` (QFluentWidgets/Flet demo benches, still in Git history) and the stale `fix/verified-leading-silence-identity` branch (PR #1), whose v0.5.49 file is kept in `version-history/`.
 
 ## Checkpoint 2026-10-30 - MCC v0.5.62 - Under construction ⚠️
 

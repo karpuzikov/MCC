@@ -25,10 +25,15 @@ class FingerprintPolicy(unittest.TestCase):
             with self.subTest(score=4+count/1000):
                 matched,sim=mcc.fingerprint_auto_match_values(original,200,changed,200)
                 self.assertAlmostEqual(sim[0],4+count/1000)
-                self.assertEqual(matched,expected)
                 details=mcc._comparison_decision_details(original,200,changed,200,matched,sim)
-                self.assertEqual(details['derived_final_match'],expected)
+                # The strict and mastering limits stay at 4.02; since v0.5.54 only the separate
+                # audio-only high-overlap profile may accept a score above it.
+                self.assertEqual(details['strict_pass'],expected)
+                self.assertEqual(details['mastering_pass'],expected)
+                self.assertEqual(details['derived_final_match'],matched)
                 self.assertTrue(details['decision_consistent'])
+                if not expected:
+                    self.assertIn('high_overlap_mastering',details['accepted_by'])
         self.assertFalse(mcc._fingerprint_profile_identity((4.020001,1,1,0,1,4,5)))
 
     def test_all_logged_watch_the_throne_profiles_pass_the_primary_comparison(self):
@@ -48,7 +53,8 @@ class FingerprintPolicy(unittest.TestCase):
                 self.assertEqual(details['derived_final_match'],accepted)
                 self.assertTrue(details['decision_consistent'])
                 self.assertFalse(details['content_gate_triggered'])
-                self.assertIsNone(details['decoded_audio_verification'])
+                # Since v0.5.55 the supplied verification is informational and never decides.
+                self.assertNotIn('decoded_pcm_mastering',details['accepted_by'])
 
     def test_primary_match_has_no_local_pcm_or_tag_veto_in_workers_and_pipeline(self):
         original=fp(count=4000)

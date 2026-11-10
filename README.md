@@ -1,16 +1,16 @@
 # Music Collection Cleaner (MCC)
 
-**Version: 0.5.62 - Under construction ⚠️**
+**Version: 0.5.63 - Under construction ⚠️**
 
 Music Collection Cleaner compares existing music releases with new ones, finds the best combination of editions, and helps preserve every wanted unique recording while removing unnecessary redundancy.
 
 ## Download and run
 
-**[Music Collection Cleaner v0.05.62.pyw](Music%20Collection%20Cleaner%20v0.05.62.pyw)** - latest single-file Windows Python application. **Under construction ⚠️** until actual Windows WebView2 testing.
+**[Music Collection Cleaner v0.05.63.pyw](Music%20Collection%20Cleaner%20v0.05.63.pyw)** - latest single-file Windows Python application. **Under construction ⚠️** until actual Windows WebView2 testing.
 
-Open with Python 3 on Windows 11 (or run from a console with `python "Music Collection Cleaner v0.05.62.pyw"`). The application checks or installs supported dependencies. The GUI uses Microsoft Edge WebView2 through pywebview; it is not a terminal-based replacement.
+Open with Python 3 on Windows 11 (or run from a console with `python "Music Collection Cleaner v0.05.63.pyw"`). The application checks or installs supported dependencies; the FFmpeg and Chromaprint downloads are pinned to exact versions and refused unless their SHA-256 matches. The GUI uses Microsoft Edge WebView2 through pywebview; it is not a terminal-based replacement.
 
-Source-level regression checks: `python "Music Collection Cleaner v0.05.62.pyw" --ui-self-test`. `--self-test` additionally requires a packaged standalone EXE.
+Source-level regression checks: `python "Music Collection Cleaner v0.05.63.pyw" --ui-self-test`, and `python tests/<file>.py` from the repository root for each file in `tests/`. `--self-test` additionally requires a packaged standalone EXE.
 
 [Latest release](https://github.com/karpuzikov/MCC/releases/latest) · [Previous versions](version-history/) · [Changelog](CHANGELOG.md)
 
@@ -30,7 +30,7 @@ Source-level regression checks: `python "Music Collection Cleaner v0.05.62.pyw" 
 
 Analysis does not change source files. File operations require explicit user action. Use **Copy** for initial real-world testing.
 
-**Known blocker:** Cross-volume **Move** is not yet verified safe against failure during source-folder cleanup after a verified copy; its journal may not fully reflect a partially removed source. **Do not use cross-volume Move on important data.** No Windows test of this migrated version has been completed.
+**Move limits:** **Move** renames folders on the same drive only, after writing an Undo journal; a cross-volume Move is refused before any file changes, so use **Copy** or a destination on the same drive. No Windows test of this migrated version has been completed.
 
 Required real-world regression cases include Cross the Line 14 vs 18 tracks, Starboy, Bangarang, Skrillex, destination collisions, worker/process cleanup, and Copy/Move/Undo on disposable test folders.
 
