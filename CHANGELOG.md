@@ -2,6 +2,13 @@
 
 Historical release notes and testing status retained from the original README.
 
+## v0.5.64 - Dead code removed and Copy cleanup failures reported (Under construction ⚠️)
+
+- Removed 22 functions and one constant that nothing called (601 lines; the file goes from 20,912 to 20,319 lines). Largest: `apply_automatic_plan` (a folder mover with no callers and no tests) and `report_text`; the rest were small helpers and the helpers only they used. The self-update code stays (it runs only in a packaged EXE).
+- Copy: if a Copy fails and removing the partly copied folders also fails, the error now lists every leftover folder and the reason. Before, that cleanup failure was ignored silently.
+- New tests for failure paths that nothing ran before: Copy rollback after a failed copy, the leftover report, Undo with an occupied original (moved music and manifest kept), and CUE parsing (numbers, titles, start/end times, tracks without INDEX 01 dropped). Each was shown to fail when the code it covers is broken. Line coverage of the app code: 37% to 42% from the test files, 58% to 61% with `--ui-self-test`.
+- Linux `py_compile`, ruff pyflakes rules, `--ui-self-test` and all 10 `tests/` files: PASS. Windows 11/WebView2, real-audio Analyze and Copy/Move/Undo on real folders: **NOT RUN**; remains **Under construction ⚠️**. No acoustic matching, classification or UI changes. Not done: splitting very large functions, moving the embedded HTML/JS out of the `.pyw`, and the other broad `except Exception` handlers.
+
 ## v0.5.63 - Verified dependency downloads and code hygiene (Under construction ⚠️)
 
 - FFmpeg (Gyan 8.0 essentials, from the GyanD/codexffmpeg GitHub release) and Chromaprint 1.6.1 are now pinned to exact URLs and SHA-256 hashes. One helper, `_download_verified_archive`, deletes the archive and raises unless the hash matches. The FFmpeg hash is what GitHub serves today (the publisher's `.sha256` file was not reachable); update URL and hash together to upgrade.

@@ -1,5 +1,11 @@
 # Music Collection Cleaner - Continuity Handoff
 
+## Checkpoint 2026-11-10 - MCC v0.5.64 - Under construction ⚠️
+
+Follow-up to the v0.5.63 code review. Measured on v0.5.63: 20,912 lines, 525 functions (4 over 1,000 lines), 124 broad or silent exception handlers, line coverage 37% from the test files and 58% with `--ui-self-test` (self-test bodies excluded). v0.5.64 deletes 22 functions and one constant that nothing referenced (found by name across the file and the tests, repeated until none remained) and makes Copy's rollback report folders it could not clean up; coverage is now 42% / 61%. The self-update code (`_startup_self_update`, runs only in a packaged EXE, trusts a checksum from the same release) was kept, with the unreferenced `STANDALONE_BUNDLE_REVISION`; delete both if no MCC EXE is ever shipped.
+
+New tests (`tests/test_file_operation_failures.py`, `tests/test_cue_parsing.py`) cover Copy rollback and leftover reporting, Undo with an occupied original, and CUE parsing; each fails against a deliberately broken copy of the code. Verified on Linux: `py_compile`, ruff pyflakes rules, `--ui-self-test` and all 10 `tests/` files. **NOT RUN:** Windows 11/WebView2, real-audio Analyze, Copy/Move/Undo on real folders. Still open: `_parse_cue_tracks` returns no tracks when a CUE cannot be read, the other 100+ broad exception handlers (only those in Undo, Copy and Move were read), the giant functions (`merge_equivalent_tracks` 1,014 lines, `_webview_main_app` 1,201, `_webview_release_map_html` 1,960) and the 2,980 lines of embedded self-test code.
+
 ## Checkpoint 2026-11-10 - MCC v0.5.63 - Under construction ⚠️
 
 Code review of v0.5.62 found that its embedded `--ui-self-test` crashed on a clean run (`TypeError: 'list' object is not callable`): a local list named `album_family` in `_ui_contract_self_test` shadowed the module function `album_family()` that a nested probe calls. v0.5.63 renames the local, imports `Union`, removes two unused imports, three unused locals and a loop variable that shadowed the dataclasses `field` import. No acoustic, classification or UI change.
