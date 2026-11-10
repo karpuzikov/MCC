@@ -6,13 +6,13 @@ Music Collection Cleaner compares existing music releases with new ones, finds t
 
 ## Download and run
 
-**[Music Collection Cleaner v0.05.62.pyw](Music%20Collection%20Cleaner%20v0.05.62.pyw)** - latest single-file Windows Python application. **Under construction ⚠️** until actual Windows WebView2 testing. Earlier source versions remain available.
+**[Music Collection Cleaner v0.05.62.pyw](Music%20Collection%20Cleaner%20v0.05.62.pyw)** - latest single-file Windows Python application. **Under construction ⚠️** until actual Windows WebView2 testing.
 
 Open with Python 3 on Windows 11 (or run from a console with `python "Music Collection Cleaner v0.05.62.pyw"`). The application checks or installs supported dependencies. The GUI uses Microsoft Edge WebView2 through pywebview; it is not a terminal-based replacement.
 
 Source-level regression checks: `python "Music Collection Cleaner v0.05.62.pyw" --ui-self-test`. `--self-test` additionally requires a packaged standalone EXE.
 
-[Previous versions](archive/) · [Version history](CHANGELOG.md)
+[Latest release](https://github.com/karpuzikov/MCC/releases/latest) · [Previous versions](version-history/) · [Changelog](CHANGELOG.md)
 
 ## What it does
 
@@ -43,6 +43,8 @@ Persistent data uses `Documents\Karpuzikov Tools\Music Collection Cleaner\`. On 
 The original production **Duplicate Edition Analyzer v0.22.12** and all previous analyzer releases remain in `karpuzikov/userscripts` and are not modified by this migration. Future MCC standalone updater lookup points only at this repository.
 
 ## Development
+
+Only the latest version stays in the repository root; every previous version lives in `version-history/`.
 
 - [SOFTWARE_RULES.md](SOFTWARE_RULES.md) - exact current account-wide requirements.
 - [RULES.md](RULES.md) - inherited complete optimizer and behavior rulebook.

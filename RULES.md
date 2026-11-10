@@ -1,5 +1,7 @@
 # Discography Torrent Project - Rules
 
+**Repository layout rule (2026-11-10, explicit user instruction):** the repository root contains only the latest `Music Collection Cleaner vX.YY.ZZ.pyw`. When a new version is published, move the previous one to `version-history/` in the same commit and publish the new version as a GitHub release. Do not commit test builds, UI benches or audit reports to `main`; delete merged branches.
+
 Last updated: 2026-10-29
 
 This file is the project-specific rulebook for the Discography Builder and Duplicate / Edition Analyzer.

@@ -1,3 +1,7 @@
+## Repository cleanup - 2026-11-10
+
+User request: clean the repository. `archive/` renamed to `version-history/`; v0.5.58-v0.5.61 moved there; root keeps only v0.5.62. v0.5.49 (previously only on branch `fix/verified-leading-silence-identity`, PR #1, superseded by v0.5.50+) saved to `version-history/` so the branch can be deleted. `tests/ui-benches/` (QFluentWidgets/Flet demo benches) removed; they remain in Git history. v0.5.62 published as a GitHub release. No application source changed; status stays Under construction ⚠️.
+
 # Music Collection Cleaner - Continuity Handoff
 
 ## Checkpoint 2026-10-30 - MCC v0.5.62 - Under construction ⚠️
