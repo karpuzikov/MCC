@@ -24,6 +24,11 @@ class ReleaseWarnings(unittest.TestCase):
     def test_clean_release_has_no_warning(self):
         self.assertEqual(mcc._release_warning(make_release()), '')
 
+    def test_integrity_reason_drops_ffmpeg_tags_and_extra_lines(self):
+        raw = '[flac @ 000000e957484b40] invalid residual\n[flac @ 000000e957484b40] decode_frame() failed'
+        self.assertEqual(mcc._short_integrity_reason(raw), 'invalid residual')
+        self.assertEqual(mcc._short_integrity_reason(''), 'unreadable')
+
 
 if __name__ == '__main__':
     unittest.main()

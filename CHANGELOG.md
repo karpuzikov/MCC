@@ -2,6 +2,12 @@
 
 Historical release notes and testing status retained from the original README.
 
+## v0.5.73 - Smaller comparison log, readable integrity warnings (Under construction ⚠️)
+
+- Comparison log: pairs rejected only because their lengths differ by more than 8 s are no longer written one by one; they stay in the summary counters. A BT run logged 107,858 of them (about 280 of 300 MB), none with an acoustic pass. Pairs with an acoustic pass, near-threshold pairs, matches and the sampled rejects are still logged.
+- Release Map banner: a corrupt-file warning shows the first FFmpeg message without its `[flac @ address]` tags (for example "invalid residual") instead of the whole FFmpeg output; the per-track integrity text in the data is unchanged. Banner rows no longer clip their text.
+- New test in `tests/test_release_warnings.py`. Checked: all `tests/` files, ruff pyflakes rules, offline count on the uploaded run. **Not run:** a fresh Windows run to confirm the new log size.
+
 ## v0.5.72 - Release Map: collapsed warning banner, lighter links (Under construction ⚠️)
 
 - The "Copy and Move blocked" banner is one line ("N release(s) ▸") that expands on click into single-line, ellipsized rows (full text in the tooltip, max 40% of the window height, scrollable). It used to fill about half the window with wrapped raw error text.

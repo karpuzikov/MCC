@@ -1,5 +1,9 @@
 # Music Collection Cleaner - Continuity Handoff
 
+## Checkpoint 2026-11-11 - MCC v0.5.73 - Under construction ⚠️
+
+Comparison-log filter in the pair handler no longer logs `duration_version_conflict` pairs without a strict/mastering/high-overlap pass; `_short_integrity_reason` shortens the Release Map banner text only. Summary counters are unchanged.
+
 ## Checkpoint 2026-11-11 - MCC v0.5.72 - Under construction ⚠️
 
 Release Map CSS/JS only: `renderAuditBanner` has `auditExpanded` state; `drawConnections` stroke widths/opacities reduced; `modeText` defaults empty. No analysis changes.
