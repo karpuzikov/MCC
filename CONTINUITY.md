@@ -1,5 +1,11 @@
 # Music Collection Cleaner - Continuity Handoff
 
+## Checkpoint 2026-11-11 - MCC v0.5.69 - Under construction ⚠️
+
+User said "i don't need a self test" after v0.5.68 moved the built-in self-tests to `tests/test_ui_self_test.py`. v0.5.69 deletes that file and the `main()` guard for `--ui-self-test` / `--self-test`; README and the RULES.md release-blocking rule no longer mention it. Do not recreate a self-test or a `--ui-self-test` flag unless the user asks. Recoverable from git history (v0.5.68 commit) and `version-history/` (v0.05.67 has the built-in one). The 12 other `tests/` files remain and still pass.
+
+Not done: `_PCMIdentityVerifier.verify` (70 lines, tripwire target in about 7 test patches), the ~120 broad exception handlers (32 on the analysis path unreviewed), symbol-only titles still get an empty key, Windows 11/WebView2 and real-audio tests never run.
+
 ## Checkpoint 2026-11-11 - MCC v0.5.68 - Under construction ⚠️
 
 User asked "can you do both?" after the conciseness answer: drop EXE support and move the built-in self-tests out of the app. Done in one script (`make_v068`-style: AST ranges, `mcc.` prefix rewriting, `globals()` becomes `vars(mcc)`, two rebound globals `_MANUAL_ALBUM_GROUP_LINKS` and `_state_dir` become `mcc.` attributes). The app has 16,109 lines (was 20,323); `tests/test_ui_self_test.py` now holds the UI contract and 13 regression self-tests. `--ui-self-test` is gone from the app; Windows testing needs the repository files. Equivalence checked by text diff of the 18 moved functions and 190 planted bugs (identical results old vs moved).

@@ -2,6 +2,13 @@
 
 Historical release notes and testing status retained from the original README.
 
+## v0.5.69 - Self-test removed (Under construction ⚠️)
+
+- Removed: the UI contract self-test and its 13 regression self-tests (`tests/test_ui_self_test.py`, 3,309 lines, 322 checks) and the `main()` guard that told users where `--ui-self-test` had gone. `--ui-self-test` and `--self-test` are now ordinary unknown arguments and start the app. The code stays in git history (v0.5.68 commit) and in `version-history/` (built-in version, v0.05.67).
+- Docs: README no longer mentions it. The RULES.md rule "Every failed UI self-test is release blocking" now reads "Every failed browser or real Windows WebView2 acceptance run is release blocking."
+- Result: the app file is 16,104 lines (v0.5.67: 20,323). Linux `py_compile`, ruff pyflakes rules and all 12 remaining `tests/` files: PASS. Windows 11/WebView2, real-audio Analyze and Copy/Move/Undo on real folders: **NOT RUN**; remains **Under construction ⚠️**.
+- Known limits: the removed checks covered release classification and keep rules, remix and mastering decisions, re-analysis, remembered patterns, external audio preflight, restricted Windows job launch and Move fault injection. The remaining `tests/` files cover Copy/Undo/Move rollback basics, fingerprint policy, CUE parsing, artist and title keys, release warnings, hover actions and silence padding.
+
 ## v0.5.68 - EXE support, dead code and built-in self-tests leave the app (Under construction ⚠️)
 
 - Removed: packaged-EXE support. The self-update check looked for tags starting with `music-collection-cleaner-v` and an EXE file; no release has either (all 5 current releases are `.pyw` only, tags are `v0.5.x`). Also removed: the `--self-test` EXE smoke test (687 lines), the frozen-build branches, `multiprocessing.freeze_support`, and the helpers and constants only they used.
