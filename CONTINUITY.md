@@ -1,5 +1,9 @@
 # Music Collection Cleaner - Continuity Handoff
 
+## Checkpoint 2026-11-11 - MCC v0.5.76 - Under construction ⚠️
+
+Release Map HTML only. `#changeBar` is now the View popover (`#viewMenuBtn`, `.open`), `#auditBanner` is a floating popover opened by `#reviewBtn` (`auditExpanded`), `renderStatusLine()` writes `#statusLine` and the Review button; `#planCounts` stays in the DOM (hidden) so `renderPlanCounts` still works. `closePopovers()` handles Esc and outside clicks. `tests/visual_qa.py` stops at line 230 on v0.5.74 and v0.5.76 alike. Next steps in the same redesign: release rows and the details panel, then the Copy/Move bar and the main window.
+
 ## Checkpoint 2026-11-11 - MCC v0.5.75 - Under construction ⚠️
 
 Main window keeps `MainBridge.folders` (rows of `path` + `star`) instead of `existing_path`/`recycle_path`; bridge calls are `setFolders(rows)`, `browseFolder(index)`, `startAnalyze(rows, ...)`. Starred rows are existing roots, unstarred are new roots; the first of each is the primary `existing`/`recycle`, the rest travel as `extra_existing`/`extra_recycle` into `prepare_analysis` and as `extra_roots` into `_io_worker_plan`, `copy_retained_plan`, `move_retained_plan`. `_save_app_settings` keeps `source_folders_v1` when a caller passes only the old keys. Release Map legend and default export destination still use the first existing and first new root. Not run: Analyze/Copy/Move with 3+ real folders.

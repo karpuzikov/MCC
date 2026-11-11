@@ -188,6 +188,7 @@ window.__qaEvents=[];window.pywebview={api:{
                     page.screenshot(path=str(output/screenshot))
                     report["screenshots"].append(screenshot)
                     page.keyboard.press("Escape")
+                    page.locator("#viewMenuBtn").click()
                     page.locator("#fullViewBtn").click()
                     page.wait_for_function("!!document.querySelector('.releaseRow[data-id=\"1\"]')")
                     screenshot=name+"-full-map.png"

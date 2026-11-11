@@ -2,6 +2,14 @@
 
 Historical release notes and testing status retained from the original README.
 
+## v0.5.76 - Minimal Release Map top bar (Under construction ⚠️)
+
+- Release Map top: title, a short Search box, one plain sentence ("157 of 361 releases will be kept. 9 need a look before you can copy or move."), a "Review N" button, "View", Re-Analyze and Close. The counter pills and the OLD/NEW legend are gone from the bar.
+- The orange banner is replaced by the Review popover: it floats over the map (the map no longer shifts), lists each release with its problem in plain text, and a click opens that release's details.
+- "No changes / Full map / Show all links" and the change filters moved into the View menu, together with the OLD/NEW source legend. The menu closes after a choice, on Esc or on a click outside.
+- `tests/visual_qa.py` opens the View menu before switching to Full map. The gate still stops at a later step (waiting for a Keep event, line 230); v0.5.74 with the original script stops at the same step.
+- Checked: all `tests/` files, ruff pyflakes rules, headless render and click-through of Review and View. **Not run:** Windows 11/WebView2. Release rows, the details panel and the Copy/Move bar are unchanged in this version.
+
 ## v0.5.75 - Source folders (Under construction ⚠️)
 
 - "Existing discography" and "New / update releases" are now "Source folder 1", "Source folder 2", and so on. "＋ Add folder" adds as many as needed. A ★ on a folder gives it the old Existing discography treatment; an unstarred folder is a New / update folder. At least one folder must be unstarred.
