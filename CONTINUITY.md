@@ -1,5 +1,7 @@
 # Music Collection Cleaner - Continuity Handoff
 
+Standing rule: the GitHub release title is exactly `Music Collection Cleaner v0.5.X - Under construction ⚠️` (the v0.5.63-65 format). No description in the title; put it in the release description. The user objected on 2026-11-11 when v0.5.66-69 carried descriptions, and the titles were changed back.
+
 ## Checkpoint 2026-11-11 - MCC v0.5.69 - Under construction ⚠️
 
 User said "i don't need a self test" after v0.5.68 moved the built-in self-tests to `tests/test_ui_self_test.py`. v0.5.69 deletes that file and the `main()` guard for `--ui-self-test` / `--self-test`; README and the RULES.md release-blocking rule no longer mention it. Do not recreate a self-test or a `--ui-self-test` flag unless the user asks. Recoverable from git history (v0.5.68 commit) and `version-history/` (v0.05.67 has the built-in one). The 12 other `tests/` files remain and still pass.
