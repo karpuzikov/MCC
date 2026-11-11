@@ -2,6 +2,15 @@
 
 Historical release notes and testing status retained from the original README.
 
+## v0.5.77 - New dark main window (Under construction ⚠️)
+
+- Main window redesigned: near-black background, one light primary button, hairline outlines, one font. Title "Where is your music?" over the source folders, which are labelled "Already have" (starred) and "New".
+- Only the two daily switches stay on the page: Keep remixes and Keep live recordings. Personal Picks, Classify patterns, Logging, Open logs folder and Audio I/O workers moved into a Settings menu (gear). An amber dot on the gear shows when patterns wait for classification.
+- The progress card appears only while there is something to show. The log is hidden behind "Show details".
+- Footer: Analyze (primary), Release Map, and a quiet "Undo last run". The Close button is gone (the window's own close button remains).
+- Release Map and the dialogs keep their layout; the dialogs use the same dark colors.
+- Checked: all `tests/` files, ruff pyflakes rules, headless render at 980x560 and 640x480 (idle, Settings open, running with details). **Not run:** Windows 11/WebView2.
+
 ## v0.5.76 - Minimal Release Map top bar (Under construction ⚠️)
 
 - Release Map top: title, a short Search box, one plain sentence ("157 of 361 releases will be kept. 9 need a look before you can copy or move."), a "Review N" button, "View", Re-Analyze and Close. The counter pills and the OLD/NEW legend are gone from the bar.

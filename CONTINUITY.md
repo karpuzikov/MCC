@@ -1,5 +1,9 @@
 # Music Collection Cleaner - Continuity Handoff
 
+## Checkpoint 2026-11-11 - MCC v0.5.77 - Under construction ⚠️
+
+Main window HTML/CSS only (`_webview_main_html`). New neutral dark palette (CSS variables, old names kept as aliases), settings popover `#settingsMenu` opened by `#settingsBtn` (`closeSettingsMenu()`, Esc and outside click), `#settingsDot` set from `pendingPatternCount`, `#detailsToggle` toggles `#activityCard.open`, `#content.idleProgress` hides the progress card while status is Ready and 0%. `#closeBtn` removed together with its handler. All element ids used by the bridge code are unchanged. Next: Release Map rows and details panel in the same style (a 400-release prototype with virtual scrolling exists outside the repo), then Copy/Move bar.
+
 ## Checkpoint 2026-11-11 - MCC v0.5.76 - Under construction ⚠️
 
 Release Map HTML only. `#changeBar` is now the View popover (`#viewMenuBtn`, `.open`), `#auditBanner` is a floating popover opened by `#reviewBtn` (`auditExpanded`), `renderStatusLine()` writes `#statusLine` and the Review button; `#planCounts` stays in the DOM (hidden) so `renderPlanCounts` still works. `closePopovers()` handles Esc and outside clicks. `tests/visual_qa.py` stops at line 230 on v0.5.74 and v0.5.76 alike. Next steps in the same redesign: release rows and the details panel, then the Copy/Move bar and the main window.
