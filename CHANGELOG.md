@@ -2,6 +2,14 @@
 
 Historical release notes and testing status retained from the original README.
 
+## v0.5.75 - Source folders (Under construction ⚠️)
+
+- "Existing discography" and "New / update releases" are now "Source folder 1", "Source folder 2", and so on. "＋ Add folder" adds as many as needed. A ★ on a folder gives it the old Existing discography treatment; an unstarred folder is a New / update folder. At least one folder must be unstarred.
+- Each row: ★/☆, path, 📁 show in Explorer (now after the path), 📂 browse, ✕ clear (rows 1-2) or remove (added rows). The "optional" tag is gone.
+- Settings: rows are saved as `source_folders_v1`; old `existing_discography` / `recycle_update_folder` open as starred folder 1 and folder 2. The old keys are still written (first starred, first unstarred folder).
+- Analysis scans every folder; Copy and Move refuse a destination inside any of them, Move cleans empty folders in all of them and records the extra roots in the manifest. The audio I/O plan looks at every folder's drive.
+- New `tests/test_source_folders.py` (7 tests). Checked: all `tests/` files, ruff pyflakes rules, headless render and click-through of the new rows (star, add, remove). **Not run:** Analyze, Copy or Move with 3+ real folders, Windows 11/WebView2.
+
 ## v0.5.74 - Parallel padding check, one log file, multi-disc folders (Under construction ⚠️)
 
 - "Measuring silent boundary padding": pairs are measured at the same time (up to 8 FFmpeg decodes) and the step shows n/total progress. In a BT run it measured 109 pairs one after another in 129 s with almost no CPU or disk use. Results are applied in the same order as before.

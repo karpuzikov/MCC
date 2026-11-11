@@ -1,5 +1,9 @@
 # Music Collection Cleaner - Continuity Handoff
 
+## Checkpoint 2026-11-11 - MCC v0.5.75 - Under construction ⚠️
+
+Main window keeps `MainBridge.folders` (rows of `path` + `star`) instead of `existing_path`/`recycle_path`; bridge calls are `setFolders(rows)`, `browseFolder(index)`, `startAnalyze(rows, ...)`. Starred rows are existing roots, unstarred are new roots; the first of each is the primary `existing`/`recycle`, the rest travel as `extra_existing`/`extra_recycle` into `prepare_analysis` and as `extra_roots` into `_io_worker_plan`, `copy_retained_plan`, `move_retained_plan`. `_save_app_settings` keeps `source_folders_v1` when a caller passes only the old keys. Release Map legend and default export destination still use the first existing and first new root. Not run: Analyze/Copy/Move with 3+ real folders.
+
 ## Checkpoint 2026-11-11 - MCC v0.5.74 - Under construction ⚠️
 
 `merge_equivalent_tracks` collects padding candidates, then measures them in a thread pool (each pair has its own `_PCMIdentityVerifier`). `_new_comparison_log_path` returns a fixed name and deletes legacy timestamped logs. `validate_release_track_totals` uses `_filename_disc_and_track` when every file name has a disc prefix and there are 2+ discs. Open: `_track_number_for_routing` still reads `2-03.` as track 2 when tags lack TRACKNUMBER; DVD declared totals unchecked on real tags.

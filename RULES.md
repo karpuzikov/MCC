@@ -527,7 +527,7 @@ For otherwise interchangeable choices:
 
 ### Optional existing-discography mode
 
-The Existing discography folder is optional.
+The Existing discography folder is optional. Since v0.5.75 the window has any number of numbered source folders; a star marks a folder as Existing discography, an unstarred folder is a New / update folder. At least one folder must be unstarred, and no two folders may be the same or nested. Old settings open as starred Source folder 1 and Source folder 2.
 
 - If Existing is provided, compare Existing + Recycle together using all normal source/preference rules.
 - If Existing is blank, analyze and optimize Recycle against itself only.
