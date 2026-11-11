@@ -1,5 +1,9 @@
 # Music Collection Cleaner - Continuity Handoff
 
+## Checkpoint 2026-11-11 - MCC v0.5.79 - Under construction ⚠️
+
+Release Map `whyShort()` derives duplicate text from `duplicateLinks` ("Same as ...") instead of `node.reason`; `.rel.indent` for duplicates in the Everything view; `.grp` restyled. Not run: Windows/WebView2.
+
 ## Checkpoint 2026-11-11 - MCC v0.5.78 - Under construction ⚠️
 
 `_webview_main_html` and `_webview_release_map_html` replaced wholesale (sources were authored as plain HTML and spliced into the two raw strings; neither may contain the string's own triple quote). Bridge contracts unchanged. Main page: `render(state)`, `handleEvent` (error/info, patternReview, manualReview, copyDone, done), one dialog shell `openDlg/closeDlg` (Esc: pattern review defers, same-song review cancels). Map page: `receiveState`, `receiveTrackToggle`, `receiveReleaseToggle`, `receivePattern`, `applyRootPatch`; flat virtualised list (`buildItems` + `paintListNow`, fixed row heights), details panel `renderDetails`, plan logic (`replacementMap`, `changeKind`, `trackStatus`, `altsFor`) kept; export enabled by `exportBlockReason()` (editable, not dirty, no audit issues, applyEnabled). Copy mode key "all", Move "new". `tests/visual_qa.py` rewritten; `tests/test_hover_actions.py` deleted (tested removed map internals). Not run: Windows/WebView2.

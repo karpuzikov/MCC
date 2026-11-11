@@ -2,6 +2,11 @@
 
 Historical release notes and testing status retained from the original README.
 
+## v0.5.79 - Quieter Release Map list (Under construction ⚠️)
+
+- Release Map rows: a duplicate release now reads "Same as <kept release>" instead of the long backend sentence, and is indented under its group in Everything. Group titles are brighter.
+- Checked: `tests/test_*.py`, ruff pyflakes rules, `tests/visual_qa.py` (headless Chromium). **Not run:** Windows 11/WebView2.
+
 ## v0.5.78 - Every screen rebuilt (Under construction ⚠️)
 
 - The whole UI is rewritten from zero: main window, all dialogs and the Release Map. No old layout, wording or markup is kept; only the bridge calls and the plan logic are.
