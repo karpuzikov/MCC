@@ -2,6 +2,12 @@
 
 Historical release notes and testing status retained from the original README.
 
+## v0.5.70 - Compact UI (Under construction ⚠️)
+
+- Main window and Release Map: smaller padding and gaps, 30 px buttons and fields (were 34 px), shorter footer and toolbar, Release Map buttons use the 13 px page font (were the 16 px browser default).
+- Removed text: the "Source folders" heading, the "Chronological release board" caption, the two-line descriptions under Copy/Move (now "Copy into:" / "Move into:" with the old text as tooltip), the empty progress-detail line.
+- Checked: Linux headless-Chrome screenshots of both windows (empty Release Map, no real data), all 12 `tests/` files, ruff pyflakes rules. **Not run:** Windows 11/WebView2, Release Map with real releases (track rows, details panel).
+
 ## v0.5.69 - Self-test removed (Under construction ⚠️)
 
 - Removed: the UI contract self-test and its 13 regression self-tests (`tests/test_ui_self_test.py`, 3,309 lines, 322 checks) and the `main()` guard that told users where `--ui-self-test` had gone. `--ui-self-test` and `--self-test` are now ordinary unknown arguments and start the app. The code stays in git history (v0.5.68 commit) and in `version-history/` (built-in version, v0.05.67).

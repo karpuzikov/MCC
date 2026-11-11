@@ -1,5 +1,9 @@
 # Music Collection Cleaner - Continuity Handoff
 
+## Checkpoint 2026-11-11 - MCC v0.5.70 - Under construction ⚠️
+
+CSS/text-only change to `_webview_main_html` and `_webview_release_map_html` (see CHANGELOG). No logic changes. Release Map was only rendered empty; rows, details panel and modals are unchecked.
+
 ## Checkpoint 2026-11-11 - MCC v0.5.69 - Under construction ⚠️
 
 v0.5.69 deletes `tests/test_ui_self_test.py` (moved there in v0.5.68) and the `main()` guard for `--ui-self-test` / `--self-test`; README and the RULES.md release-blocking rule no longer mention it. Recoverable from git history (v0.5.68 commit) and `version-history/` (v0.05.67 has the built-in one). The 12 other `tests/` files remain and still pass.
