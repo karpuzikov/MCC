@@ -61,12 +61,10 @@ class FingerprintPolicy(unittest.TestCase):
         changed=tuple(v^(0xffffffff if 2000<=i<2020 else 0) for i,v in enumerate(original))
         tracks=[mcc.Track(1,Path('cd.flac'),1,title='Song',duration=498,explicit='clean',fingerprint=original),
                 mcc.Track(2,Path('web.flac'),1,title='Song',duration=498,explicit='explicit',fingerprint=changed)]
-        with patch.object(mcc,'_fingerprint_local_identity',side_effect=AssertionError('No secondary fingerprint check')), \
-             patch.object(mcc._PCMIdentityVerifier,'verify',side_effect=AssertionError('No decoded identity check')), \
+        with patch.object(mcc._PCMIdentityVerifier,'verify',side_effect=AssertionError('No decoded identity check')), \
              patch.object(mcc,'_compare_workers',return_value=1):
             self.assertTrue(mcc.fingerprint_auto_match(*tracks)[0])
             mcc._init_compare_worker([(t.fingerprint,t.duration) for t in tracks])
-            self.assertTrue(mcc._compare_pair_worker((0,1))[2])
             self.assertTrue(mcc._compare_pair_batch_worker([(1,0,1)])[0][3])
             with tempfile.TemporaryDirectory() as td:
                 log=Path(td)/'comparison.jsonl'

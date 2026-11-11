@@ -1,5 +1,11 @@
 # Music Collection Cleaner - Continuity Handoff
 
+## Checkpoint 2026-11-11 - MCC v0.5.68 - Under construction ⚠️
+
+User asked "can you do both?" after the conciseness answer: drop EXE support and move the built-in self-tests out of the app. Done in one script (`make_v068`-style: AST ranges, `mcc.` prefix rewriting, `globals()` becomes `vars(mcc)`, two rebound globals `_MANUAL_ALBUM_GROUP_LINKS` and `_state_dir` become `mcc.` attributes). The app has 16,109 lines (was 20,323); `tests/test_ui_self_test.py` now holds the UI contract and 13 regression self-tests. `--ui-self-test` is gone from the app; Windows testing needs the repository files. Equivalence checked by text diff of the 18 moved functions and 190 planted bugs (identical results old vs moved).
+
+Not done: `_PCMIdentityVerifier.verify` (70 lines, tripwire target in about 7 test patches), the ~120 broad exception handlers (32 on the analysis path unreviewed), symbol-only titles still get an empty key, Windows 11/WebView2 and real-audio tests never run.
+
 ## Checkpoint 2026-11-11 - MCC v0.5.67 - Under construction ⚠️
 
 User said "go on" after the improvement list. Done: unreadable CUE sheets are caught per sheet (`OSError` only) and shown in the release warning (`_release_warning`, new `Release.unreadable_cue_paths`); compilation warning shows the real folder name; three dead methods removed; two Move rollback tests added and mutation-checked. Not done: the other broad exception handlers (about 120; 32 on the analysis path still unreviewed), self-update code removal (waiting for the user's answer on shipping an EXE), symbol-only titles still get an empty key, Windows 11/WebView2 and real-audio tests.

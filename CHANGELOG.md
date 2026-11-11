@@ -2,6 +2,15 @@
 
 Historical release notes and testing status retained from the original README.
 
+## v0.5.68 - EXE support, dead code and built-in self-tests leave the app (Under construction ⚠️)
+
+- Removed: packaged-EXE support. The self-update check looked for tags starting with `music-collection-cleaner-v` and an EXE file; no release has either (all 5 current releases are `.pyw` only, tags are `v0.5.x`). Also removed: the `--self-test` EXE smoke test (687 lines), the frozen-build branches, `multiprocessing.freeze_support`, and the helpers and constants only they used.
+- Moved: the built-in UI contract self-test (2,293 lines), its 13 regression self-tests and 4 helpers only they used now live in `tests/test_ui_self_test.py` (3,309 lines). `--ui-self-test` and `--self-test` no longer exist in the app: they print where to run the test and exit with an error instead of starting the window. Run `python tests/test_ui_self_test.py` from the repository root. Consequence: testing on Windows now needs the repository files, not only the single `.pyw`.
+- Removed dead code: the legacy fingerprint local-distance diagnostic (kept as a test helper in `tests/test_audio_safety.py` so the synthetic fingerprints are still checked), the single-pair compare worker (the batch worker is what runs) and an unused nested function. Two policy tripwire patches that pointed at the removed functions were dropped from `tests/test_fingerprint_policy.py`.
+- Result: the app file shrinks from 20,323 to 16,109 lines (about 21%).
+- Checked: the 18 moved functions are text-identical to the originals except for `mcc.` prefixes and `vars(mcc)` instead of `globals()` (322 assertion raises preserved); the moved test passes on both the v0.5.67 and v0.5.68 sources; 190 single-line bugs planted in the v0.5.67 code were caught identically by the old in-app test and the moved test (32 caught by each, 0 disagreements). Linux `py_compile`, ruff pyflakes rules and all 13 `tests/` files: PASS. Windows 11/WebView2, real-audio Analyze and Copy/Move/Undo on real folders: **NOT RUN**; remains **Under construction ⚠️**.
+- Known limits: the self-test catches only about 17% of planted bugs, the same as before the move. `_PCMIdentityVerifier.verify` (70 lines) is no longer called by the app but tests patch it as a tripwire, so it stays for now. The `bundled/` folder lookups for FFmpeg and fpcalc stay.
+
 ## v0.5.67 - Unreadable CUE sheets are reported; dead code removed (Under construction ⚠️)
 
 - Fixed: a CUE sheet that could not be read was silently ignored, so its whole-album audio image counted as one track with no hint why. The release now shows "Unreadable CUE sheet (name): its audio image counts as one track." in its warning line. Other read problems are not swallowed any more: only file-read errors (`OSError`) are caught, per CUE sheet, so one bad sheet does not stop the others.

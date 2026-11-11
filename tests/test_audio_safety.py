@@ -28,6 +28,19 @@ def fp(seed=42, count=1000):
     return tuple(rng.getrandbits(32) for _ in range(count))
 
 
+def local_worst_window_score(fp1, fp2, sim):
+    """Highest mean bit distance in any 40-frame window of the aligned fingerprints."""
+    shift = int(sim[3])
+    a0, b0 = max(shift, 0), max(-shift, 0)
+    n = min(len(fp1) - a0, len(fp2) - b0)
+    distances = [(fp1[a0 + i] ^ fp2[b0 + i]).bit_count() for i in range(n)]
+    size = min(40, n)
+    starts = list(range(0, n - size + 1, max(1, size // 2)))
+    if starts[-1] != n - size:
+        starts.append(n - size)
+    return round(max(sum(distances[start:start + size]) / size for start in starts), 6)
+
+
 class AcousticSafety(unittest.TestCase):
     def test_authoritative_fingerprint_tolerates_small_unmatched_ends(self):
         original=fp()
@@ -67,7 +80,7 @@ class AcousticSafety(unittest.TestCase):
                 matched,sim=mcc.fingerprint_auto_match_values(long,duration+delta,short,duration)
                 self.assertTrue(matched)
                 self.assertAlmostEqual(sim[0],score,places=6)
-                self.assertEqual(mcc._fingerprint_local_identity(long,short,sim)['worst_window_score'],worst)
+                self.assertEqual(local_worst_window_score(long,short,sim),worst)
                 details=mcc._comparison_decision_details(long,duration+delta,short,duration,True,sim,
                     {'passed':False,'reason':'PCM would reject mastering or boundary difference'})
                 self.assertTrue(details['identity_confirmed'])
