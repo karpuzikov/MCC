@@ -2,6 +2,11 @@
 
 Historical release notes and testing status retained from the original README.
 
+## v0.5.71 - Faster silent boundary padding check (Under construction ⚠️)
+
+- "Measuring silent boundary padding" measured every sample of both recordings in a Python loop on one core. It now uses built-in C-level sums; results are identical (integer sums, same peak). Synthetic 4-minute stereo pair: 5.5 s -> 2.1 s per pair on Linux; the rest is FFmpeg decoding.
+- Checked: `tests/test_silence_padding.py` and all other `tests/` files, ruff pyflakes rules. **Not run:** Windows 11/WebView2, a real library, and a before/after timing there. Pairs are still processed one at a time, so a library with many such pairs is still not parallel.
+
 ## v0.5.70 - Compact UI (Under construction ⚠️)
 
 - Main window and Release Map: smaller padding and gaps, 30 px buttons and fields (were 34 px), shorter footer and toolbar, Release Map buttons use the 13 px page font (were the 16 px browser default).

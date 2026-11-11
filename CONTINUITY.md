@@ -1,5 +1,9 @@
 # Music Collection Cleaner - Continuity Handoff
 
+## Checkpoint 2026-11-11 - MCC v0.5.71 - Under construction ⚠️
+
+`_PCMIdentityVerifier.verify_padding` `levels()` uses slice + `sum`/`math.sumprod` instead of a per-sample loop (new `_pcm_sum_of_squares`). Remaining cost is FFmpeg decode per pair, serial. Not done: parallel padding checks (verifier cache is not thread-safe).
+
 ## Checkpoint 2026-11-11 - MCC v0.5.70 - Under construction ⚠️
 
 CSS/text-only change to `_webview_main_html` and `_webview_release_map_html` (see CHANGELOG). No logic changes. Release Map was only rendered empty; rows, details panel and modals are unchecked.
