@@ -2,6 +2,13 @@
 
 Historical release notes and testing status retained from the original README.
 
+## v0.5.74 - Parallel padding check, one log file, multi-disc folders (Under construction ⚠️)
+
+- "Measuring silent boundary padding": pairs are measured at the same time (up to 8 FFmpeg decodes) and the step shows n/total progress. In a BT run it measured 109 pairs one after another in 129 s with almost no CPU or disk use. Results are applied in the same order as before.
+- Logs: one `Music Collection Cleaner Comparison.jsonl` and one `Music Collection Cleaner Re-Analyze.jsonl` in the logs folder, overwritten every run; older timestamped logs of both kinds are deleted when a new run starts.
+- Completeness check: a folder whose file names all carry disc and track (`1-01.`, `2-03.`, `DVD-12.`) is split into those discs, with the DVD labelled "DVD:", instead of being read as one disc with conflicting totals and duplicate numbers. Missing tracks on a disc are still reported. New `tests/test_multi_disc_folder.py` (fails on v0.5.73).
+- Checked: all `tests/` files, ruff pyflakes rules. **Not run:** the real BT folder (its tags were not in the log, so the DVD's declared totals are unverified), a Windows run, timing of the parallel step.
+
 ## v0.5.73 - Smaller comparison log, readable integrity warnings (Under construction ⚠️)
 
 - Comparison log: pairs rejected only because their lengths differ by more than 8 s are no longer written one by one; they stay in the summary counters. A BT run logged 107,858 of them (about 280 of 300 MB), none with an acoustic pass. Pairs with an acoustic pass, near-threshold pairs, matches and the sampled rejects are still logged.

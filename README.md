@@ -1,14 +1,14 @@
 # Music Collection Cleaner (MCC)
 
-**Version: 0.5.73 - Under construction ⚠️**
+**Version: 0.5.74 - Under construction ⚠️**
 
 Music Collection Cleaner compares existing music releases with new ones, finds the best combination of editions, and helps preserve every wanted unique recording while removing unnecessary redundancy.
 
 ## Download and run
 
-**[Music Collection Cleaner v0.05.73.pyw](Music%20Collection%20Cleaner%20v0.05.73.pyw)** - latest single-file Windows Python application. **Under construction ⚠️** until actual Windows WebView2 testing.
+**[Music Collection Cleaner v0.05.74.pyw](Music%20Collection%20Cleaner%20v0.05.74.pyw)** - latest single-file Windows Python application. **Under construction ⚠️** until actual Windows WebView2 testing.
 
-Open with Python 3 on Windows 11 (or run from a console with `python "Music Collection Cleaner v0.05.73.pyw"`). The application checks or installs supported dependencies; the FFmpeg and Chromaprint downloads are pinned to exact versions and refused unless their SHA-256 matches. The GUI uses Microsoft Edge WebView2 through pywebview; it is not a terminal-based replacement.
+Open with Python 3 on Windows 11 (or run from a console with `python "Music Collection Cleaner v0.05.74.pyw"`). The application checks or installs supported dependencies; the FFmpeg and Chromaprint downloads are pinned to exact versions and refused unless their SHA-256 matches. The GUI uses Microsoft Edge WebView2 through pywebview; it is not a terminal-based replacement.
 
 Source-level regression checks: `python tests/<file>.py` from the repository root for each file in `tests/`.
 

@@ -1,5 +1,9 @@
 # Music Collection Cleaner - Continuity Handoff
 
+## Checkpoint 2026-11-11 - MCC v0.5.74 - Under construction ⚠️
+
+`merge_equivalent_tracks` collects padding candidates, then measures them in a thread pool (each pair has its own `_PCMIdentityVerifier`). `_new_comparison_log_path` returns a fixed name and deletes legacy timestamped logs. `validate_release_track_totals` uses `_filename_disc_and_track` when every file name has a disc prefix and there are 2+ discs. Open: `_track_number_for_routing` still reads `2-03.` as track 2 when tags lack TRACKNUMBER; DVD declared totals unchecked on real tags.
+
 ## Checkpoint 2026-11-11 - MCC v0.5.73 - Under construction ⚠️
 
 Comparison-log filter in the pair handler no longer logs `duration_version_conflict` pairs without a strict/mastering/high-overlap pass; `_short_integrity_reason` shortens the Release Map banner text only. Summary counters are unchanged.
