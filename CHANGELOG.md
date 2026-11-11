@@ -2,6 +2,14 @@
 
 Historical release notes and testing status retained from the original README.
 
+## v0.5.67 - Unreadable CUE sheets are reported; dead code removed (Under construction ⚠️)
+
+- Fixed: a CUE sheet that could not be read was silently ignored, so its whole-album audio image counted as one track with no hint why. The release now shows "Unreadable CUE sheet (name): its audio image counts as one track." in its warning line. Other read problems are not swallowed any more: only file-read errors (`OSError`) are caught, per CUE sheet, so one bad sheet does not stop the others.
+- Fixed: the "Review as Compilation" warning showed the internal comparison key (`acdc`) instead of the artist folder name. `_discography_artist_folder_name` gives the real name; the key is built from it.
+- Removed: `MainBridge._apply_done`, `Release.has_remixes`, `Release.retained_audio_file_count` (no callers anywhere in the program or tests).
+- New tests: `tests/test_release_warnings.py` (3), one unreadable-CUE test, and two Move rollback tests (rollback restores the first release; blocked rollback raises "needs manual recovery" and keeps the journal). Both rollback tests fail against deliberately broken copies of the code. The warning and CUE tests fail against v0.5.66. Linux `py_compile`, ruff pyflakes rules, `--ui-self-test` and all 13 `tests/` files: PASS. Windows 11/WebView2, real-audio Analyze and Copy/Move/Undo on real folders: **NOT RUN**; remains **Under construction ⚠️**.
+- Not changed: the other ~120 broad exception handlers were left as they are (the other 32 on the analysis path were not reviewed yet), and the self-update code stays until it is decided whether an MCC EXE is shipped.
+
 ## v0.5.66 - Track titles and credit names work in any script (Under construction ⚠️)
 
 - Fixed: the keys built from track titles deleted everything except a-z and 0-9, so a Cyrillic, Japanese or Arabic title became an empty key (`Привет, мир` gave an empty string). Title-based features skip an empty key, so Explicit>Clean twins, censor-mask matching, descriptor/version grouping and Personal Picks did nothing for those libraries; a non-Latin Personal Pick was dropped on save.

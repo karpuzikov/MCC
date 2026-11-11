@@ -1,5 +1,9 @@
 # Music Collection Cleaner - Continuity Handoff
 
+## Checkpoint 2026-11-11 - MCC v0.5.67 - Under construction ⚠️
+
+User said "go on" after the improvement list. Done: unreadable CUE sheets are caught per sheet (`OSError` only) and shown in the release warning (`_release_warning`, new `Release.unreadable_cue_paths`); compilation warning shows the real folder name; three dead methods removed; two Move rollback tests added and mutation-checked. Not done: the other broad exception handlers (about 120; 32 on the analysis path still unreviewed), self-update code removal (waiting for the user's answer on shipping an EXE), symbol-only titles still get an empty key, Windows 11/WebView2 and real-audio tests.
+
 ## Checkpoint 2026-11-10 - MCC v0.5.66 - Under construction ⚠️
 
 Follow-up to v0.5.65, approved by the user: track-title keys still used `[^a-z0-9]`, so non-Latin titles got empty keys and title features silently skipped them. v0.5.66 adds `compact_title_key` (`[\W_]+` removed from `normalize_title`) and uses it for `identity_title`, descriptor/base-title keys, advisory (Explicit>Clean) keys, censor masks, album slot keys and Personal Picks; credit-name word extractors are Unicode; the page script uses `\p{L}\p{N}`. Left Latin on purpose: English version/generic word lists, `_is_named_person_mix_descriptor`, Latin-initial possessors, tag-field-name keys.

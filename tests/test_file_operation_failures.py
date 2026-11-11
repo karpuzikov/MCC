@@ -78,6 +78,35 @@ class FileOperationFailures(unittest.TestCase):
         self.assertTrue((moved_old_release / '01 track.flac').is_file())
         self.assertTrue(self.manifest.is_file())  # kept so Undo can be retried
 
+    def second_move_fails(self, rollback_works):
+        real_move = mcc._verified_release_directory_move
+        calls = []
+
+        def move_failing_for_second_release(source, target, *args, **kwargs):
+            calls.append(Path(source))
+            if len(calls) == 2:
+                raise OSError('destination locked')
+            if len(calls) == 3 and not rollback_works:
+                raise OSError('rollback blocked')
+            return real_move(source, target, *args, **kwargs)
+        return patch.object(mcc, '_verified_release_directory_move', move_failing_for_second_release)
+
+    def test_failed_move_puts_the_first_release_back(self):
+        with self.second_move_fails(rollback_works=True):
+            with self.assertRaises(OSError):
+                mcc.move_retained_plan(self.old_root, self.new_root, self.destination, self.releases, self.decisions)
+        self.assertTrue((self.sources[0] / '01 track.flac').is_file())
+        self.assertTrue((self.sources[1] / '01 track.flac').is_file())
+        self.assertFalse(self.manifest.exists())
+
+    def test_failed_move_with_blocked_rollback_asks_for_undo_and_keeps_the_journal(self):
+        with self.second_move_fails(rollback_works=False):
+            with self.assertRaises(RuntimeError) as raised:
+                mcc.move_retained_plan(self.old_root, self.new_root, self.destination, self.releases, self.decisions)
+        self.assertIn('rollback needs manual recovery', str(raised.exception))
+        self.assertTrue((self.destination / 'Albums' / 'Edition 0' / '01 track.flac').is_file())
+        self.assertTrue(self.manifest.is_file())
+
 
 if __name__ == '__main__':
     unittest.main()

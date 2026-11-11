@@ -48,5 +48,21 @@ class CueParsing(unittest.TestCase):
         self.assertEqual([t['track_number'] for t in tracks], [1])
 
 
+class UnreadableCue(unittest.TestCase):
+    def test_unreadable_cue_is_reported_not_ignored(self):
+        temp = tempfile.TemporaryDirectory(prefix='mcc-cue-')
+        self.addCleanup(temp.cleanup)
+        folder = Path(temp.name)
+        image = folder / 'album.flac'
+        image.write_bytes(b'image')
+        readable = folder / 'good.cue'
+        readable.write_text(CUE_WITH_TWO_TRACKS, encoding='utf-8')
+        missing = folder / 'missing.cue'
+        specs, image_files, unreadable = mcc._cue_image_track_specs([readable, missing], [image])
+        self.assertEqual(unreadable, [missing])
+        self.assertEqual(len(specs), 2)
+        self.assertEqual(image_files, {image})
+
+
 if __name__ == '__main__':
     unittest.main()
