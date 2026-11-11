@@ -2,6 +2,14 @@
 
 Historical release notes and testing status retained from the original README.
 
+## v0.5.72 - Release Map: collapsed warning banner, lighter links (Under construction ⚠️)
+
+- The "Copy and Move blocked" banner is one line ("N release(s) ▸") that expands on click into single-line, ellipsized rows (full text in the tooltip, max 40% of the window height, scrollable). It used to fill about half the window with wrapped raw error text.
+- Selected-release link lines are thinner and fainter (versions, remixes, live, duplicates, track carriers).
+- The "Chronological release board" / "Changes only" / "Full chronological release map" caption is no longer set; search and track messages remain.
+- Release rows, group titles and metadata have slightly higher contrast and size.
+- Checked: headless Chrome render with fake audit data (collapsed and expanded), all `tests/` files, ruff pyflakes rules. **Not run:** Windows 11/WebView2, a real library with a selected release (link lines).
+
 ## v0.5.71 - Faster silent boundary padding check (Under construction ⚠️)
 
 - "Measuring silent boundary padding" measured every sample of both recordings in a Python loop on one core. It now uses built-in C-level sums; results are identical (integer sums, same peak). Synthetic 4-minute stereo pair: 5.5 s -> 2.1 s per pair on Linux; the rest is FFmpeg decoding.
