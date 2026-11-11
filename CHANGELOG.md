@@ -2,6 +2,15 @@
 
 Historical release notes and testing status retained from the original README.
 
+## v0.5.78 - Every screen rebuilt (Under construction ⚠️)
+
+- The whole UI is rewritten from zero: main window, all dialogs and the Release Map. No old layout, wording or markup is kept; only the bridge calls and the plan logic are.
+- Main window: one centred column, "Clean up your music". Each folder row has a Library / Incoming switch, a path box, Show, Browse and a remove button. Two switches (remixes, live recordings). Settings (gear): Always keep, Unusual titles, Write logs, Open logs folder, Parallel reads. Progress shows only while there is something to show; the log sits behind "Show log". Footer: Analyze, Open map, Undo last run.
+- Dialogs share one style: message, confirm, Unusual titles (review and manager), Same song? (a Different / Same choice per pair), Always keep, Finished, Copied, Moved.
+- Release Map: a search box, one summary sentence, tabs Changes / Everything / Needs a look with filter chips, and a virtual list that stays fast with hundreds of releases. Selecting a release opens a side panel with notices, actions, album family, related releases (clickable) and tracks. Clicking a track title lists every release that carries it. Per-track menu: ignore or restore, treat as remix or live, always keep. Copy and Move always answer: when blocked, a short message says why. Export is one dialog with the destination and plain safety text.
+- Removed: Release Map link lines, the View menu, the Review popover, `tests/test_hover_actions.py` (it tested the old Release Map internals). `tests/visual_qa.py` is rewritten for the new pages (both window sizes, every dialog, a 400-release map, export flow).
+- Checked: all remaining `tests/test_*.py`, ruff pyflakes rules, `tests/visual_qa.py` in headless Chromium. **Not run:** Windows 11/WebView2, real Analyze/Copy/Move.
+
 ## v0.5.77 - New dark main window (Under construction ⚠️)
 
 - Main window redesigned: near-black background, one light primary button, hairline outlines, one font. Title "Where is your music?" over the source folders, which are labelled "Already have" (starred) and "New".
