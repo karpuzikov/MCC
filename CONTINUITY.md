@@ -1,5 +1,9 @@
 # Music Collection Cleaner - Continuity Handoff
 
+## Checkpoint 2026-11-12 - MCC v0.5.81 - Under construction ⚠️
+
+Release Map `renderOverview()` fills `#dScroll` when `closeDetails` runs (no selection); tiles use `data-ov` (changes/look + `data-kind`) handled at the top of the `#dScroll` click handler; `data-go` works without a selection. `tests/visual_qa.py` checks `#dName` is not "Overview" after a click. Not run: Windows/WebView2.
+
 ## Checkpoint 2026-11-12 - MCC v0.5.80 - Under construction ⚠️
 
 Release Map layout: `#listWrap` is `flex:0 0 clamp(440px,44%,780px)`, `#details` is always displayed (`.open` only means a release is selected; `closeDetails` writes the empty message). `tests/visual_qa.py` checks `#dName` instead of the `.open` class. Not run: Windows/WebView2.

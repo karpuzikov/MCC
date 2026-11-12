@@ -2,6 +2,11 @@
 
 Historical release notes and testing status retained from the original README.
 
+## v0.5.81 - Release Map overview panel (Under construction ⚠️)
+
+- Release Map: when no release is selected, the right panel shows an Overview instead of an empty message: releases and tracks kept, counts of Added / Upgraded / Replaced / Removed / Ignored (click one to filter the list), the first ten releases that need a look, and the Library and Incoming folders.
+- Checked: `tests/test_*.py`, ruff pyflakes rules, `tests/visual_qa.py`, 2000 px wide render, tile click filters the list. **Not run:** Windows 11/WebView2.
+
 ## v0.5.80 - Release Map uses the full window (Under construction ⚠️)
 
 - Release Map: the release list is a fixed-width column on the left and the details panel is always on the right (empty message until a release is selected). Wide windows no longer stretch rows across the whole screen.
