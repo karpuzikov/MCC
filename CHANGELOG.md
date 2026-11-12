@@ -2,6 +2,11 @@
 
 Historical release notes and testing status retained from the original README.
 
+## v0.5.80 - Release Map uses the full window (Under construction ⚠️)
+
+- Release Map: the release list is a fixed-width column on the left and the details panel is always on the right (empty message until a release is selected). Wide windows no longer stretch rows across the whole screen.
+- Checked: `tests/test_*.py`, ruff pyflakes rules, `tests/visual_qa.py`, 2000 px wide render. **Not run:** Windows 11/WebView2.
+
 ## v0.5.79 - Quieter Release Map list (Under construction ⚠️)
 
 - Release Map rows: a duplicate release now reads "Same as <kept release>" instead of the long backend sentence, and is indented under its group in Everything. Group titles are brighter.

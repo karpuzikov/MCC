@@ -187,7 +187,7 @@ def main() -> int:
             page.click("#spacer .rel")
             page.wait_for_timeout(100)
             page.screenshot(path=str(out / f"map_{size}_details.png"))
-            check(page.evaluate("document.getElementById('details').classList.contains('open')"), "details open on click")
+            check(page.evaluate("document.getElementById('dName').textContent!=='Nothing selected'"), "details fill on click")
             page.click("#dScroll .kebab")
             page.screenshot(path=str(out / f"map_{size}_trackmenu.png"))
             page.keyboard.press("Escape")

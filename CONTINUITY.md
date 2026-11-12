@@ -1,5 +1,9 @@
 # Music Collection Cleaner - Continuity Handoff
 
+## Checkpoint 2026-11-12 - MCC v0.5.80 - Under construction ⚠️
+
+Release Map layout: `#listWrap` is `flex:0 0 clamp(440px,44%,780px)`, `#details` is always displayed (`.open` only means a release is selected; `closeDetails` writes the empty message). `tests/visual_qa.py` checks `#dName` instead of the `.open` class. Not run: Windows/WebView2.
+
 ## Checkpoint 2026-11-11 - MCC v0.5.79 - Under construction ⚠️
 
 Release Map `whyShort()` derives duplicate text from `duplicateLinks` ("Same as ...") instead of `node.reason`; `.rel.indent` for duplicates in the Everything view; `.grp` restyled. Not run: Windows/WebView2.
