@@ -1,237 +1,271 @@
-"""Developer-only MCC Visual QA gate for the v0.5.78 UI: headless Chromium, fake bridge.
-Run: py -m pip install playwright ; py -m playwright install chromium ; py tests/visual_qa.py [--out DIR]
-Renders every screen and dialog at two window sizes, drives the main interactions, and fails on
-page errors, horizontal overflow or missing elements. Does NOT replace Windows WebView2 acceptance.
+"""Developer-only MCC Visual QA Gate: browser rendering and interaction fixtures.
+Run: py -m pip install playwright; py -m playwright install chromium
+     py tests/visual_qa.py
+This does NOT replace actual Windows WebView2 acceptance.
 """
 from __future__ import annotations
 
 import argparse
-import importlib.machinery
-import importlib.util
+from datetime import datetime
 import json
+import os
 from pathlib import Path
-import random
+import runpy
+import shutil
 import sys
-import tempfile
-
-ROOT = Path(__file__).resolve().parents[1]
-SIZES = {"standard": (1040, 760), "minimum": (880, 640)}
-
-MAIN_STATE = {
-    "folders": [{"path": r"D:\Music\Pink Floyd", "star": True},
-                {"path": r"E:\Downloads\Pink Floyd update", "star": False}],
-    "status": "Ready", "activity": [], "ioWorkers": "auto", "saveRemixes": True, "saveLive": False,
-    "logging": True, "personalCount": 4, "pendingPatternCount": 3, "mapAvailable": True,
-    "running": False, "reviewPending": False, "mapOpen": False, "progressPct": 0,
-}
-RUNNING = dict(MAIN_STATE, status="Analyzing releases", progressPct=42, running=True,
-               progressCount="812 / 1,934 tracks", runStartedEpochMs=0,
-               activity=["Scanning D:\\Music\\Pink Floyd", "Found 312 releases", "Comparing audio..."])
-
-EVENTS = {
-    "error": {"type": "error", "title": "Folder missing", "message": "Cannot read:\nD:\\Music\\Gone\nCheck the drive."},
-    "unusual": {"type": "patternReview", "deferred": False, "patterns": [
-        {"key": "live at", "label": "(Live at …)", "count": 12, "examples": ["Money (Live at Pompeii)"], "variants": []},
-        {"key": "remaster", "label": "(2011 Remaster)", "count": 9, "examples": ["Time (2011 Remaster)"], "variants": []}]},
-    "samesong": {"type": "manualReview", "candidates": [
-        {"key": "a", "title_a": "Echoes", "artist_a": "Pink Floyd", "title_b": "Echoes (Part 1)", "artist_b": "Pink Floyd",
-         "path_a": "x", "path_b": "y", "reason": "different_titles_same_audio", "score": 0.91, "overlap": 0.9, "good": 0.8}]},
-    "done": {"type": "done", "duplicates": r"E:\Dups", "recycle": r"E:\Downloads",
-             "result": {"remaining_recycle": 24, "moved": 7, "intra_duplicate_files": 3, "remix_moved": 2,
-                        "add": 10, "replace": 4, "skipped_recycle": 1, "removed_current": 5}},
-    "copied": {"type": "copyDone", "destination": r"E:\Downloads - UPDATED",
-               "result": {"source_folders_modified": False, "logical_releases": 120, "existing_releases": 90,
-                          "new_releases": 30, "physical_folders": 121}},
-}
+import traceback
 
 
-def make_map_state(count: int = 400) -> dict:
-    rnd = random.Random(7)
-    nodes = []
-    for i in range(count):
-        recycle = i % 3 == 0
-        action = rnd.choice(["ADD", "REPLACE", "SKIP"]) if recycle else rnd.choice(["KEEP", "KEEP", "REMOVE"])
-        retained = action in ("KEEP", "ADD", "REPLACE")
-        tracks = []
-        for t in range(rnd.randint(4, 12)):
-            tracks.append(dict(
-                index=i * 100 + t, number=t + 1, title=f"Track {i}-{t} " + ("long " * rnd.randint(0, 6)),
-                duration="4:%02d" % rnd.randint(0, 59), durationSeconds=240 + t, groupId=i * 100 + t,
-                baseKey=f"k{i}-{t}", family="version", included=retained, excluded=not retained,
-                isRemix=False, isLive=False, patternKind="", patternKey="", manualSkip=False,
-                pendingIgnore=False, pendingRestore=False, unique=t == 0, isGem=t == 1,
-                explicitState="explicit" if t == 2 else "unknown", replacementSource="", orphaned=False,
-                exclusionReason="" if retained else "Duplicate", audioMatchEditions=0, unverifiedEditions=0,
-                coveredBy=[], coveredByAlternateVersion=False))
-        nodes.append(dict(
-            id=i, name=f"{2000 + i % 25}-01-01 - Album number {i} [WEB]", title=f"Album number {i}",
-            kind="retained" if retained else "duplicate", action=action,
-            rootKind="recycle" if recycle else "existing", sourceRoot="E:\\x" if recycle else "D:\\y",
-            sourceMedium="WEB", sourceDescription="", sourceRank=1,
-            releaseType=rnd.choice(["album", "album", "ep", "single", "anthology"]),
-            displayGroupKey=f"group-{i // 2}", displayGroupTitle=f"Album group {i // 2}", family=f"f{i // 2}",
-            upgradeFrom=[], manualRemoved=False, pendingReleaseIgnore=False, pendingReleaseRestore=False,
-            pendingReleaseChange=False, releaseBlocked=False, forceKeep=False, manualGroupAssigned=False,
-            auditIssues=["Missing track 3"] if i in (5, 77) else [], typeWarning="", reason="Better quality" if retained else "Duplicate edition",
-            path=f"D:\\Music\\Album {i}", uniqueCount=1, includedTracks=len(tracks) if retained else 0,
-            isGem=False, gemTitles=[], tracks=tracks))
-    return dict(nodes=nodes, duplicateLinks=[], versionFamilies={}, planCounts=dict(
-        initial=dict(releases=count, tracks=2400), result=dict(releases=count - 60, tracks=2100), delta=dict(releases=-60, tracks=-300)),
-        scannedCounts=dict(releases=count, tracks=2400), auditIssueCount=2, editable=True, dirty=False,
-        applyEnabled=True, applyHighlighted=False, requiresFreshScan=False, standaloneMode=False,
-        sourceRoots=dict(existing="D:\\y", recycle="E:\\x"), defaultExportDestination="E:\\x - UPDATED", result=None)
+def fixture():
+    root = r"C:\!deemix Music\Noisia\Noisia ALAC"
+    def track(i, title, saved="", excluded=True):
+        return dict(index=i, number=i+1, title=title, duration="4:33",
+                    durationSeconds=273, groupId=100+i, baseKey="test-"+str(i),
+                    family="remix", included=not excluded, excluded=excluded,
+                    isRemix=excluded, isLive=False, patternKind=saved,
+                    patternKey="noisia remix" if saved else "", manualSkip=False,
+                    pendingIgnore=False, pendingRestore=False, unique=not excluded,
+                    isGem=False, explicitState="unknown", replacementSource="",
+                    orphaned=False, exclusionReason="Remix" if excluded else "",
+                    audioMatchEditions=0, unverifiedEditions=0, coveredBy=[],
+                    coveredByAlternateVersion=False)
+    tracks = [
+        track(0, "Voodoo (Noisia's 'Outer Edges' Remix)", "remix"),
+        track(1, "Tommy's Theme (Noisia's 'Outer Edges' Remix) - " +
+              "Extremely Long Extended Festival Mix with Another Descriptor " * 2),
+        track(2, "Dead Limit (Noisia's 'Outer Edges' Remix)"),
+        track(3, "Diplodocus (Noisia's 'Outer Edges' Remix)", excluded=False),
+        track(4, "Surfaceless (Noisia's 'Outer Edges' Remix)", "skip"),
+    ]
+    original = dict(id=1, name="2017-06-09 - Outer Edges (Noisia Remixes) [VSN030]",
+                    title="Outer Edges (Noisia Remixes)", rootKind="existing",
+                    sourceRoot=root, path=root+r"\2017-06-09 - Outer Edges (Noisia Remixes) [VSN030]",
+                    kind="duplicate", action="REMOVE", releaseType="album",
+                    sourceMedium="WEB", sourceRank=1, includedTracks=1,
+                    uniqueCount=0, reason="Duplicate edition",
+                    displayGroupKey="noisia-remixes", tracks=tracks, auditIssues=[],
+                    upgradeFrom=[], forceKeep=False, manualRemoved=False, releaseBlocked=False)
+    other = dict(original, id=2, name="2018-01-01 - Another Album [ABC123]",
+                 title="Another Album", path=root+r"\2018-01-01 - Another Album [ABC123]",
+                 displayGroupKey="another-album", action="KEEP", kind="retained",
+                 tracks=[track(10, "Unrelated track", excluded=False)])
+    return dict(editable=True, dirty=False, applyEnabled=False,
+                requiresFreshScan=False, standaloneMode=False, auditIssueCount=0,
+                nodes=[original, other], duplicateLinks=[],
+                versionFamilies={"test-2": [dict(groupId=333, releaseId=2,
+                    family="version", title="Dead Limit (Alternate Version)",
+                    duration="4:21", durationSeconds=261, available=True,
+                    retained=False, releaseNames=["Another Album"])]},
+                sourceRoots=dict(existing=root, recycle=r"C:\!deemix Music\Noisia\deemix"),
+                planCounts=dict(initial=dict(releases=2, tracks=6),
+                                result=dict(releases=1, tracks=1)),
+                result=dict(show=False), defaultExportDestination="")
 
 
-INIT = """
-window.__calls=[];
-const mk=(name)=>async(...a)=>{window.__calls.push([name,a]);
-  if(name==='getState')return JSON.stringify(window.__st);
-  if(name==='getPersonalPicks')return JSON.stringify({rules:[{mode:'contains',value:'bonus'},{mode:'exact',value:'Time'}]});
-  if(name==='getPatternManager')return JSON.stringify({categories:[{key:'live at',label:'(Live at …)',kind:'live'}],pending:[{key:'x',label:'(Demo)'}]});
-  if(name==='chooseDestination')return 'E:\\\\Chosen';
-  if(name==='setFolders')return JSON.stringify(Object.assign({},window.__st,{folders:a[0]}));
-  return JSON.stringify(window.__st);};
-window.pywebview={api:new Proxy({},{get:(_t,n)=>mk(n)})};
-"""
+GEOMETRY = r"""() => {
+ const faults=[], panel=document.querySelector('#details');
+ const rect=e=>e.getBoundingClientRect();
+ if(!panel||!panel.classList.contains('open'))return ['Details did not open'];
+ const p=rect(panel);
+ if(p.left<-1||p.right>innerWidth+1)faults.push('Details outside viewport');
+ for(const [i,row] of [...document.querySelectorAll('#tracks .track')].entries()){
+   const cols=['.num','.titleCell','.dur','.versionsCell','.status','.trackActionGroup']
+     .map(x=>row.querySelector(x)).filter(Boolean);
+   for(let j=1;j<cols.length;j++){
+     if(rect(cols[j-1]).right>rect(cols[j]).left+1.5)
+       faults.push('Row '+i+': overlapping columns');
+   }
+   const r=rect(row);
+   if(r.left<p.left-1||r.right>p.right+1)faults.push('Row '+i+': clipped row');
+   const status=row.querySelector('.status');
+   for(const btn of row.querySelectorAll('button')){
+     const style=getComputedStyle(btn);
+     if(style.visibility==='hidden'||style.display==='none')continue;
+     const b=rect(btn);
+     if(b.width<20||b.height<20)faults.push('Row '+i+': tiny button');
+     if(b.left<r.left-1||b.right>r.right+1||b.top<r.top-1||b.bottom>r.bottom+1)
+       faults.push('Row '+i+': button outside row');
+     if(status&&btn.closest('.trackActionGroup')){
+       const a=rect(status);
+       if(Math.min(a.right,b.right)-Math.max(a.left,b.left)>1.5 &&
+          Math.min(a.bottom,b.bottom)-Math.max(a.top,b.top)>1.5)
+         faults.push('Row '+i+': action covers status');
+     }
+   }
+   const badge=row.querySelector('.patternBadge'),title=row.querySelector('.titleText');
+   if(badge&&title){
+     const a=rect(title),b=rect(badge);
+     if(Math.min(a.right,b.right)-Math.max(a.left,b.left)>1.5&&
+        Math.min(a.bottom,b.bottom)-Math.max(a.top,b.top)>1.5)
+       faults.push('Row '+i+': saved badge covers title');
+   }
+ }
+ if(document.documentElement.scrollWidth>innerWidth+2)faults.push('Horizontal page overflow');
+ return faults;
+}"""
 
 
-def load_html(pyw: Path):
-    loader = importlib.machinery.SourceFileLoader("mcc_qa", str(pyw))
-    spec = importlib.util.spec_from_loader("mcc_qa", loader)
-    module = importlib.util.module_from_spec(spec)
-    sys.modules["mcc_qa"] = module
-    loader.exec_module(module)
-    return module._webview_main_html(), module._webview_release_map_html()
+def run(app, output, browser_kind):
+    try:
+        from playwright.sync_api import sync_playwright
+    except ImportError:
+        raise SystemExit("Install test dependency: py -m pip install playwright")
+    if not app.is_file():
+        raise SystemExit("Missing source: "+str(app))
+    html=runpy.run_path(str(app),run_name="mcc_visual_qa")["_webview_release_map_html"]()
+    if html.count("</script>")!=1:
+        raise RuntimeError("MCC Release Map must contain exactly one module script")
+    html=html.replace("</script>",
+        "window.__visualQa={receiveState,openDetails,getNode};\n</script>")
+    output.mkdir(parents=True,exist_ok=True)
+    fixture_file=output/"release-map-fixture.html"
+    fixture_file.write_text(html,encoding="utf-8")
+    data=fixture()
+    report=dict(app=str(app),browser=browser_kind,
+                native_windows_webview2="NOT RUN",cases=[],errors=[],screenshots=[])
+    cases=[("normal",1486,913,1),("minimum",1050,680,1),
+           ("large",1700,1000,1),("zoom125",1486,913,1.25)]
+    try:
+        with sync_playwright() as pw:
+            args=dict(headless=True)
+            if browser_kind=="edge":
+                args["channel"]="msedge"
+            elif browser_kind=="system":
+                executable=shutil.which("chromium") or shutil.which("chromium-browser") or shutil.which("google-chrome")
+                if not executable:
+                    raise RuntimeError("No system Chromium; install Playwright Chromium")
+                args["executable_path"]=executable
+            browser=pw.chromium.launch(**args)
+            try:
+                for name,width,height,zoom in cases:
+                    context=browser.new_context(viewport=dict(width=width,height=height))
+                    page=context.new_page()
+                    js_errors=[]
+                    page.on("pageerror",lambda e:js_errors.append(str(e)))
+                    page.on("console",lambda m:js_errors.append(
+                        "console: "+m.text) if m.type=="error" else None)
+                    init="window.__qaFixture="+json.dumps(data,ensure_ascii=False)+";"+r"""
+window.__qaEvents=[];window.pywebview={api:{
+ getState:()=>JSON.stringify(window.__qaFixture),
+ markTrackPattern:(index,kind)=>{
+   window.__qaEvents.push({index,kind});
+   return JSON.stringify({kind:'patternToggle',tracks:[],requiresFreshScan:true});
+ }
+}};"""
+                    page.add_init_script(init)
+                    # Real <script type="module"> is blocked on file:// in
+                    # Chromium by origin/CORS policy. Fulfill a same-origin HTTP
+                    # navigation locally, without making any external requests.
+                    # This tests the actual module, not a downgraded classic script.
+                    page.route("http://mcc-visual.test/**", lambda route: route.fulfill(
+                        status=200, content_type="text/html; charset=utf-8", body=html))
+                    page.goto("http://mcc-visual.test/release-map", wait_until="load")
+                    try:
+                        page.wait_for_function(
+                            "!!window.__visualQa && !!document.querySelector('.changeRow[data-id=\"1\"],.releaseRow[data-id=\"1\"]')",
+                            timeout=15000)
+                    except Exception:
+                        # Keep actionable diagnostic artifacts even if init fails.
+                        screenshot=name+"-initialization-error.png"
+                        page.screenshot(path=str(output/screenshot), full_page=True)
+                        report["screenshots"].append(screenshot)
+                        report["errors"].append(
+                            name+": startup failed: "+("; ".join(js_errors) or
+                            page.evaluate("document.body.innerText.slice(0,800)")))
+                        raise
+                    if zoom!=1:
+                        page.evaluate("(z)=>document.body.style.zoom=String(z)",zoom)
+                    # The app opens in Changes, whose rows are .changeRow,
+                    # not .releaseRow. Exercise both actual release views.
+                    if not page.locator('.changeRow[data-id="1"]').count():
+                        raise AssertionError("Changes view did not render the removed release")
+                    screenshot=name+"-changes.png"
+                    page.screenshot(path=str(output/screenshot))
+                    report["screenshots"].append(screenshot)
+                    page.locator('.changeRow[data-id="1"]').click()
+                    page.wait_for_function("document.querySelector('#details').classList.contains('open')")
+                    screenshot=name+"-changes-details.png"
+                    page.screenshot(path=str(output/screenshot))
+                    report["screenshots"].append(screenshot)
+                    page.keyboard.press("Escape")
+                    page.locator("#viewMenuBtn").click()
+                    page.locator("#fullViewBtn").click()
+                    page.wait_for_function("!!document.querySelector('.releaseRow[data-id=\"1\"]')")
+                    screenshot=name+"-full-map.png"
+                    page.screenshot(path=str(output/screenshot))
+                    report["screenshots"].append(screenshot)
+                    page.locator('.releaseRow[data-id="1"]').click()
+                    page.wait_for_function("document.querySelector('#details').classList.contains('open')")
+                    page.locator('#tracks .track').first.hover()
+                    screenshot=name+"-hover.png"
+                    page.screenshot(path=str(output/screenshot))
+                    report["screenshots"].append(screenshot)
+                    problems=page.evaluate(GEOMETRY)
+                    if page.locator("#copyPathBtn").count():
+                        problems.append("Duplicate Copy path button")
+                    if not page.locator(".trackActionGroup").first.is_visible():
+                        problems.append("Hover actions inaccessible")
+                    if page.locator('.track').first.locator('.patternMark[data-kind="remix"]').count():
+                        problems.append("Saved Remix duplicated in actions")
+                    group=page.locator(".albumGroupActions")
+                    if group.count():
+                        if group.evaluate("(x)=>x.open"):
+                            problems.append("Album group not initially collapsed")
+                        group.locator("summary").click()
+                        if not group.evaluate("(x)=>x.open"):
+                            problems.append("Album group cannot open")
+                        screenshot=name+"-album-group.png"
+                        page.screenshot(path=str(output/screenshot))
+                        report["screenshots"].append(screenshot)
+                        problems.extend(page.evaluate(GEOMETRY))
+                    page.locator("#releasePath").focus()
+                    page.keyboard.press("Control+A")
+                    if page.evaluate("window.getSelection().toString()")!=data["nodes"][0]["path"]:
+                        problems.append("Ctrl+A path selection failed")
+                    badge=page.locator(".track").first.locator(".patternBadge")
+                    badge.focus()
+                    if not page.locator(".trackActionGroup").first.is_visible():
+                        problems.append("Actions hidden from keyboard focus")
+                    badge.press("Enter")
+                    page.wait_for_function("window.__qaEvents.some(x=>x.kind==='keep')")
+                    page.keyboard.press("Escape")
+                    if page.locator("#details").evaluate("(x)=>x.classList.contains('open')"):
+                        problems.append("Escape did not close details")
+                    problems += ["JavaScript: "+e for e in js_errors]
+                    report["cases"].append(dict(name=name,viewport=[width,height],css_zoom=zoom,
+                        status="FAIL" if problems else "PASS",issues=problems))
+                    report["errors"] += [name+": "+error for error in problems]
+                    context.close()
+            finally:
+                browser.close()
+    except Exception as exc:
+        report["errors"].append(type(exc).__name__+": "+str(exc))
+        report["traceback"]=traceback.format_exc()[-4000:]
+    finally:
+        location=output/"report.json"
+        location.write_text(json.dumps(report,indent=2,ensure_ascii=False),encoding="utf-8")
+        print("Browser Visual QA: "+("FAIL" if report["errors"] else "PASS")+" | "+str(location))
+        for error in report["errors"]:
+            print("FAIL: "+error)
+        print("Native Windows WebView2: NOT RUN")
+    return int(bool(report["errors"]))
 
 
-def main() -> int:
-    from playwright.sync_api import sync_playwright
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--out", default=str(Path(tempfile.gettempdir()) / "mcc_visual_qa"))
-    parser.add_argument("--chrome", default="")
-    args = parser.parse_args()
-    out = Path(args.out)
-    out.mkdir(parents=True, exist_ok=True)
-    pyw = max(ROOT.glob("Music Collection Cleaner v*.pyw"))
-    main_html, map_html = load_html(pyw)
-    (out / "main.html").write_text(main_html, encoding="utf-8")
-    (out / "map.html").write_text(map_html, encoding="utf-8")
-    failures: list[str] = []
-
-    def check(cond, message):
-        if not cond:
-            failures.append(message)
-
-    with sync_playwright() as p:
-        launch = {"args": ["--no-sandbox"]}
-        if args.chrome:
-            launch["executable_path"] = args.chrome
-        browser = p.chromium.launch(**launch)
-
-        def page_for(size, html_name, state):
-            w, h = SIZES[size]
-            page = browser.new_page(viewport={"width": w, "height": h})
-            errors: list[str] = []
-            page.on("pageerror", lambda e: errors.append(str(e)))
-            page.add_init_script(INIT)
-            page.add_init_script("window.__st=" + json.dumps(state))
-            page.goto((out / html_name).as_uri())
-            page.wait_for_timeout(250)
-            return page, errors
-
-        def overflow(page, label):
-            check(not page.evaluate("document.documentElement.scrollWidth>innerWidth"), f"{label}: horizontal overflow")
-
-        for size in SIZES:
-            page, errors = page_for(size, "main.html", MAIN_STATE)
-            page.screenshot(path=str(out / f"main_{size}_idle.png"))
-            overflow(page, f"main {size}")
-            page.click("#gear")
-            page.screenshot(path=str(out / f"main_{size}_menu.png"))
-            page.keyboard.press("Escape")
-            check(not page.evaluate("document.getElementById('menu').classList.contains('on')"), "menu closes on Escape")
-            page.evaluate("s=>window.__deaStateChanged(JSON.stringify(s))", RUNNING)
-            page.click("#logToggle")
-            page.screenshot(path=str(out / f"main_{size}_running.png"))
-            check(page.evaluate("document.getElementById('analyze').disabled"), "Analyze disabled while running")
-            page.evaluate("s=>window.__deaStateChanged(JSON.stringify(s))", MAIN_STATE)
-            for name, event in EVENTS.items():
-                page.evaluate("e=>window.__deaEventRaised(JSON.stringify(e))", event)
-                page.wait_for_timeout(120)
-                page.screenshot(path=str(out / f"main_{size}_dialog_{name}.png"))
-                check(page.evaluate("document.getElementById('scrim').classList.contains('on')"), f"dialog {name} opens")
-                check(page.evaluate("(()=>{const d=document.getElementById('dlg').getBoundingClientRect();return d.bottom<=innerHeight&&d.right<=innerWidth})()"),
-                      f"dialog {name} fits at {size}")
-                page.keyboard.press("Escape")
-                page.evaluate("document.getElementById('scrim').classList.remove('on')")
-            page.click("#gear")
-            page.click("#mAlways")
-            page.wait_for_timeout(150)
-            page.screenshot(path=str(out / f"main_{size}_dialog_always.png"))
-            page.keyboard.press("Escape")
-            page.click("#gear")
-            page.click("#mUnusual")
-            page.wait_for_timeout(150)
-            page.screenshot(path=str(out / f"main_{size}_dialog_manager.png"))
-            page.keyboard.press("Escape")
-            check(not errors, f"main {size} page errors: {errors}")
-            page.close()
-
-        for size in SIZES:
-            state = make_map_state()
-            page, errors = page_for(size, "map.html", state)
-            page.screenshot(path=str(out / f"map_{size}_changes.png"))
-            overflow(page, f"map {size}")
-            rows = page.evaluate("document.querySelectorAll('#spacer .rel').length")
-            check(0 < rows < 60, f"virtual list renders a window of rows, got {rows}")
-            page.click("#spacer .rel")
-            page.wait_for_timeout(100)
-            page.screenshot(path=str(out / f"map_{size}_details.png"))
-            check(page.evaluate("document.getElementById('dName').textContent!=='Overview'"), "details fill on click")
-            page.click("#dScroll .kebab")
-            page.screenshot(path=str(out / f"map_{size}_trackmenu.png"))
-            page.keyboard.press("Escape")
-            page.click('.tab[data-view="all"]')
-            page.screenshot(path=str(out / f"map_{size}_everything.png"))
-            page.click('.tab[data-view="look"]')
-            page.screenshot(path=str(out / f"map_{size}_look.png"))
-            page.fill("#find", "Album number 123")
-            page.wait_for_timeout(100)
-            check(page.evaluate("document.querySelectorAll('#spacer .rel').length") >= 1 or True, "search runs")
-            page.fill("#find", "")
-            page.click("#copyBtn")
-            page.wait_for_timeout(100)
-            blocked = page.evaluate("document.getElementById('scrim').classList.contains('open')")
-            check(not blocked, "export blocked while issues remain")
-            page.screenshot(path=str(out / f"map_{size}_blocked.png"))
-            check(not errors, f"map {size} page errors: {errors}")
-            page.close()
-
-            clean = make_map_state()
-            for n in clean["nodes"]:
-                n["auditIssues"] = []
-            clean["auditIssueCount"] = 0
-            page, errors = page_for(size, "map.html", clean)
-            page.click("#copyBtn")
-            page.wait_for_timeout(150)
-            page.screenshot(path=str(out / f"map_{size}_export.png"))
-            check(page.evaluate("document.getElementById('scrim').classList.contains('open')"), "export dialog opens when ready")
-            page.click('[data-d="go"]')
-            calls = page.evaluate("window.__calls.map(c=>c[0])")
-            check("copyPlan" in calls, "copyPlan bridge call made")
-            check(not errors, f"map clean {size} page errors: {errors}")
-            page.close()
-        browser.close()
-
-    print(f"Screenshots: {out}")
-    if failures:
-        print("FAILED:")
-        for f in failures:
-            print(" -", f)
-        return 1
-    print("Visual QA passed (headless Chromium only; Windows WebView2 acceptance NOT RUN).")
-    return 0
-
-
-if __name__ == "__main__":
-    sys.exit(main())
+if __name__=="__main__":
+    p=argparse.ArgumentParser(description="MCC headless visual regression gate")
+    # Always test the latest versioned one-file app in the checkout. Keeping a
+    # hard-coded old default silently tests the wrong UI after version bumps.
+    root=Path(__file__).resolve().parents[1]
+    candidates=list(root.glob("Music Collection Cleaner v*.pyw"))
+    if not candidates:
+        raise SystemExit("No Music Collection Cleaner versioned .pyw in "+str(root))
+    latest=max(candidates,key=lambda file: tuple(
+        int(part) for part in file.stem.rsplit(" v",1)[-1].split(".")
+    ))
+    p.add_argument("--app",type=Path,default=latest)
+    p.add_argument("--browser",choices=["edge","chromium","system"],
+        default="edge" if os.name=="nt" else "system")
+    p.add_argument("--output",type=Path,default=Path.home()/"Documents"/"Karpuzikov Tools"/
+        "Music Collection Cleaner"/"testing"/("visual-qa-"+datetime.now().strftime("%Y-%m-%d-%H-%M-%S-%f")))
+    args=p.parse_args()
+    sys.exit(run(args.app.resolve(),args.output.resolve(),args.browser))

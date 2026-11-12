@@ -2,6 +2,12 @@
 
 Historical release notes and testing status retained from the original README.
 
+## v0.5.82 - Back to the v0.5.76 interface (Under construction ⚠️)
+
+- The interface is the same as v0.5.76. The redesign work in v0.5.77 to v0.5.81 is not part of this version. Their files stay in `version-history/`.
+- `tests/test_hover_actions.py` and the old `tests/visual_qa.py` are back.
+- Checked: all `tests/test_*.py`, ruff pyflakes rules. **Not run:** Windows 11/WebView2.
+
 ## v0.5.81 - Release Map overview panel (Under construction ⚠️)
 
 - Release Map: when no release is selected, the right panel shows an Overview instead of an empty message: releases and tracks kept, counts of Added / Upgraded / Replaced / Removed / Ignored (click one to filter the list), the first ten releases that need a look, and the Library and Incoming folders.
