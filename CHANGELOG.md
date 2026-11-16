@@ -2,6 +2,15 @@
 
 Historical release notes and testing status retained from the original README.
 
+## v0.5.102 - Release dialog: alignment, dividers, palette, any-group move (Under construction ⚠️)
+
+- Fixed: track rows align on one shared grid (number, title, length, badges, note), with the length-difference chip next to the badges; per-track action buttons overlay the row on hover instead of reserving a column; rows are tighter.
+- Restored: dividers between tracks.
+- Fixed: "Keep release" is shown only when the release is not already retained (or to undo a forced keep).
+- Changed: "Move to another group" is available for every release type and lists every other group on the map with its column (Albums, Singles, Compilations, ...). A move between Album/EP releases works as before; any other move changes only the display group and column, not the optimizer.
+- Changed: path font 8px -> 12px; one badge palette (blue medium, cyan CUE, green LOG, amber Versions/length, purple Remixes, rose Live).
+- Checked: all `tests/test_*.py` (new test for a Single moved into an Album group), ruff pyflakes rules, headless Chrome screenshot. **Not run:** Windows 11/WebView2; a real move on a scanned library; long titles and narrow panels.
+
 ## v0.5.101 - Release dialog rebuilt from the UI Template Maker mock-up (Under construction ⚠️)
 
 - Changed: the release details panel follows `Re-TROS_release_dialog.layout.json`: title; one row with medium (CD), CUE, LOG %, "Move to another group" and "Ignore release" on the right; folder button with a one-line path; "Tracks"; rows of number, title, length, Versions/Remixes/Live badges, length-difference chip and a note.

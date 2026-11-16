@@ -31,6 +31,15 @@ class AlbumTitleFamily(unittest.TestCase):
         with patch.object(mcc, "_manual_album_group_links", return_value={}):
             self.assertEqual(len(mcc._album_clusters([ep, album])), 2)
 
+    def test_manual_move_puts_a_single_into_an_album_group_and_column(self):
+        album = {"id": 1, "path": "C:/m/Album", "releaseType": "album", "name": "Album", "displayGroupKind": "album"}
+        single = {"id": 2, "path": "C:/m/Single", "releaseType": "single", "name": "Single"}
+        links = {mcc._manual_album_group_path_key(Path("C:/m/Single")): mcc._manual_album_group_path_key(Path("C:/m/Album"))}
+        with patch.object(mcc, "_manual_album_group_links", return_value=links):
+            mcc._assign_release_map_display_groups([album, single])
+        self.assertEqual(single["displayGroupKey"], album["displayGroupKey"])
+        self.assertEqual(single["displayGroupKind"], "album")
+
     def test_same_album_tag_with_different_tracks_is_not_related(self):
         one = release(1, "album", "Greatest Hits", TITLES, 0)
         two = release(2, "album", "Greatest Hits", ["Other %d" % i for i in range(6)], 10)
