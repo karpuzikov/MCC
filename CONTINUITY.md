@@ -1,5 +1,9 @@
 # Music Collection Cleaner - Continuity Handoff
 
+## Checkpoint 2026-11-16 - MCC v0.5.95 - Under construction ⚠️
+
+The post-grouping "reconcile default Live/Remix wording" loop in the analysis function now requires `track.is_live and not track.is_remix`; Remix-excluded tracks are no longer restored by an identical allowed copy. Side effect to watch: the v0.5.43 case (Japanese CD track wrongly excluded for Remix wording) is no longer rescued if it is Remix-labelled. `8+2+8 I (Remix)` stays wanted through the featured-remix exception (remixer in the artist tag).
+
 ## Checkpoint 2026-11-16 - MCC v0.5.94 - Under construction ⚠️
 
 `_recordings_that_require_release` = `rel.groups` minus the groups of every other non-blocked release (selected or not). Highlight/essential now mean "no other edition has this audio"; the older "Copies on discarded releases do not supply coverage" behaviour is gone. `tests/fixtures/pablo_retention_highlights.json` and `bully_song_presence.json` hold cached `unique_to_release` flags and still assert the old results; they are not regenerated.

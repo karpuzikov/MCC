@@ -2,6 +2,11 @@
 
 Historical release notes and testing status retained from the original README.
 
+## v0.5.95 - Remixes stay excluded (Under construction ⚠️)
+
+- Fixed: a track detected as a Remix was put back into the wanted set when the same audio was wanted on another release. Example: `2017-10-06 - 8+2+8 (Paul Frick Remix) [190296960222]` was kept because `8+2+8 I (Remix)` (artist `Re-TROS;Paul Frick`) has identical audio. Remixes now stay excluded; only Live-labelled tracks are still restored this way (rule added in v0.5.43).
+- Checked: all `tests/test_*.py`, ruff pyflakes rules. **Not run:** Windows 11/WebView2, a rescan. No new test: the rule sits inside the large analysis function.
+
 ## v0.5.94 - A song with the same audio on another edition is never highlighted (Under construction ⚠️)
 
 - Release Map: a track is highlighted ("essential", "Unique to this release") only when no other release has the same audio, kept or not. Before, copies on unselected editions were ignored, so a release kept as a better or larger edition showed every song highlighted next to "Same audio on 2 editions". Example: `Re-TROS - Before the Applause [CD] (FLAC)`.
