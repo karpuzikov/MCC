@@ -2,6 +2,12 @@
 
 Historical release notes and testing status retained from the original README.
 
+## v0.5.94 - A song with the same audio on another edition is never highlighted (Under construction ⚠️)
+
+- Release Map: a track is highlighted ("essential", "Unique to this release") only when no other release has the same audio, kept or not. Before, copies on unselected editions were ignored, so a release kept as a better or larger edition showed every song highlighted next to "Same audio on 2 editions". Example: `Re-TROS - Before the Applause [CD] (FLAC)`.
+- Replaces the v0.5.91 rule (equivalent unselected edition only). Tests that expected highlights next to unselected copies were changed to the new rule: `test_recording_on_any_other_edition_is_never_highlighted` and the Ignore/Restore delta test.
+- Checked: all `tests/test_*.py`, ruff pyflakes rules. **Not run:** Windows 11/WebView2, a rescan. The Pablo and Bully fixture tests use saved highlight flags, so they do not exercise this rule.
+
 ## v0.5.93 - Every rip log result is shown (Under construction ⚠️)
 
 - Release details list one line per checked `.log` file under the source: `file.log: 98% (EAC)`, `file.log: 100% (XLD) - flagged`, `file.log: not recognized - <reason>` or `file.log: scoring failed - <reason>`. Every `.log` in the release folder except `audiochecker.log` is checked, as before; only the result display is new.

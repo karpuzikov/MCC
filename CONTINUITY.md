@@ -1,5 +1,9 @@
 # Music Collection Cleaner - Continuity Handoff
 
+## Checkpoint 2026-11-16 - MCC v0.5.94 - Under construction ⚠️
+
+`_recordings_that_require_release` = `rel.groups` minus the groups of every other non-blocked release (selected or not). Highlight/essential now mean "no other edition has this audio"; the older "Copies on discarded releases do not supply coverage" behaviour is gone. `tests/fixtures/pablo_retention_highlights.json` and `bully_song_presence.json` hold cached `unique_to_release` flags and still assert the old results; they are not regenerated.
+
 ## Checkpoint 2026-11-16 - MCC v0.5.93 - Under construction ⚠️
 
 `Release.rip_log_results` (one display line per log, filled in `score_cd_rip_logs`) -> snapshot `rip_log_results` -> node `ripLogResults` -> `.ripLogLine` lines in `sourceSummary`. Scanning still collects only `*.log` (`all_files` suffix), minus `audiochecker.log`.
