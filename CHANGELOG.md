@@ -2,6 +2,12 @@
 
 Historical release notes and testing status retained from the original README.
 
+## v0.5.96 - A remixer in the ARTIST tag is not a feature (Under construction ⚠️)
+
+- Fixed: `2017-10-06 - 8+2+8 I (Remix) [602478199110]` was kept with Save Remixes OFF because its ARTIST tag is `Re-TROS;Paul Frick`, and the extra name was read as a featured vocalist. For a track detected as a Remix, only a stated `feat.`/`ft.` credit now keeps it; a second ARTIST entry no longer does.
+- Behaviour change: remixes like `Song (Remix)` with artist `Band;Guest` (no `feat.` in the title or artist) are now excluded instead of kept.
+- New `tests/test_remix_credit.py`. Checked: all `tests/test_*.py`, ruff pyflakes rules. **Not run:** Windows 11/WebView2, a rescan.
+
 ## v0.5.95 - Remixes stay excluded (Under construction ⚠️)
 
 - Fixed: a track detected as a Remix was put back into the wanted set when the same audio was wanted on another release. Example: `2017-10-06 - 8+2+8 (Paul Frick Remix) [190296960222]` was kept because `8+2+8 I (Remix)` (artist `Re-TROS;Paul Frick`) has identical audio. Remixes now stay excluded; only Live-labelled tracks are still restored this way (rule added in v0.5.43).

@@ -1,5 +1,9 @@
 # Music Collection Cleaner - Continuity Handoff
 
+## Checkpoint 2026-11-16 - MCC v0.5.96 - Under construction ⚠️
+
+`configure_exclusions` Pass 2: for `track.is_remix` the feature set comes only from `_featured_artists_from_text` (no `_artist_tag_collaborators`), and `remix_feature_exception` needs an explicit feat./ft. credit via `_has_explicit_feature_credit`. The old "single credited collaborator on a generic (Remix)" rescue (docstring example: `The Weeknd;Ariana Grande`) is gone. Non-remix tracks still use `featured_artists`. Open: no real-data rescan.
+
 ## Checkpoint 2026-11-16 - MCC v0.5.95 - Under construction ⚠️
 
 The post-grouping "reconcile default Live/Remix wording" loop in the analysis function now requires `track.is_live and not track.is_remix`; Remix-excluded tracks are no longer restored by an identical allowed copy. Side effect to watch: the v0.5.43 case (Japanese CD track wrongly excluded for Remix wording) is no longer rescued if it is Remix-labelled. `8+2+8 I (Remix)` stays wanted through the featured-remix exception (remixer in the artist tag).
