@@ -2,6 +2,12 @@
 
 Historical release notes and testing status retained from the original README.
 
+## v0.5.84 - Album families for editions with different masters (Under construction ⚠️)
+
+- Two Album/EP editions now form one family when their album tag matches and at least 80% of their track titles match (at least 4 tracks), even when no audio fingerprint matches. Example: `2005-11-01 - CUT OFF!` (EP) and `Re-TROS - Cut Off! [2005]` (Album) are one group in the Release Map. This only groups releases; it does not make recordings count as the same recording.
+- Release Map, "Album group": a release can now be moved into a family with the same title that is shown in another column (Album vs EP). Before, that family was missing from the list, so the move was impossible.
+- New `tests/test_album_title_family.py`. Checked: all `tests/test_*.py`, ruff pyflakes rules, Release Map page loads without script errors. **Not run:** Windows 11/WebView2, a rescan of the Re-TROS folders.
+
 ## v0.5.83 - Chinese, Japanese and Korean tags (Under construction ⚠️)
 
 - Fixed: tags with Chinese, Japanese or Korean text appeared as garbage (for example `ä1�é ̃Ÿçš„å¤�å¤©2`). ffprobe output is now read as UTF-8 instead of the Windows code page.

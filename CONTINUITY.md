@@ -1,5 +1,9 @@
 # Music Collection Cleaner - Continuity Handoff
 
+## Checkpoint 2026-11-16 - MCC v0.5.84 - Under construction ⚠️
+
+`_album_editions_related_by_titles` (album tag via `_release_album_title_key` + >=80% shared normalized track titles, >=4) is OR-ed with the audio rule in `_album_clusters` only; `_related_album_releases`, dominance and replacement logic still use audio/barcode. Cause in the logged case: the two Cut Off! editions had no shared acoustic group (different masters) and different artist tags. Release Map JS: the "Move to group" target list skips a family only if it has the same key AND the same column (`releaseColumnKind`). Open: optimizer behaviour with title-only families was not run on real data.
+
 ## Checkpoint 2026-11-16 - MCC v0.5.83 - Under construction ⚠️
 
 `probe_track` passes `encoding="utf-8"` to `run_hidden` (text mode had used the Windows code page, which produced mojibake and U+FFFD for CJK tags; `clean_metadata_text` then NFKC-folded the damage). Tags already damaged inside files, or in older logs, are not repaired; `repair_mojibake` still only handles Cyrillic and common Latin patterns. Other `run_hidden` text-mode calls (fpcalc JSON, integrity checks) were not changed. Not run: real scan on Windows.
