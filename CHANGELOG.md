@@ -2,6 +2,12 @@
 
 Historical release notes and testing status retained from the original README.
 
+## v0.5.91 - Kept-for-source releases highlight no songs; LOG and CUE marks (Under construction ⚠️)
+
+- Release Map: a release kept as the better source (for example a CD rip) of an equivalent, unselected edition (same recordings both ways) is not kept for any one song, so no song is highlighted and the "essential" count is 0. Example: `Re-TROS - Watch Out! Climate Has Changed, Fat Mum Rises... (2009) [CN - M-035] ALAC` replacing `2009-02-27 - Watch Out！…`.
+- Release details show highlighted `LOG` and `CUE` marks next to the source. `LOG` carries the rip-log score in percent (worst score among the release's logs, from hey-bro-check-log); `LOG` alone means the log was not scored.
+- New test in `tests/test_hover_actions.py`. Checked: all `tests/test_*.py`, ruff pyflakes rules, map script syntax. **Not run:** Windows 11/WebView2; the marks were not looked at on screen.
+
 ## v0.5.90 - Match window fits all logged Cut Off! pairs (Under construction ⚠️)
 
 - Same title in the same album track slot (length within 8 seconds, overlap at least 0.995, coverage at least 0.985): Chromaprint score up to 10.0, good fraction at least 0.60, median up to 10, p90 up to 16. Logged pair `If The Monkey Becomes (To Be) The King`: score 9.56, good fraction 0.619, median 10, p90 13. `Die In 1977` (15.8 s apart, score 11.3, good fraction 0.40) stays a separate version.

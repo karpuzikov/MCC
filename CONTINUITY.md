@@ -1,5 +1,9 @@
 # Music Collection Cleaner - Continuity Handoff
 
+## Checkpoint 2026-11-16 - MCC v0.5.91 - Under construction ⚠️
+
+`_recordings_that_require_release` replaces both `essential_groups` computations (plan text and `build_decision_snapshot`): empty when an unselected, unblocked release covers this one and is covered by it. Snapshot rows carry `has_cue`, `has_rip_log`, `rip_log_percent` (min of `rip_log_scores`); node fields `hasCue`, `hasRipLog`, `ripLogPercent`; `.ripMark` pills in `sourceSummary`. Marks only in the details panel, not on the release rows.
+
 ## Checkpoint 2026-11-16 - MCC v0.5.90 - Under construction ⚠️
 
 `FP_ALBUM_CONTEXT_*` constants (score 10.0, good 0.60, median 10, p90 16) replace the `MANUAL_REVIEW_*` reuse in `_fingerprint_album_context_match`. Fitted to the logged v0.5.89 Cut Off! pairs (worst: Monkey 9.56/0.619/10/13). No negative examples; false-match risk untested.
