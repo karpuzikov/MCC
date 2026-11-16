@@ -1,5 +1,9 @@
 # Music Collection Cleaner - Continuity Handoff
 
+## Checkpoint 2026-11-16 - MCC v0.5.83 - Under construction ⚠️
+
+`probe_track` passes `encoding="utf-8"` to `run_hidden` (text mode had used the Windows code page, which produced mojibake and U+FFFD for CJK tags; `clean_metadata_text` then NFKC-folded the damage). Tags already damaged inside files, or in older logs, are not repaired; `repair_mojibake` still only handles Cyrillic and common Latin patterns. Other `run_hidden` text-mode calls (fpcalc JSON, integrity checks) were not changed. Not run: real scan on Windows.
+
 ## Checkpoint 2026-11-12 - MCC v0.5.82 - Under construction ⚠️
 
 Code is v0.5.76 with `APP_VERSION` 0.5.82. v0.5.77 to v0.5.81 UI work is archived in `version-history/` only. `tests/visual_qa.py` is the v0.5.77-era script again (it stops at line 230 as before). Not run: Windows/WebView2.

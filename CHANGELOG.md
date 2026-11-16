@@ -2,6 +2,12 @@
 
 Historical release notes and testing status retained from the original README.
 
+## v0.5.83 - Chinese, Japanese and Korean tags (Under construction ⚠️)
+
+- Fixed: tags with Chinese, Japanese or Korean text appeared as garbage (for example `ä1�é ̃Ÿçš„å¤�å¤©2`). ffprobe output is now read as UTF-8 instead of the Windows code page.
+- The button reads "Personal Picks" (no "...").
+- New `tests/test_ffprobe_utf8.py`. Checked: all `tests/test_*.py`, ruff pyflakes rules. **Not run:** Windows 11/WebView2, a real scan of the affected folders.
+
 ## v0.5.82 - Back to the v0.5.76 interface (Under construction ⚠️)
 
 - The interface is the same as v0.5.76. The redesign work in v0.5.77 to v0.5.81 is not part of this version. Their files stay in `version-history/`.
