@@ -2,6 +2,11 @@
 
 Historical release notes and testing status retained from the original README.
 
+## v0.5.117 - Visible separator lines in dark Classic (Under construction ⚠️)
+
+- Fixed: row, group, column, header and track separator lines became nearly invisible against the dark Classic background in v0.5.116. All 27 border colours darker than 17% lightness in both pages are now #363a42; SB 2026 separators use #2D3F54.
+- Checked: all `tests/test_*.py`, ruff pyflakes rules, headless Chrome screenshot of the Release Map. **Not run:** Windows 11/WebView2; main window re-screenshot; Neon Arcade (borders there are set by its own layer).
+
 ## v0.5.116 - Classic theme made dark (Under construction ⚠️)
 
 - Changed: Classic page and panels #14161a (CIE L* about 8, was #43464C at about 30); bars #1d2026; fields #262a31; borders #2b2e35; buttons #43464C (hover #555a66); text #D3DCF2, muted #9197A6 and the #7690CF accent/primary are unchanged. Remaining dark literal colours in both pages were lowered in lightness by a fixed curve; light text colours were not touched. #14161a, #1d2026, #262a31, #2b2e35 are derived, not from the Aspen Gray palette.

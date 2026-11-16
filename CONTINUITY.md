@@ -1,5 +1,9 @@
 # Music Collection Cleaner - Continuity Handoff
 
+## Checkpoint 2026-11-16 - MCC v0.5.117 - Under construction ⚠️
+
+All `border*` colours darker than 17% lightness in both HTML pages are #363a42 (Classic); SB layer separators #2D3F54. Connector curves in the map are unchanged. Not run: Windows 11/WebView2.
+
 ## Checkpoint 2026-11-16 - MCC v0.5.116 - Under construction ⚠️
 
 Classic tokens in `APP_THEME_CSS`: --bg/--panel #14161a, --bar #1d2026, --field #262a31, --raised #43464C, --line #2b2e35; page literals with lightness under 60% lowered by a fixed curve. Not run: Windows 11/WebView2.
