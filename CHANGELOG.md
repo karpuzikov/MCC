@@ -2,6 +2,12 @@
 
 Historical release notes and testing status retained from the original README.
 
+## v0.5.97 - One Release Map layout at every window size (Under construction ⚠️)
+
+- Fixed: Albums, Singles and Compilations sat side by side when the map area was wider than 1750 px and stacked in rows when narrower, so the layout jumped while resizing the window. They are now always stacked in rows; only the release columns inside each row still follow the width.
+- Removed the side-by-side category grid and its width weights (`--category-grid`).
+- Checked: all `tests/test_*.py`, ruff pyflakes rules, map script syntax, computed grid in headless Chrome at 2400, 1700 and 1200 px (one column each). **Not run:** Windows 11/WebView2.
+
 ## v0.5.96 - A remixer in the ARTIST tag is not a feature (Under construction ⚠️)
 
 - Fixed: `2017-10-06 - 8+2+8 I (Remix) [602478199110]` was kept with Save Remixes OFF because its ARTIST tag is `Re-TROS;Paul Frick`, and the extra name was read as a featured vocalist. For a track detected as a Remix, only a stated `feat.`/`ft.` credit now keeps it; a second ARTIST entry no longer does.

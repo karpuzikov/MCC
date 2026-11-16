@@ -1,5 +1,9 @@
 # Music Collection Cleaner - Continuity Handoff
 
+## Checkpoint 2026-11-16 - MCC v0.5.97 - Under construction ⚠️
+
+`#columns.fullMapColumns` is a single column at all widths (both `@container release-map-viewport` rules and `--category-grid`/`categoryGrid`/`categoryColumns` in the freeze logic removed). If a side-by-side layout is wanted again it must be a setting, not a width threshold.
+
 ## Checkpoint 2026-11-16 - MCC v0.5.96 - Under construction ⚠️
 
 `configure_exclusions` Pass 2: for `track.is_remix` the feature set comes only from `_featured_artists_from_text` (no `_artist_tag_collaborators`), and `remix_feature_exception` needs an explicit feat./ft. credit via `_has_explicit_feature_credit`. The old "single credited collaborator on a generic (Remix)" rescue (docstring example: `The Weeknd;Ariana Grande`) is gone. Non-remix tracks still use `featured_artists`. Open: no real-data rescan.
