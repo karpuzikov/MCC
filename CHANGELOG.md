@@ -2,6 +2,11 @@
 
 Historical release notes and testing status retained from the original README.
 
+## v0.5.87 - Highlight fix for editions with different artist tags (Under construction ⚠️)
+
+- Fixed: v0.5.86 changed nothing for `Re-TROS - Cut Off! [2005]` and `2005-11-01 - CUT OFF!` because their artist tags differ (`Rebuilding The Rights of Statues` and `Re-TROS`). The same-song check no longer compares artists; it uses title, album tag and length (within 8 seconds).
+- The test in `test_hover_actions.py` now uses different artist tags. Checked: all `tests/test_*.py`, ruff pyflakes rules. **Not run:** Windows 11/WebView2, a rescan of the Re-TROS folders.
+
 ## v0.5.86 - Highlight only the songs that keep a release (Under construction ⚠️)
 
 - Release Map: a song is no longer highlighted or labelled "Unique to this release" when another retained release has the same song with the same album tag and a length within 8 seconds. Example: in `2005-11-01 - CUT OFF!` only `Die In 1977` is highlighted; in `Re-TROS - Cut Off!` only `Die In 1977` and `A Vision Of Christ`. Recordings are still not merged; this changes only the highlight.

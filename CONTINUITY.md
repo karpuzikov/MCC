@@ -1,5 +1,9 @@
 # Music Collection Cleaner - Continuity Handoff
 
+## Checkpoint 2026-11-16 - MCC v0.5.87 - Under construction ⚠️
+
+`retained_song_copies` key is now `(song title identity, family, normalized album tag)`; the artist alias part of `_release_map_song_key` is dropped because the Cut Off! editions carry different artist tags, so v0.5.86 never matched them. Not run on real data.
+
 ## Checkpoint 2026-11-16 - MCC v0.5.86 - Under construction ⚠️
 
 In `_release_map_state_for_ui`, `unique` also requires no copy of the same `_release_map_song_key` with the same normalized album tag and length within `DURATION_VERSION_MAX_SAME_SECONDS` on another retained release (`retained_song_copies`). Display only; the optimizer still treats the groups as distinct. Logged fact: the decoded-waveform check rejected the Cut Off! pairs (median correlation 0.16 to 0.68), so the audio differs. Limit: two retained same-album copies cancel each other's highlight. A rule without the album-tag condition broke the Bully/Pablo fixtures.

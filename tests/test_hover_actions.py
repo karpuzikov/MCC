@@ -135,8 +135,8 @@ process.stdout.write(JSON.stringify(input.tracks.map(t=>status(t,{kind:'retained
     def test_same_song_and_album_tag_within_8_seconds_on_another_retained_release_is_not_highlighted(self):
         ep=[mcc.Track(1,Path('EP/a.flac'),1,title='Die In 1977',artist='Re-TROS',album='CUT OFF!',duration=294.4,group_id=0),
             mcc.Track(1,Path('EP/b.flac'),2,title='TV Show',artist='Re-TROS',album='CUT OFF!',duration=296.4,group_id=1)]
-        album=[mcc.Track(2,Path('Album/a.flac'),1,title='Die In 1977',artist='Re-TROS',album='Cut Off!',duration=310.2,group_id=2),
-               mcc.Track(2,Path('Album/b.flac'),2,title='TV Show',artist='Re-TROS',album='Cut Off!',duration=296.4,group_id=3)]
+        album=[mcc.Track(2,Path('Album/a.flac'),1,title='Die In 1977',artist='Rebuilding The Rights of Statues',album='Cut Off!',duration=310.2,group_id=2),
+               mcc.Track(2,Path('Album/b.flac'),2,title='TV Show',artist='Rebuilding The Rights of Statues',album='Cut Off!',duration=296.4,group_id=3)]
         releases=[mcc.Release(1,'recycle',Path('EP'),'EP',tracks=ep),mcc.Release(2,'recycle',Path('Album'),'Album',tracks=album)]
         snapshots=mcc.build_decision_snapshot(releases,ep+album,{1,2},
             [mcc.ReleaseDecision(r.rid,'ADD','Plan') for r in releases])
