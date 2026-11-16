@@ -36,14 +36,20 @@ class AlbumTitleFamily(unittest.TestCase):
         two = release(2, "album", "Greatest Hits", ["Other %d" % i for i in range(6)], 10)
         self.assertFalse(mcc._album_editions_related_by_titles(one, two))
 
-    def test_same_title_and_slot_pairs_reach_waveform_check_with_looser_fingerprint_bounds(self):
+    def test_same_title_and_slot_alternate_masters_match_only_within_8_seconds(self):
         fingerprint = tuple(range(200))
-        laugh_from_the_time = (7.739669, 0.889348, 1.0, 0, 0.16483, 8.0, 11)
-        args = (fingerprint, 280.0, fingerprint, 280.6, laugh_from_the_time)
-        self.assertFalse(mcc._fingerprint_pcm_rescue_candidate(*args))
-        self.assertTrue(mcc._fingerprint_pcm_rescue_candidate(*args, same_title_and_album_slot=True))
-        die_in_1977 = (fingerprint, 294.0, fingerprint, 310.0, laugh_from_the_time)
-        self.assertFalse(mcc._fingerprint_pcm_rescue_candidate(*die_in_1977, same_title_and_album_slot=True))
+        logged_pairs = {  # sims logged for the Cut Off! editions
+            "Laugh From The Time": (7.739669, 0.889348, 1.0, 0, 0.16483, 8.0, 11),
+            "TV Show": (6.220067, 0.9414, 1.0, 0, 0.420742, 6.0, 10),
+            "Boys In Cage": (8.054377, 0.828249, 1.0, 0, 0.154509, 8.0, 12),
+        }
+        for title, sim in logged_pairs.items():
+            with self.subTest(title=title):
+                self.assertTrue(mcc._fingerprint_album_context_match(fingerprint, 280.0, fingerprint, 282.0, sim))
+        sim = logged_pairs["TV Show"]
+        self.assertFalse(mcc._fingerprint_album_context_match(fingerprint, 294.0, fingerprint, 310.0, sim))
+        self.assertFalse(mcc._fingerprint_album_context_match(
+            fingerprint, 280.0, fingerprint, 282.0, (11.0, 0.5, 1.0, 0, 0.0, 14.0, 20)))
 
 
 if __name__ == "__main__":

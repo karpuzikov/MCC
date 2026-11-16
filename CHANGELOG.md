@@ -2,6 +2,12 @@
 
 Historical release notes and testing status retained from the original README.
 
+## v0.5.88 - Alternate masters of the same album track (Under construction ⚠️)
+
+- A pair with the same title in the same album track slot, length within 8 seconds, and a near-complete fingerprint overlap now counts as the same recording at looser Chromaprint bounds (score up to 8.5, good fraction at least 0.82, median up to 8, p90 up to 12, overlap at least 0.995, coverage at least 0.985). Outside that context the thresholds are unchanged. Example: `TV Show (Hang The Police)` (score 6.22) on `2005-11-01 - CUT OFF!` and `Re-TROS - Cut Off! [2005]`. The comparison log lists these as `album_context_fingerprint`.
+- Replaced the v0.5.85 rule that sent such pairs to the decoded-waveform check (it rejected them).
+- `tests/test_album_title_family.py` updated. Checked: all `tests/test_*.py`, ruff pyflakes rules. **Not run:** Windows 11/WebView2, a rescan of the Re-TROS folders.
+
 ## v0.5.87 - Highlight fix for editions with different artist tags (Under construction ⚠️)
 
 - Fixed: v0.5.86 changed nothing for `Re-TROS - Cut Off! [2005]` and `2005-11-01 - CUT OFF!` because their artist tags differ (`Rebuilding The Rights of Statues` and `Re-TROS`). The same-song check no longer compares artists; it uses title, album tag and length (within 8 seconds).

@@ -1,5 +1,9 @@
 # Music Collection Cleaner - Continuity Handoff
 
+## Checkpoint 2026-11-16 - MCC v0.5.88 - Under construction ⚠️
+
+`_fingerprint_album_context_match` (looser bounds) is applied in the post-comparison loop next to the PCM rescue, only when `candidate_reasons[(a,b)]` has `same_base_title` and `same_album_track_slot`; matches go to `album_context_matches`, which is OR-ed into the final `comparison_results` and logged as `accepted_by: album_context_fingerprint`. The v0.5.85 looser PCM routing was removed (decoded correlation for the Cut Off! pairs was 0.16 to 0.68). Bounds were calibrated on 4 logged pairs, no negative examples; false-positive risk for same-title different-recording pairs is untested. Not run on real data.
+
 ## Checkpoint 2026-11-16 - MCC v0.5.87 - Under construction ⚠️
 
 `retained_song_copies` key is now `(song title identity, family, normalized album tag)`; the artist alias part of `_release_map_song_key` is dropped because the Cut Off! editions carry different artist tags, so v0.5.86 never matched them. Not run on real data.
