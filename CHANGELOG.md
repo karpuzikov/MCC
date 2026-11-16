@@ -2,6 +2,12 @@
 
 Historical release notes and testing status retained from the original README.
 
+## v0.5.113 - Third theme: SB 2026 (Under construction ⚠️)
+
+- Added: theme "SB 2026" in the Theme selector (saved as `ui_theme` = `sb`), built as another switchable `<style id="sbTheme">` layer: #2D3F54 page and panels, #52647A bars, #1DBD8E primary, #00D4C6 accent, #004C94/#006ECF/#3C93FA blues for selected rows and CD badges, #028183/#0FA69D teal for CUE and toggles. Text #F2F2F5 and muted #a9b6c6 are derived (the palette has no light text colour).
+- Changed: theme switching and the page injection handle both layers (`neonTheme`, `sbTheme`); `tests/test_ui_theme.py` covers all three.
+- Checked: all `tests/test_*.py`, ruff pyflakes rules, headless Chrome screenshots of both windows in SB 2026. **Not run:** Windows 11/WebView2; modal dialogs and rarely shown states in SB 2026; contrast of amber/purple badges on the new blue-grey.
+
 ## v0.5.112 - Classic theme in Aspen Gray colours (Under construction ⚠️)
 
 - Changed: the Classic theme uses the palette #43464C (page, panels), #48577D (bars, buttons, selects), #9197A6 (muted text), #D3DCF2 (text), #7690CF (primary button, accent). Buttons inside the top and bottom bars are lighter (#5f73ad) than the bar. Neon Arcade is unchanged.

@@ -1,5 +1,9 @@
 # Music Collection Cleaner - Continuity Handoff
 
+## Checkpoint 2026-11-16 - MCC v0.5.113 - Under construction ⚠️
+
+`UI_THEME_NAMES = ("neon","classic","sb")`. `APP_SB_CSS` is injected into `<style id="sbTheme" media=...>` (after `neonTheme`) by `_apply_app_theme`; JS in `renderState` toggles both media attributes. SB is an override layer on top of the Classic (Aspen) base, so uncovered components keep Aspen greys. Not run: Windows 11/WebView2.
+
 ## Checkpoint 2026-11-16 - MCC v0.5.112 - Under construction ⚠️
 
 Classic tokens in `APP_THEME_CSS` are Aspen Gray (--bg/--panel #43464C, --bar/--raised #48577D, --text #D3DCF2, --muted #9197A6, --accent/--teal #7690CF); page literals were remapped; `.appBar .btn` is #5f73ad (Neon overrides it back to #0b0b26). Not run: Windows 11/WebView2.

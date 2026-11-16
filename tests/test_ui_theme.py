@@ -19,6 +19,11 @@ class UiThemeTests(unittest.TestCase):
         with patch.object(mcc, "_load_app_settings", return_value={"ui_theme": "classic"}):
             html = mcc._webview_main_html()
         self.assertIn('id="neonTheme" media="not all"', html)
+        self.assertIn('id="sbTheme" media="not all"', html)
+        with patch.object(mcc, "_load_app_settings", return_value={"ui_theme": "sb"}):
+            html = mcc._webview_main_html()
+        self.assertIn('id="sbTheme" media="all"', html)
+        self.assertIn('id="neonTheme" media="not all"', html)
         with patch.object(mcc, "_load_app_settings", return_value={}):
             html = mcc._webview_release_map_html()
         self.assertIn('id="neonTheme" media="all"', html)
