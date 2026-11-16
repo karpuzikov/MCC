@@ -1,5 +1,9 @@
 # Music Collection Cleaner - Continuity Handoff
 
+## Checkpoint 2026-11-16 - MCC v0.5.112 - Under construction ⚠️
+
+Classic tokens in `APP_THEME_CSS` are Aspen Gray (--bg/--panel #43464C, --bar/--raised #48577D, --text #D3DCF2, --muted #9197A6, --accent/--teal #7690CF); page literals were remapped; `.appBar .btn` is #5f73ad (Neon overrides it back to #0b0b26). Not run: Windows 11/WebView2.
+
 ## Checkpoint 2026-11-16 - MCC v0.5.111 - Under construction ⚠️
 
 Theme option: `UI_THEME_NAMES`, `_ui_theme_name`, `_save_ui_theme`, `_apply_app_theme` (injects `APP_THEME_CSS`, `APP_NEON_CSS`, and `media="all"/"not all"` into `<style id="neonTheme">`); bridge `setTheme`; `_state_payload` has `theme`; `_save_app_settings` preserves `ui_theme`. Not run: Windows 11/WebView2.
