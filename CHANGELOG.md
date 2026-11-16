@@ -2,6 +2,11 @@
 
 Historical release notes and testing status retained from the original README.
 
+## v0.5.93 - Every rip log result is shown (Under construction ⚠️)
+
+- Release details list one line per checked `.log` file under the source: `file.log: 98% (EAC)`, `file.log: 100% (XLD) - flagged`, `file.log: not recognized - <reason>` or `file.log: scoring failed - <reason>`. Every `.log` in the release folder except `audiochecker.log` is checked, as before; only the result display is new.
+- Checked: all `tests/test_*.py`, ruff pyflakes rules, map script syntax. **Not run:** Windows 11/WebView2, a real scan. Files that are not named `*.log` (for example `*.txt` rip logs) are not checked.
+
 ## v0.5.92 - LOG mark says when the log was not scored (Under construction ⚠️)
 
 - A `LOG` mark without a percent meant the rip log was found but the scorer did not return a score (unrecognized log or scoring error). The mark now reads `LOG not scored` (grey) and its tooltip lists the reason per log file. Logged for `Re-TROS - Watch Out! … [CN - M-035] ALAC`: no score and no CD rip quality; other CD releases in the same log scored 100.

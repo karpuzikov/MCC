@@ -138,7 +138,7 @@ process.stdout.write(JSON.stringify(input.tracks.map(t=>status(t,{kind:'retained
         cd=[mcc.Track(2,Path('C/a.flac'),1,title='One',artist='Artist',duration=120,group_id=0),
             mcc.Track(2,Path('C/b.flac'),2,title='Two',artist='Artist',duration=130,group_id=1)]
         releases=[mcc.Release(1,'recycle',Path('W'),'W',tracks=web),
-                  mcc.Release(2,'recycle',Path('C'),'C',tracks=cd,has_cue=True,has_rip_log=True,rip_log_scores=[98,100],rip_log_unrecognized=['x.log: unrecognized'])]
+                  mcc.Release(2,'recycle',Path('C'),'C',tracks=cd,has_cue=True,has_rip_log=True,rip_log_scores=[98,100],rip_log_unrecognized=['x.log: unrecognized'],rip_log_results=['a.log: 98% (EAC)','x.log: not recognized - unrecognized'])]
         snapshots=mcc.build_decision_snapshot(releases,web+cd,{2},
             [mcc.ReleaseDecision(1,'SKIP','Plan'),mcc.ReleaseDecision(2,'ADD','Plan')])
         node=next(n for n in self.ui_state(snapshots)['nodes'] if n['id']==2)
@@ -146,6 +146,7 @@ process.stdout.write(JSON.stringify(input.tracks.map(t=>status(t,{kind:'retained
         self.assertFalse(any(t['unique'] for t in node['tracks']))
         self.assertEqual((node['hasCue'],node['hasRipLog'],node['ripLogPercent']),(True,True,98))
         self.assertEqual(node['ripLogProblems'],['x.log: unrecognized'])
+        self.assertEqual(node['ripLogResults'],['a.log: 98% (EAC)','x.log: not recognized - unrecognized'])
 
     def test_same_song_and_album_tag_within_8_seconds_on_another_retained_release_is_not_highlighted(self):
         ep=[mcc.Track(1,Path('EP/a.flac'),1,title='Die In 1977',artist='Re-TROS',album='CUT OFF!',duration=294.4,group_id=0),

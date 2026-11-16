@@ -1,5 +1,9 @@
 # Music Collection Cleaner - Continuity Handoff
 
+## Checkpoint 2026-11-16 - MCC v0.5.93 - Under construction ⚠️
+
+`Release.rip_log_results` (one display line per log, filled in `score_cd_rip_logs`) -> snapshot `rip_log_results` -> node `ripLogResults` -> `.ripLogLine` lines in `sourceSummary`. Scanning still collects only `*.log` (`all_files` suffix), minus `audiochecker.log`.
+
 ## Checkpoint 2026-11-16 - MCC v0.5.92 - Under construction ⚠️
 
 Snapshot `rip_log_problems` (= `rel.rip_log_unrecognized`) -> node `ripLogProblems`; unscored LOG mark is grey with the reasons as tooltip. Unknown: why release 21 (CN - M-035 ALAC) is unscored while two other CD releases scored 100; `score_cd_rip_logs` errors only go to the app `errors` list, not the comparison log.
