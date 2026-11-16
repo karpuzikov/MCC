@@ -2,6 +2,11 @@
 
 Historical release notes and testing status retained from the original README.
 
+## v0.5.108 - Palette hierarchy: dark dominant, small elements brighter (Under construction ⚠️)
+
+- Changed: page, columns, details panel, cards and the Activity log use the darkest colour (#222942); toolbar, footer, copy/move bar, text fields and the progress track use #2a3550/#2f3b57; buttons #36485B; primary button #0D7D8B. Smaller elements are now brighter than larger ones.
+- Checked: all `tests/test_*.py`, ruff pyflakes rules, headless Chrome screenshots of both windows. **Not run:** Windows 11/WebView2; column header strip and modal dialogs still use the earlier remapped shades.
+
 ## v0.5.107 - One shared theme, new palette (Under construction ⚠️)
 
 - Changed: the main window and the Release Map share one theme string (`APP_THEME_CSS`): colour variables, base page styles, `.appBar` (44 px top toolbar and bottom footer), `.btn`/`.iconBtn` (flat, no border, `.primary` teal) and `.field`.

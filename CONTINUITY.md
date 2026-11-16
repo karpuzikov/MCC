@@ -1,5 +1,9 @@
 # Music Collection Cleaner - Continuity Handoff
 
+## Checkpoint 2026-11-16 - MCC v0.5.108 - Under construction ⚠️
+
+Theme tokens in `APP_THEME_CSS`: `--bg/--panel` #222942 (dominant), `--bar/--panel2` #2a3550, `--field` #2f3b57, `--raised` #36485B. `#activity` uses `--bg`; `.exportChoice` is transparent; `#boardViewport` is flat #222942. Not run: Windows 11/WebView2.
+
 ## Checkpoint 2026-11-16 - MCC v0.5.107 - Under construction ⚠️
 
 `APP_THEME_CSS` (defined before `_webview_release_map_html`) is injected into both pages through the `/*APP_THEME*/` placeholder at the end of each HTML function; it holds `:root` tokens (`--bg --bar --panel --field --raised --teal --accent --text --muted`), `.appBar`, `.btn`, `.iconBtn`, `.field`. `#toolbar` and `#footer` use `.appBar`. Remaining literal hex colours in both pages were remapped by lightness/hue to the new palette. Not run: Windows 11/WebView2.
