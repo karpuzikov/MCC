@@ -1,5 +1,9 @@
 # Music Collection Cleaner - Continuity Handoff
 
+## Checkpoint 2026-11-16 - MCC v0.5.86 - Under construction ⚠️
+
+In `_release_map_state_for_ui`, `unique` also requires no copy of the same `_release_map_song_key` with the same normalized album tag and length within `DURATION_VERSION_MAX_SAME_SECONDS` on another retained release (`retained_song_copies`). Display only; the optimizer still treats the groups as distinct. Logged fact: the decoded-waveform check rejected the Cut Off! pairs (median correlation 0.16 to 0.68), so the audio differs. Limit: two retained same-album copies cancel each other's highlight. A rule without the album-tag condition broke the Bully/Pablo fixtures.
+
 ## Checkpoint 2026-11-16 - MCC v0.5.85 - Under construction ⚠️
 
 `_album_editions_related_by_titles` now requires equal `release_type` (no Album+EP families). `_fingerprint_pcm_rescue_candidate(..., same_title_and_album_slot=True)` is passed when the pair's `candidate_reasons` contain `same_base_title` and `same_album_track_slot`: looser fingerprint bounds (score <=9, good >=0.80, median <=9, p90 <=13, overlap >=0.995, coverage >=0.98) but acceptance still needs `_PCMIdentityVerifier.verify_mastering`. Release Map "unique" is unchanged (essential acoustic group); it only drops for a track once its group merges with another edition's. A display-only "same song within 8 s elsewhere" rule was tried and rejected: it broke the logged Bully/Pablo retention tests. Open: real-audio run on the Cut Off! pair.

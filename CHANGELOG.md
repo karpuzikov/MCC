@@ -2,6 +2,11 @@
 
 Historical release notes and testing status retained from the original README.
 
+## v0.5.86 - Highlight only the songs that keep a release (Under construction ⚠️)
+
+- Release Map: a song is no longer highlighted or labelled "Unique to this release" when another retained release has the same song with the same album tag and a length within 8 seconds. Example: in `2005-11-01 - CUT OFF!` only `Die In 1977` is highlighted; in `Re-TROS - Cut Off!` only `Die In 1977` and `A Vision Of Christ`. Recordings are still not merged; this changes only the highlight.
+- Checked: all `tests/test_*.py` (new test in `test_hover_actions.py`), ruff pyflakes rules. **Not run:** Windows 11/WebView2, a rescan of the Re-TROS folders.
+
 ## v0.5.85 - Albums and EPs stay apart; alternate masters of the same track (Under construction ⚠️)
 
 - Reverted from v0.5.84: an Album and an EP are never grouped together. The title-based family now needs both editions to have the same type.

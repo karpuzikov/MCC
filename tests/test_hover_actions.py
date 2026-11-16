@@ -132,6 +132,17 @@ process.stdout.write(JSON.stringify(input.tracks.map(t=>status(t,{kind:'retained
                 self.assertEqual(nodes[1]['tracks'][1]['audioMatchEditions'],1)
                 self.assertFalse(nodes[1]['tracks'][1]['isGem'])
 
+    def test_same_song_and_album_tag_within_8_seconds_on_another_retained_release_is_not_highlighted(self):
+        ep=[mcc.Track(1,Path('EP/a.flac'),1,title='Die In 1977',artist='Re-TROS',album='CUT OFF!',duration=294.4,group_id=0),
+            mcc.Track(1,Path('EP/b.flac'),2,title='TV Show',artist='Re-TROS',album='CUT OFF!',duration=296.4,group_id=1)]
+        album=[mcc.Track(2,Path('Album/a.flac'),1,title='Die In 1977',artist='Re-TROS',album='Cut Off!',duration=310.2,group_id=2),
+               mcc.Track(2,Path('Album/b.flac'),2,title='TV Show',artist='Re-TROS',album='Cut Off!',duration=296.4,group_id=3)]
+        releases=[mcc.Release(1,'recycle',Path('EP'),'EP',tracks=ep),mcc.Release(2,'recycle',Path('Album'),'Album',tracks=album)]
+        snapshots=mcc.build_decision_snapshot(releases,ep+album,{1,2},
+            [mcc.ReleaseDecision(r.rid,'ADD','Plan') for r in releases])
+        for node in self.ui_state(snapshots)['nodes']:
+            self.assertEqual([t['title'] for t in node['tracks'] if t['unique']],['Die In 1977'])
+
     def ui_state(self,snapshots):
         with patch.object(mcc,'_load_pattern_categories',return_value={}), \
              patch.object(mcc,'_load_app_settings',return_value={}), \
