@@ -1,5 +1,9 @@
 # Music Collection Cleaner - Continuity Handoff
 
+## Checkpoint 2026-11-16 - MCC v0.5.119 - Under construction ⚠️
+
+Icons in `APP_THEME_CSS`: `#closeDetailsBtn` and `.clearBtn` draw × with two rotated bars; `.rowMenuBtn` draws three dots with `::before` and box-shadows; button text is `font-size:0`. The main window `mk("clearBtn","✕",...)` call passes the class. Not run: Windows 11/WebView2.
+
 ## Checkpoint 2026-11-16 - MCC v0.5.118 - Under construction ⚠️
 
 Leftover Aspen-derived grey literals in both HTML pages were unified: #1b1c1e/#1a1b1e -> #14161a (page), panel greys -> #1d2026, field greys -> #262a31. Both windows now sample identical page and bar colours. Not run: Windows 11/WebView2.

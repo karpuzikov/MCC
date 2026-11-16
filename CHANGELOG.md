@@ -2,6 +2,11 @@
 
 Historical release notes and testing status retained from the original README.
 
+## v0.5.119 - Centred icons (Under construction ⚠️)
+
+- Fixed: the close "×" of the release dialog, the "✕" remove-folder buttons and the "⋯" track menu button were font glyphs that sat off-centre. They are now drawn with CSS (`::before`/`::after`) in the button's current colour, so they follow the theme. Icon buttons use `line-height:1`.
+- Checked: all `tests/test_*.py`, ruff pyflakes rules; measured the rendered close button at 4x device scale in headless Chrome: glyph centre equals box centre. The "⋯" button is within 0.5 px vertically. **Not run:** Windows 11/WebView2; the folder emoji and star buttons (only line-height changed, emoji fonts differ per system); the remove-folder button in the main window (class added, not screenshotted).
+
 ## v0.5.118 - Same colours in both windows (Under construction ⚠️)
 
 - Fixed: the Release Map page was #1b1c1e (a leftover grey) while the main window page was #14161a. All leftover grey literals in both pages now use the Classic tokens: page #14161a, bars/panels #1d2026, fields #262a31 (`rgba` overlays likewise).
