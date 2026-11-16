@@ -2,6 +2,11 @@
 
 Historical release notes and testing status retained from the original README.
 
+## v0.5.116 - Classic theme made dark (Under construction ⚠️)
+
+- Changed: Classic page and panels #14161a (CIE L* about 8, was #43464C at about 30); bars #1d2026; fields #262a31; borders #2b2e35; buttons #43464C (hover #555a66); text #D3DCF2, muted #9197A6 and the #7690CF accent/primary are unchanged. Remaining dark literal colours in both pages were lowered in lightness by a fixed curve; light text colours were not touched. #14161a, #1d2026, #262a31, #2b2e35 are derived, not from the Aspen Gray palette.
+- Checked: all `tests/test_*.py`, ruff pyflakes rules, headless Chrome screenshots of both windows (the SB 2026 layer was not re-screenshotted). **Not run:** Windows 11/WebView2; dialogs; Classic on the real app.
+
 ## v0.5.115 - SB 2026 theme much darker (Under construction ⚠️)
 
 - Changed: SB 2026 page, panels, details and dialogs #0d131b; bars #16202c; fields and borders #1c2938; buttons #2D3F54 (hover #3a506a); selected row #00305f. Primary #1DBD8E and the other accents unchanged. #0d131b, #16202c, #1c2938 and #00305f are derived from the palette, not supplied.

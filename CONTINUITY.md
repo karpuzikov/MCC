@@ -1,5 +1,9 @@
 # Music Collection Cleaner - Continuity Handoff
 
+## Checkpoint 2026-11-16 - MCC v0.5.116 - Under construction ⚠️
+
+Classic tokens in `APP_THEME_CSS`: --bg/--panel #14161a, --bar #1d2026, --field #262a31, --raised #43464C, --line #2b2e35; page literals with lightness under 60% lowered by a fixed curve. Not run: Windows 11/WebView2.
+
 ## Checkpoint 2026-11-16 - MCC v0.5.115 - Under construction ⚠️
 
 `APP_SB_CSS` retuned much darker: --bg/--panel #0d131b, --bar #16202c, --field/--line #1c2938, --raised #2D3F54, selected row #00305f. Not run: Windows 11/WebView2.
