@@ -2,6 +2,13 @@
 
 Historical release notes and testing status retained from the original README.
 
+## v0.5.111 - Theme option: Neon Arcade / Classic (Under construction ⚠️)
+
+- Added: "Theme" selector in the main window (Neon Arcade, Classic). It applies immediately, is saved as `ui_theme` in the settings file (default Neon Arcade; unknown values fall back to it) and is used by the Release Map when it opens.
+- Changed: the Neon Arcade CSS is now a separate `<style id="neonTheme">` element that is switched on and off with its `media` attribute; Classic is the v0.5.109 look.
+- Added: `tests/test_ui_theme.py` (fallback, unknown name rejected, media attribute per theme).
+- Checked: all `tests/test_*.py`, ruff pyflakes rules, headless Chrome: Neon screenshot, and the Classic switch removes the neon borders. **Not run:** Windows 11/WebView2; changing the theme while a Release Map window is already open (it keeps its theme until reopened); the save path to the real settings file.
+
 ## v0.5.110 - Neon Arcade design for both windows (Under construction ⚠️)
 
 - Changed: new `APP_NEON_CSS` layer (injected at the end of both pages' style) restyles the whole app after the Neon Arcade mock-up: near-black navy page with a faint grid, 2px neon borders with glow (cyan default, magenta cards/bars/primary, green copy and LOG, yellow move, red ignore), uppercase glowing headings, monospace font, neon progress bar, neon selected release row, badges and dialog panels.

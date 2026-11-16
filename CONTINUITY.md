@@ -1,5 +1,9 @@
 # Music Collection Cleaner - Continuity Handoff
 
+## Checkpoint 2026-11-16 - MCC v0.5.111 - Under construction ⚠️
+
+Theme option: `UI_THEME_NAMES`, `_ui_theme_name`, `_save_ui_theme`, `_apply_app_theme` (injects `APP_THEME_CSS`, `APP_NEON_CSS`, and `media="all"/"not all"` into `<style id="neonTheme">`); bridge `setTheme`; `_state_payload` has `theme`; `_save_app_settings` preserves `ui_theme`. Not run: Windows 11/WebView2.
+
 ## Checkpoint 2026-11-16 - MCC v0.5.110 - Under construction ⚠️
 
 `APP_NEON_CSS` (before `_webview_release_map_html`) is injected via `/*APP_NEON*/` before `</style>` of both pages and overrides the theme tokens and component styles (2px neon borders, glow). Removing the placeholder replaces the look with the v0.5.109 theme. Not run: Windows 11/WebView2.
