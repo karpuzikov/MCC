@@ -2,6 +2,11 @@
 
 Historical release notes and testing status retained from the original README.
 
+## v0.5.98 - Release Map categories side by side at every window size (Under construction ⚠️)
+
+- Fixed: v0.5.97 stacked Albums, Singles and Compilations in rows at every size, the opposite of the intended layout. They now sit side by side at every window size, with the weighted column widths (`--category-grid`) from v0.5.96. Both `@container release-map-viewport` width rules are removed, so nothing switches while resizing.
+- Checked: all `tests/test_*.py`, ruff pyflakes rules, computed grid in headless Chrome at 2400, 1700 and 1200 px (three tracks each). **Not run:** Windows 11/WebView2; appearance at narrow widths.
+
 ## v0.5.97 - One Release Map layout at every window size (Under construction ⚠️)
 
 - Fixed: Albums, Singles and Compilations sat side by side when the map area was wider than 1750 px and stacked in rows when narrower, so the layout jumped while resizing the window. They are now always stacked in rows; only the release columns inside each row still follow the width.

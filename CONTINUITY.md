@@ -1,5 +1,9 @@
 # Music Collection Cleaner - Continuity Handoff
 
+## Checkpoint 2026-11-16 - MCC v0.5.98 - Under construction ⚠️
+
+Built from the v0.5.96 file: both `@container release-map-viewport` rules deleted, so `#columns.fullMapColumns` uses `--category-grid` (sqrt-weighted tracks) at every width. The v0.5.97 single-column change is reverted. Open: narrow-window look is unchecked; no real WebView2 run.
+
 ## Checkpoint 2026-11-16 - MCC v0.5.97 - Under construction ⚠️
 
 `#columns.fullMapColumns` is a single column at all widths (both `@container release-map-viewport` rules and `--category-grid`/`categoryGrid`/`categoryColumns` in the freeze logic removed). If a side-by-side layout is wanted again it must be a setting, not a width threshold.
