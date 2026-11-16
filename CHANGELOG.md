@@ -2,6 +2,12 @@
 
 Historical release notes and testing status retained from the original README.
 
+## v0.5.106 - Main window: less padding (Under construction ⚠️)
+
+- Changed: main window spacing roughly halved: outer padding and gaps between cards (10/8 px to 4-6 px), source and options spacing, progress card, Activity header and log box padding, footer height (46 to 38 px).
+- Fixed: the line under the progress bar repeated the percentage already shown on the right; it is now hidden when it is only a percentage.
+- Checked: all `tests/test_*.py`, ruff pyflakes rules, headless Chrome screenshot of the main window. **Not run:** Windows 11/WebView2; the source-folder rows (no bridge in the screenshot).
+
 ## v0.5.105 - Release dialog: close button alignment, one gold check (Under construction ⚠️)
 
 - Fixed: the close button now shares the right edge (12 px) with Ignore release, the folder path and the row menu buttons; the header no longer reserves extra right padding. The title leaves room for it.

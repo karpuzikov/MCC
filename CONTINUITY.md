@@ -1,5 +1,9 @@
 # Music Collection Cleaner - Continuity Handoff
 
+## Checkpoint 2026-11-16 - MCC v0.5.106 - Under construction ⚠️
+
+Main window CSS in `_webview_main_html` tightened (`#content` gap 4 / padding 4px 6px, `.sources`, `.options`, `.progressCard`, `#activity`, `#footer` 38px). `currentDetail()` drops a progressCount that is only a percentage. The Release Map and dialog spacing were not touched in this version.
+
 ## Checkpoint 2026-11-16 - MCC v0.5.105 - Under construction ⚠️
 
 `#detailsHead` padding is 8px 12px; `#closeDetailsBtn` (28px, absolute right:12px) and the track menu column (28px) share the right edge with `.releaseButtons`/`#releasePath`. `perfectRip` wraps the three badges in `.perfectRip` plus `.perfectTick` (24px gold ✓) and suppresses the small ticks.
