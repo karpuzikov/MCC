@@ -2,6 +2,12 @@
 
 Historical release notes and testing status retained from the original README.
 
+## v0.5.92 - LOG mark says when the log was not scored (Under construction ⚠️)
+
+- A `LOG` mark without a percent meant the rip log was found but the scorer did not return a score (unrecognized log or scoring error). The mark now reads `LOG not scored` (grey) and its tooltip lists the reason per log file. Logged for `Re-TROS - Watch Out! … [CN - M-035] ALAC`: no score and no CD rip quality; other CD releases in the same log scored 100.
+- The reason itself is **not known**: the comparison log does not record it. Check the tooltip after a rescan.
+- Checked: all `tests/test_*.py`, ruff pyflakes rules, map script syntax. **Not run:** Windows 11/WebView2.
+
 ## v0.5.91 - Kept-for-source releases highlight no songs; LOG and CUE marks (Under construction ⚠️)
 
 - Release Map: a release kept as the better source (for example a CD rip) of an equivalent, unselected edition (same recordings both ways) is not kept for any one song, so no song is highlighted and the "essential" count is 0. Example: `Re-TROS - Watch Out! Climate Has Changed, Fat Mum Rises... (2009) [CN - M-035] ALAC` replacing `2009-02-27 - Watch Out！…`.

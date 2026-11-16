@@ -1,5 +1,9 @@
 # Music Collection Cleaner - Continuity Handoff
 
+## Checkpoint 2026-11-16 - MCC v0.5.92 - Under construction ⚠️
+
+Snapshot `rip_log_problems` (= `rel.rip_log_unrecognized`) -> node `ripLogProblems`; unscored LOG mark is grey with the reasons as tooltip. Unknown: why release 21 (CN - M-035 ALAC) is unscored while two other CD releases scored 100; `score_cd_rip_logs` errors only go to the app `errors` list, not the comparison log.
+
 ## Checkpoint 2026-11-16 - MCC v0.5.91 - Under construction ⚠️
 
 `_recordings_that_require_release` replaces both `essential_groups` computations (plan text and `build_decision_snapshot`): empty when an unselected, unblocked release covers this one and is covered by it. Snapshot rows carry `has_cue`, `has_rip_log`, `rip_log_percent` (min of `rip_log_scores`); node fields `hasCue`, `hasRipLog`, `ripLogPercent`; `.ripMark` pills in `sourceSummary`. Marks only in the details panel, not on the release rows.
