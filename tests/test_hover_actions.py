@@ -414,7 +414,7 @@ const calls=[],buttons={
 const inner={querySelectorAll:selector=>buttons[selector]};
 const bridge={markTrackPattern:(index,kind)=>calls.push(['pattern',index,kind]),
   toggleTrack:index=>calls.push(['recording',index])};
-new Function('inner','bridge','receivePatternClassification','receiveTrackToggle',code)(inner,bridge,()=>{},()=>{});
+new Function('inner','bridge','receivePatternClassification','receiveTrackToggle','closeTrackMenus',code)(inner,bridge,()=>{},()=>{},()=>{});
 let stopped=0;
 Object.values(buttons).flat().forEach(button=>button.onclick({stopPropagation:()=>stopped++}));
 process.stdout.write(JSON.stringify({calls,stopped}));

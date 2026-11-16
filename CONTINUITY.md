@@ -1,5 +1,9 @@
 # Music Collection Cleaner - Continuity Handoff
 
+## Checkpoint 2026-11-16 - MCC v0.5.104 - Under construction ⚠️
+
+Track actions: `.rowMenuCell` (last grid column) holds `.rowMenuBtn` and `.trackActionGroup` (position:fixed menu, shown under `.track.menuOpen`, placed by the click handler; `closeTrackMenus` is defined before `openDetails`, closes on document click/Esc and in the three action handlers). `.tagsCell` = `.versionsCell` + `.status`. Ticks: `perfectRip` = medium starts with CD && hasCue && hasRipLog && ripLogPercent===100 -> gold. No `#tracksTitle`, no `#releaseReason`; `.planBadge` + `#essentialCount` are in `.releaseBadges`. All outlines in `#details` are replaced by a background change. UI rules from the user: no outlines, no long text outside logs.
+
 ## Checkpoint 2026-11-16 - MCC v0.5.103 - Under construction ⚠️
 
 `.trackActionGroup` is now inside `.titleCell` (absolute, right edge) and contains `badge` (saved pattern, text "To Personal Picks"), Mark Remix/Live buttons (hidden when the track is already that kind) and Ignore/Restore. `#releasePlan` = `.planBadge` + `#essentialCount` ("N essential (highlighted)") + `#releaseReason` (`n.reason`, the existing optimizer text). Note column: flagged states, else "Essential" for `t.unique` (the in-place update code repeats this). Group move is `<select id="albumGroupSelect">` with onchange -> `bridge.setAlbumGroup`; option value -1 = automatic. `#releaseMeta` is still gone. Not run on WebView2.

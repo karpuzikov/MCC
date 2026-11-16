@@ -2,6 +2,14 @@
 
 Historical release notes and testing status retained from the original README.
 
+## v0.5.104 - Release dialog: row menu, rip ticks, less text (Under construction ⚠️)
+
+- Changed: the hover buttons are replaced by a "..." button at the end of each track row that opens a small menu (Mark Remix, Mark Live, To Personal Picks, Ignore/Restore); it closes on click outside, Esc or after an action.
+- Changed: CD, CUE and a scored LOG show a green check; a CD + CUE + LOG 100% release shows gold checks. A LOG without a score shows no check.
+- Removed: the "Tracks" heading, the long reason text (now only the tooltip of the status badge), the bright blue accent on the selected track, and the blue focus outline in the dialog (focus is shown by a lighter background).
+- Changed: the Remix/Live/Ignored/Essential note now sits in the same column as the badges; the status badge sits in the badge row.
+- Checked: all `tests/test_*.py`, ruff pyflakes rules, headless Chrome screenshots with the menu open and closed. **Not run:** Windows 11/WebView2; the menu near the bottom of a long list; keyboard use of the menu.
+
 ## v0.5.103 - Release dialog: no overlap, readable buttons, plan line, Change group (Under construction ⚠️)
 
 - Fixed: the per-track hover buttons overlapped the Versions/Remixes badges. They now sit at the right end of the title cell and use text labels ("Mark Remix", "Mark Live", "To Personal Picks", "Ignore"/"Restore"). A track already detected as Remix or Live no longer offers the matching Mark button; the saved-pattern "R" badge is shown only as the "To Personal Picks" hover button.
