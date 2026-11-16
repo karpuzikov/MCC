@@ -2,6 +2,11 @@
 
 Historical release notes and testing status retained from the original README.
 
+## v0.5.100 - Equal-width Release Map categories (Under construction ⚠️)
+
+- Fixed: Singles got a wider column than Albums and Compilations (width weighted by group count) while its releases run in a single list, leaving the right half empty and truncating the Compilations release name. Albums, Singles and Compilations are now equal-width columns; the weights (`--category-grid`) are removed.
+- Checked: all `tests/test_*.py`, ruff pyflakes rules. **Not run:** Windows 11/WebView2.
+
 ## v0.5.99 - One list per Release Map category (Under construction ⚠️)
 
 - Fixed: in a wide category (Singles) the releases were split into 2-3 side-by-side sub-columns instead of one list running down. Each category (Albums, Singles, Compilations) is now a single column; the two `@container release-category` rules that created the sub-columns are removed.

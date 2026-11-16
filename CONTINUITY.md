@@ -1,5 +1,9 @@
 # Music Collection Cleaner - Continuity Handoff
 
+## Checkpoint 2026-11-16 - MCC v0.5.100 - Under construction ⚠️
+
+Removed the sqrt-weighted `--category-grid` (CSS rule, weights code, freeze field); `#columns` uses `repeat(--visible-columns, minmax(0,1fr))`. Freeze logic always applies `repeat(categoryColumns,…)`. Not run on WebView2.
+
 ## Checkpoint 2026-11-16 - MCC v0.5.99 - Under construction ⚠️
 
 Deleted both `@container release-category (min-width:…)` rules; `.releaseGroups` stays `column-count:1`. Cause of the v0.5.98 screenshot: Singles was wide enough for 3 CSS columns. Not run on WebView2.
