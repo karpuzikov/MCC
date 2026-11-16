@@ -2,6 +2,13 @@
 
 Historical release notes and testing status retained from the original README.
 
+## v0.5.107 - One shared theme, new palette (Under construction ⚠️)
+
+- Changed: the main window and the Release Map share one theme string (`APP_THEME_CSS`): colour variables, base page styles, `.appBar` (44 px top toolbar and bottom footer), `.btn`/`.iconBtn` (flat, no border, `.primary` teal) and `.field`.
+- Changed: palette #222942, #36485B, #0D7D8B, #1BA4A4, #F2F2F5 (page, raised surfaces/buttons, primary button, accent, text); all existing neutral blue-greys and blue/cyan accents in both pages were remapped to it; red, amber, green, purple and rose status colours are unchanged.
+- Changed: cards, log box, progress track, text fields, selects, release path, copy/move bar and the dialog buttons lost their borders and use fills instead; Ignore release uses a dark red fill.
+- Checked: all `tests/test_*.py`, ruff pyflakes rules, headless Chrome screenshots of both windows. **Not run:** Windows 11/WebView2; modal dialogs and other main-window states (colours remapped, not individually reviewed); contrast of small status badges on the new background.
+
 ## v0.5.106 - Main window: less padding (Under construction ⚠️)
 
 - Changed: main window spacing roughly halved: outer padding and gaps between cards (10/8 px to 4-6 px), source and options spacing, progress card, Activity header and log box padding, footer height (46 to 38 px).

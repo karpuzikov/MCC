@@ -1,5 +1,9 @@
 # Music Collection Cleaner - Continuity Handoff
 
+## Checkpoint 2026-11-16 - MCC v0.5.107 - Under construction ⚠️
+
+`APP_THEME_CSS` (defined before `_webview_release_map_html`) is injected into both pages through the `/*APP_THEME*/` placeholder at the end of each HTML function; it holds `:root` tokens (`--bg --bar --panel --field --raised --teal --accent --text --muted`), `.appBar`, `.btn`, `.iconBtn`, `.field`. `#toolbar` and `#footer` use `.appBar`. Remaining literal hex colours in both pages were remapped by lightness/hue to the new palette. Not run: Windows 11/WebView2.
+
 ## Checkpoint 2026-11-16 - MCC v0.5.106 - Under construction ⚠️
 
 Main window CSS in `_webview_main_html` tightened (`#content` gap 4 / padding 4px 6px, `.sources`, `.options`, `.progressCard`, `#activity`, `#footer` 38px). `currentDetail()` drops a progressCount that is only a percentage. The Release Map and dialog spacing were not touched in this version.
