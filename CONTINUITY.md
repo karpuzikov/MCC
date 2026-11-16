@@ -1,5 +1,9 @@
 # Music Collection Cleaner - Continuity Handoff
 
+## Checkpoint 2026-11-16 - MCC v0.5.105 - Under construction ⚠️
+
+`#detailsHead` padding is 8px 12px; `#closeDetailsBtn` (28px, absolute right:12px) and the track menu column (28px) share the right edge with `.releaseButtons`/`#releasePath`. `perfectRip` wraps the three badges in `.perfectRip` plus `.perfectTick` (24px gold ✓) and suppresses the small ticks.
+
 ## Checkpoint 2026-11-16 - MCC v0.5.104 - Under construction ⚠️
 
 Track actions: `.rowMenuCell` (last grid column) holds `.rowMenuBtn` and `.trackActionGroup` (position:fixed menu, shown under `.track.menuOpen`, placed by the click handler; `closeTrackMenus` is defined before `openDetails`, closes on document click/Esc and in the three action handlers). `.tagsCell` = `.versionsCell` + `.status`. Ticks: `perfectRip` = medium starts with CD && hasCue && hasRipLog && ripLogPercent===100 -> gold. No `#tracksTitle`, no `#releaseReason`; `.planBadge` + `#essentialCount` are in `.releaseBadges`. All outlines in `#details` are replaced by a background change. UI rules from the user: no outlines, no long text outside logs.

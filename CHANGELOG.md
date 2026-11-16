@@ -2,6 +2,12 @@
 
 Historical release notes and testing status retained from the original README.
 
+## v0.5.105 - Release dialog: close button alignment, one gold check (Under construction ⚠️)
+
+- Fixed: the close button now shares the right edge (12 px) with Ignore release, the folder path and the row menu buttons; the header no longer reserves extra right padding. The title leaves room for it.
+- Changed: a CD + CUE + LOG 100% release shows ONE large gold check after the CD/CUE/LOG group instead of three small ticks; other releases keep the small green ticks.
+- Checked: all `tests/test_*.py`, ruff pyflakes rules, measured right edges in headless Chrome (all equal). **Not run:** Windows 11/WebView2.
+
 ## v0.5.104 - Release dialog: row menu, rip ticks, less text (Under construction ⚠️)
 
 - Changed: the hover buttons are replaced by a "..." button at the end of each track row that opens a small menu (Mark Remix, Mark Live, To Personal Picks, Ignore/Restore); it closes on click outside, Esc or after an action.
