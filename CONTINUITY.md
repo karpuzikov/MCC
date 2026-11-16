@@ -1,5 +1,9 @@
 # Music Collection Cleaner - Continuity Handoff
 
+## Checkpoint 2026-11-16 - MCC v0.5.109 - Under construction ⚠️
+
+Neutral hex colours in both HTML pages with lightness >= 75% were replaced by #F2F2F5 (text/small elements), 55-75% by #c9d3dc; `--muted` #c9d3dc. Not run: Windows 11/WebView2.
+
 ## Checkpoint 2026-11-16 - MCC v0.5.108 - Under construction ⚠️
 
 Theme tokens in `APP_THEME_CSS`: `--bg/--panel` #222942 (dominant), `--bar/--panel2` #2a3550, `--field` #2f3b57, `--raised` #36485B. `#activity` uses `--bg`; `.exportChoice` is transparent; `#boardViewport` is flat #222942. Not run: Windows 11/WebView2.

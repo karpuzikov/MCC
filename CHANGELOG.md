@@ -2,6 +2,11 @@
 
 Historical release notes and testing status retained from the original README.
 
+## v0.5.109 - Brightest colour #F2F2F5 on text and small elements (Under construction ⚠️)
+
+- Changed: every light neutral text/icon colour in both pages (lightness 75% and above) is now #F2F2F5; mid-light greys (55-75%) are #c9d3dc; `--muted` is #c9d3dc.
+- Checked: all `tests/test_*.py`, ruff pyflakes rules, headless Chrome screenshot of the Release Map. **Not run:** Windows 11/WebView2; main window re-screenshot; contrast of dimmed (disabled/ignored) rows.
+
 ## v0.5.108 - Palette hierarchy: dark dominant, small elements brighter (Under construction ⚠️)
 
 - Changed: page, columns, details panel, cards and the Activity log use the darkest colour (#222942); toolbar, footer, copy/move bar, text fields and the progress track use #2a3550/#2f3b57; buttons #36485B; primary button #0D7D8B. Smaller elements are now brighter than larger ones.
