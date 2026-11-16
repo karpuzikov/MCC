@@ -2,6 +2,13 @@
 
 Historical release notes and testing status retained from the original README.
 
+## v0.5.103 - Release dialog: no overlap, readable buttons, plan line, Change group (Under construction ⚠️)
+
+- Fixed: the per-track hover buttons overlapped the Versions/Remixes badges. They now sit at the right end of the title cell and use text labels ("Mark Remix", "Mark Live", "To Personal Picks", "Ignore"/"Restore"). A track already detected as Remix or Live no longer offers the matching Mark button; the saved-pattern "R" badge is shown only as the "To Personal Picks" hover button.
+- Added: a plan line under the buttons with the release status (Retained, Removed, ...), the essential-track count and the existing reason text; rows that keep the release show "Essential" in the note column.
+- Changed: "Move to another group" is one "Change group" dropdown (Albums, Singles, Compilations, ... plus "Automatic group" after a manual move) that moves on selection; the expanding panel and its hint are removed. Change group, Keep release and Ignore release are rectangular buttons on the right, separate from the small coloured CD/CUE/LOG badges on the left.
+- Checked: all `tests/test_*.py`, ruff pyflakes rules, headless Chrome screenshot with a hovered row. **Not run:** Windows 11/WebView2; a real group move; long titles and narrow panels.
+
 ## v0.5.102 - Release dialog: alignment, dividers, palette, any-group move (Under construction ⚠️)
 
 - Fixed: track rows align on one shared grid (number, title, length, badges, note), with the length-difference chip next to the badges; per-track action buttons overlay the row on hover instead of reserving a column; rows are tighter.

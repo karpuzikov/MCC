@@ -1,5 +1,9 @@
 # Music Collection Cleaner - Continuity Handoff
 
+## Checkpoint 2026-11-16 - MCC v0.5.103 - Under construction ⚠️
+
+`.trackActionGroup` is now inside `.titleCell` (absolute, right edge) and contains `badge` (saved pattern, text "To Personal Picks"), Mark Remix/Live buttons (hidden when the track is already that kind) and Ignore/Restore. `#releasePlan` = `.planBadge` + `#essentialCount` ("N essential (highlighted)") + `#releaseReason` (`n.reason`, the existing optimizer text). Note column: flagged states, else "Essential" for `t.unique` (the in-place update code repeats this). Group move is `<select id="albumGroupSelect">` with onchange -> `bridge.setAlbumGroup`; option value -1 = automatic. `#releaseMeta` is still gone. Not run on WebView2.
+
 ## Checkpoint 2026-11-16 - MCC v0.5.102 - Under construction ⚠️
 
 `#tracks` is a 5-column grid (num | title | length | tags `.versionsCell` incl. `.lengthDelta` | `.status`) and `.track` uses `grid-template-columns:subgrid`; alt panels span all columns; `.trackActionGroup` is absolutely positioned. `setAlbumGroup` accepts any source/target release; `_assign_release_map_display_groups` copies the target's displayGroupKey/Title/Kind to the source for non-Album/EP pairs (Album/EP pairs still go through `_album_clusters`; `_album_clusters` ignores links whose endpoints are not both albums/EPs, so the optimizer is unchanged). Group dropdown lists every group by `releaseColumnKind|groupKey`. Keep release button hidden for retained releases unless `forceKeep`.

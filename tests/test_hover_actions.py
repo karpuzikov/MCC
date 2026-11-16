@@ -349,7 +349,7 @@ process.stdout.write(JSON.stringify(results));
         for result,count,titles,gem in zip(results,[1,0,0,1],[['Rare'],[],[],['Rare']],[True,False,False,True]):
             self.assertEqual(result['count'],count)
             self.assertEqual(result['hidden'],count==0)
-            self.assertEqual(result['label'],' · '+str(count)+' essential')
+            self.assertEqual(result['label'],str(count)+' essential (highlighted)')
             self.assertEqual(result['titles'],titles)
             self.assertEqual(result['gem'],gem)
             self.assertEqual([r['highlight'] for r in result['rows']],['Song' in titles,'Rare' in titles])
