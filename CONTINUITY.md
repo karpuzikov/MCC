@@ -1,5 +1,9 @@
 # Music Collection Cleaner - Continuity Handoff
 
+## Checkpoint 2026-11-16 - MCC v0.5.101 - Under construction ⚠️
+
+`openDetails` markup/CSS restructured: `#releaseActions` holds `.mediumBadge`, CUE/LOG `.ripMark`, the Album-group `<details>` (summary "Move to another group") and `.releaseButtons`; `#releaseMeta`, `#reason`, `.sourceSummary` (kept only for the upgrade line) and the ripLog lines are gone. `.track` grid = num | title | length | versionsCell | `.lengthDeltaCell` | `.status` | actions (fixed 92px); `.status` text is shown only for excluded/ignored/orphaned/manual-removed tracks (the update-in-place code repeats that condition). Path font is 8px as in the mock-up. `tests/visual_qa.py` times out here (also on v0.5.100).
+
 ## Checkpoint 2026-11-16 - MCC v0.5.100 - Under construction ⚠️
 
 Removed the sqrt-weighted `--category-grid` (CSS rule, weights code, freeze field); `#columns` uses `repeat(--visible-columns, minmax(0,1fr))`. Freeze logic always applies `repeat(categoryColumns,…)`. Not run on WebView2.

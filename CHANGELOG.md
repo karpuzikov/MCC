@@ -2,6 +2,13 @@
 
 Historical release notes and testing status retained from the original README.
 
+## v0.5.101 - Release dialog rebuilt from the UI Template Maker mock-up (Under construction ⚠️)
+
+- Changed: the release details panel follows `Re-TROS_release_dialog.layout.json`: title; one row with medium (CD), CUE, LOG %, "Move to another group" and "Ignore release" on the right; folder button with a one-line path; "Tracks"; rows of number, title, length, Versions/Remixes/Live badges, length-difference chip and a note.
+- Removed from the panel: "Retained · N included" line, NEW/OLD label, separate rip-log lines (now in the LOG badge tooltip), the explanation paragraph, row dividers, and the "Same audio on N editions" text (still in the row tooltip). The note column only shows Remix/Live/Ignored and similar states.
+- Kept (not in the mock-up): "Keep release" next to "Ignore release", per-track Ignore/Mark buttons on hover, notices for pending/ignored/audit issues, the upgrade line.
+- Checked: all `tests/test_*.py`, ruff pyflakes rules, headless Chrome screenshot of the panel. `tests/visual_qa.py` times out on this build and on v0.5.100 in this environment. **Not run:** Windows 11/WebView2; long titles, many badges and narrow panels.
+
 ## v0.5.100 - Equal-width Release Map categories (Under construction ⚠️)
 
 - Fixed: Singles got a wider column than Albums and Compilations (width weighted by group count) while its releases run in a single list, leaving the right half empty and truncating the Compilations release name. Albums, Singles and Compilations are now equal-width columns; the weights (`--category-grid`) are removed.
