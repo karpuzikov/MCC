@@ -1,5 +1,9 @@
 # Music Collection Cleaner - Continuity Handoff
 
+## Checkpoint 2026-11-16 - MCC v0.5.115 - Under construction ⚠️
+
+`APP_SB_CSS` retuned much darker: --bg/--panel #0d131b, --bar #16202c, --field/--line #1c2938, --raised #2D3F54, selected row #00305f. Not run: Windows 11/WebView2.
+
 ## Checkpoint 2026-11-16 - MCC v0.5.114 - Under construction ⚠️
 
 `APP_SB_CSS` retuned: --bg/--panel #172230 (derived dark), --bar/--field-base #2D3F54, fields #3a4f68, buttons #52647A. Not run: Windows 11/WebView2.

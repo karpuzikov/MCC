@@ -2,6 +2,11 @@
 
 Historical release notes and testing status retained from the original README.
 
+## v0.5.115 - SB 2026 theme much darker (Under construction ⚠️)
+
+- Changed: SB 2026 page, panels, details and dialogs #0d131b; bars #16202c; fields and borders #1c2938; buttons #2D3F54 (hover #3a506a); selected row #00305f. Primary #1DBD8E and the other accents unchanged. #0d131b, #16202c, #1c2938 and #00305f are derived from the palette, not supplied.
+- Checked: all `tests/test_*.py`, ruff pyflakes rules, headless Chrome screenshots of both windows. **Not run:** Windows 11/WebView2; dialogs in SB 2026.
+
 ## v0.5.114 - SB 2026 theme made dark (Under construction ⚠️)
 
 - Changed: SB 2026 page, panels, details and dialogs use a darkened #2D3F54 (#172230); bars, bottom copy/move bar and Release Map panel borders use #2D3F54; fields #3a4f68; buttons #52647A; primary #1DBD8E and the blues/teals are unchanged. The darkest colour now dominates and smaller elements are brighter.
