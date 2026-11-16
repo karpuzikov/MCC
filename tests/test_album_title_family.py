@@ -42,6 +42,7 @@ class AlbumTitleFamily(unittest.TestCase):
             "Laugh From The Time": (7.739669, 0.889348, 1.0, 0, 0.16483, 8.0, 11),
             "TV Show": (6.220067, 0.9414, 1.0, 0, 0.420742, 6.0, 10),
             "Boys In Cage": (8.054377, 0.828249, 1.0, 0, 0.154509, 8.0, 12),
+            "If The Monkey Becomes": (9.562859, 0.618894, 1.0, 0, 0.1, 10.0, 13),
         }
         for title, sim in logged_pairs.items():
             with self.subTest(title=title):
@@ -49,7 +50,7 @@ class AlbumTitleFamily(unittest.TestCase):
         sim = logged_pairs["TV Show"]
         self.assertFalse(mcc._fingerprint_album_context_match(fingerprint, 294.0, fingerprint, 310.0, sim))
         self.assertFalse(mcc._fingerprint_album_context_match(
-            fingerprint, 280.0, fingerprint, 282.0, (11.0, 0.5, 1.0, 0, 0.0, 14.0, 20)))
+            fingerprint, 280.0, fingerprint, 282.0, (11.295396, 0.396419, 1.0, 0, 0.0, 11.0, 16)))
 
     def test_heuristic_types_of_one_album_edition_pair_are_harmonized(self):
         ep = release(0, "ep", "CUT OFF!", TITLES, 0)

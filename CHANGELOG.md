@@ -2,6 +2,11 @@
 
 Historical release notes and testing status retained from the original README.
 
+## v0.5.90 - Match window fits all logged Cut Off! pairs (Under construction ⚠️)
+
+- Same title in the same album track slot (length within 8 seconds, overlap at least 0.995, coverage at least 0.985): Chromaprint score up to 10.0, good fraction at least 0.60, median up to 10, p90 up to 16. Logged pair `If The Monkey Becomes (To Be) The King`: score 9.56, good fraction 0.619, median 10, p90 13. `Die In 1977` (15.8 s apart, score 11.3, good fraction 0.40) stays a separate version.
+- Checked: all `tests/test_*.py`, ruff pyflakes rules. **Not run:** Windows 11/WebView2. The bounds come from the five Cut Off! pairs only; no different-song pairs with the same title and slot were available to test false matches.
+
 ## v0.5.89 - Same type for editions of one album; wider match window (Under construction ⚠️)
 
 - Why `Re-TROS - Cut Off! [2005]` was an Album and `2005-11-01 - CUT OFF!` an EP: with no release-type tag, a release with 7 or more tracks (or 30+ minutes) is guessed as an Album and a shorter one as an EP. The editions have 7 and 6 tracks. Now, when two guessed-type editions share the album tag and at least 80% of their track titles, both get the Album type. Types set by a tag or by `EP` in the name are never changed.
