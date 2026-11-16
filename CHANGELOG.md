@@ -2,6 +2,11 @@
 
 Historical release notes and testing status retained from the original README.
 
+## v0.5.118 - Same colours in both windows (Under construction ⚠️)
+
+- Fixed: the Release Map page was #1b1c1e (a leftover grey) while the main window page was #14161a. All leftover grey literals in both pages now use the Classic tokens: page #14161a, bars/panels #1d2026, fields #262a31 (`rgba` overlays likewise).
+- Checked: all `tests/test_*.py`, ruff pyflakes rules, sampled screenshot pixels: page #14161a and bar #1d2026 are identical in both windows. **Not run:** Windows 11/WebView2; SB 2026 and Neon Arcade (they have their own layers).
+
 ## v0.5.117 - Visible separator lines in dark Classic (Under construction ⚠️)
 
 - Fixed: row, group, column, header and track separator lines became nearly invisible against the dark Classic background in v0.5.116. All 27 border colours darker than 17% lightness in both pages are now #363a42; SB 2026 separators use #2D3F54.

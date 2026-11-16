@@ -1,5 +1,9 @@
 # Music Collection Cleaner - Continuity Handoff
 
+## Checkpoint 2026-11-16 - MCC v0.5.118 - Under construction ⚠️
+
+Leftover Aspen-derived grey literals in both HTML pages were unified: #1b1c1e/#1a1b1e -> #14161a (page), panel greys -> #1d2026, field greys -> #262a31. Both windows now sample identical page and bar colours. Not run: Windows 11/WebView2.
+
 ## Checkpoint 2026-11-16 - MCC v0.5.117 - Under construction ⚠️
 
 All `border*` colours darker than 17% lightness in both HTML pages are #363a42 (Classic); SB layer separators #2D3F54. Connector curves in the map are unchanged. Not run: Windows 11/WebView2.
