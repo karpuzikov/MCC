@@ -2,6 +2,13 @@
 
 Historical release notes and testing status retained from the original README.
 
+## v0.5.89 - Same type for editions of one album; wider match window (Under construction ⚠️)
+
+- Why `Re-TROS - Cut Off! [2005]` was an Album and `2005-11-01 - CUT OFF!` an EP: with no release-type tag, a release with 7 or more tracks (or 30+ minutes) is guessed as an Album and a shorter one as an EP. The editions have 7 and 6 tracks. Now, when two guessed-type editions share the album tag and at least 80% of their track titles, both get the Album type. Types set by a tag or by `EP` in the name are never changed.
+- Same title in the same album track slot (length within 8 seconds, overlap and coverage almost complete) now matches within the existing manual-review window (score up to 9.0, good fraction at least 0.72, median up to 8, p90 up to 16). It was narrower before (8.5, 0.82, 8, 12).
+- The comparison log now records every such pair in detail, so a pair that still fails shows its numbers (`If The Monkey Becomes (To Be) The King` had no logged numbers).
+- Checked: all `tests/test_*.py` (new type test), ruff pyflakes rules. **Not run:** Windows 11/WebView2, a rescan of the Re-TROS folders.
+
 ## v0.5.88 - Alternate masters of the same album track (Under construction ⚠️)
 
 - A pair with the same title in the same album track slot, length within 8 seconds, and a near-complete fingerprint overlap now counts as the same recording at looser Chromaprint bounds (score up to 8.5, good fraction at least 0.82, median up to 8, p90 up to 12, overlap at least 0.995, coverage at least 0.985). Outside that context the thresholds are unchanged. Example: `TV Show (Hang The Police)` (score 6.22) on `2005-11-01 - CUT OFF!` and `Re-TROS - Cut Off! [2005]`. The comparison log lists these as `album_context_fingerprint`.

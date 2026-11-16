@@ -51,6 +51,19 @@ class AlbumTitleFamily(unittest.TestCase):
         self.assertFalse(mcc._fingerprint_album_context_match(
             fingerprint, 280.0, fingerprint, 282.0, (11.0, 0.5, 1.0, 0, 0.0, 14.0, 20)))
 
+    def test_heuristic_types_of_one_album_edition_pair_are_harmonized(self):
+        ep = release(0, "ep", "CUT OFF!", TITLES, 0)
+        album = release(20, "album", "Cut Off!", TITLES + ["A Vision Of Christ"], 36)
+        other = release(30, "ep", "Another Record", ["X%d" % i for i in range(5)], 60)
+        for rel in (ep, album, other):
+            rel.type_source = "heuristic"
+        mcc._harmonize_heuristic_album_types([ep, album, other])
+        self.assertEqual((ep.release_type, album.release_type, other.release_type), ("album", "album", "ep"))
+        ep.release_type, ep.type_source = "ep", "tag"
+        album.release_type = "album"
+        mcc._harmonize_heuristic_album_types([ep, album])
+        self.assertEqual(ep.release_type, "ep")
+
 
 if __name__ == "__main__":
     unittest.main()

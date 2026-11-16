@@ -1,5 +1,9 @@
 # Music Collection Cleaner - Continuity Handoff
 
+## Checkpoint 2026-11-16 - MCC v0.5.89 - Under construction ⚠️
+
+`_harmonize_heuristic_album_types` (end of `refresh_heuristic_release_types`) sets both editions to "album" when only heuristic types differ and `_album_editions_share_titles` holds; `_album_editions_related_by_titles` = equal type + that relation. Typing cause: `infer_release_type` guesses album at >=7 tracks or >=30 min, else ep. `_fingerprint_album_context_match` now uses the `MANUAL_REVIEW_*` constants; all same-title same-slot pairs are logged in detail. The Monkey pair's numbers are unknown (never logged); if it is outside score 9.0/good 0.72 it still fails.
+
 ## Checkpoint 2026-11-16 - MCC v0.5.88 - Under construction ⚠️
 
 `_fingerprint_album_context_match` (looser bounds) is applied in the post-comparison loop next to the PCM rescue, only when `candidate_reasons[(a,b)]` has `same_base_title` and `same_album_track_slot`; matches go to `album_context_matches`, which is OR-ed into the final `comparison_results` and logged as `accepted_by: album_context_fingerprint`. The v0.5.85 looser PCM routing was removed (decoded correlation for the Cut Off! pairs was 0.16 to 0.68). Bounds were calibrated on 4 logged pairs, no negative examples; false-positive risk for same-title different-recording pairs is untested. Not run on real data.
