@@ -1,5 +1,9 @@
 # Music Collection Cleaner - Continuity Handoff
 
+## Checkpoint 2026-11-16 - MCC v0.5.110 - Under construction ⚠️
+
+`APP_NEON_CSS` (before `_webview_release_map_html`) is injected via `/*APP_NEON*/` before `</style>` of both pages and overrides the theme tokens and component styles (2px neon borders, glow). Removing the placeholder replaces the look with the v0.5.109 theme. Not run: Windows 11/WebView2.
+
 ## Checkpoint 2026-11-16 - MCC v0.5.109 - Under construction ⚠️
 
 Neutral hex colours in both HTML pages with lightness >= 75% were replaced by #F2F2F5 (text/small elements), 55-75% by #c9d3dc; `--muted` #c9d3dc. Not run: Windows 11/WebView2.

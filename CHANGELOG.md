@@ -2,6 +2,12 @@
 
 Historical release notes and testing status retained from the original README.
 
+## v0.5.110 - Neon Arcade design for both windows (Under construction ⚠️)
+
+- Changed: new `APP_NEON_CSS` layer (injected at the end of both pages' style) restyles the whole app after the Neon Arcade mock-up: near-black navy page with a faint grid, 2px neon borders with glow (cyan default, magenta cards/bars/primary, green copy and LOG, yellow move, red ignore), uppercase glowing headings, monospace font, neon progress bar, neon selected release row, badges and dialog panels.
+- Not done: pixel font and pixel icons from the mock-up (no bundled font; system monospace is used); trophy/level icons; modal dialogs only inherit the shared colours and were not reviewed.
+- Checked: all `tests/test_*.py`, ruff pyflakes rules, headless Chrome screenshots of both windows. **Not run:** Windows 11/WebView2.
+
 ## v0.5.109 - Brightest colour #F2F2F5 on text and small elements (Under construction ⚠️)
 
 - Changed: every light neutral text/icon colour in both pages (lightness 75% and above) is now #F2F2F5; mid-light greys (55-75%) are #c9d3dc; `--muted` is #c9d3dc.
