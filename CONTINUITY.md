@@ -1,5 +1,9 @@
 # Music Collection Cleaner - Continuity Handoff
 
+## Checkpoint 2026-11-16 - MCC v0.5.120 - Under construction ⚠️
+
+Centring is global in `APP_THEME_CSS`: icon masks via `--icon` custom property on `#closeDetailsBtn,.clearBtn,.rowMenuBtn,.starBtn,.drawnFolder`; `button{text-box:trim-both cap alphabetic}`. Not run: Windows 11/WebView2.
+
 ## Checkpoint 2026-11-16 - MCC v0.5.119 - Under construction ⚠️
 
 Icons in `APP_THEME_CSS`: `#closeDetailsBtn` and `.clearBtn` draw × with two rotated bars; `.rowMenuBtn` draws three dots with `::before` and box-shadows; button text is `font-size:0`. The main window `mk("clearBtn","✕",...)` call passes the class. Not run: Windows 11/WebView2.

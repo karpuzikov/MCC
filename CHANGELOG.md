@@ -2,6 +2,12 @@
 
 Historical release notes and testing status retained from the original README.
 
+## v0.5.120 - Centred buttons everywhere (Under construction ⚠️)
+
+- Changed: icons (close ×, remove ✕, track menu ⋯, folder, star ☆/★) are CSS masks on a 14 px box centred with `inset:0; margin:auto`; they inherit the button text colour. The glyph text stays in the DOM with `font-size:0`. New class `drawnFolder` marks every folder button.
+- Changed: all `button` labels use `text-box:trim-both cap alphabetic` so capital letters are centred in the button (Segoe UI places them below the line-box middle).
+- Checked: all `tests/test_*.py`, ruff pyflakes rules; ink-bounding-box measurement at 4x in headless Chrome (Release Map + main window): caps-only label within 0.25 px, close × exact, other icons within 0.5 px. **Not run:** Windows 11/WebView2 (Segoe UI not available in the test browser, so the label trim was not measured with the real font); modal dialogs.
+
 ## v0.5.119 - Centred icons (Under construction ⚠️)
 
 - Fixed: the close "×" of the release dialog, the "✕" remove-folder buttons and the "⋯" track menu button were font glyphs that sat off-centre. They are now drawn with CSS (`::before`/`::after`) in the button's current colour, so they follow the theme. Icon buttons use `line-height:1`.
