@@ -2,6 +2,12 @@
 
 Historical release notes and testing status retained from the original README.
 
+## v0.5.85 - Albums and EPs stay apart; alternate masters of the same track (Under construction ⚠️)
+
+- Reverted from v0.5.84: an Album and an EP are never grouped together. The title-based family now needs both editions to have the same type.
+- Same title in the same album track slot, length within 8 seconds, and a near-complete fingerprint overlap now go to the decoded-waveform check even when the fingerprint scores are looser than usual. Only the waveform check can accept the pair, so a confirmed match makes the track a copy of the other edition's recording instead of a "unique" one. Tracks more than 8 seconds apart (for example `Die In 1977`) stay separate versions and stay highlighted.
+- `tests/test_album_title_family.py` updated. Checked: all `tests/test_*.py`, ruff pyflakes rules. **Not run:** Windows 11/WebView2, a rescan of the Re-TROS folders, so it is not confirmed that the waveform check accepts the five Cut Off! tracks.
+
 ## v0.5.84 - Album families for editions with different masters (Under construction ⚠️)
 
 - Two Album/EP editions now form one family when their album tag matches and at least 80% of their track titles match (at least 4 tracks), even when no audio fingerprint matches. Example: `2005-11-01 - CUT OFF!` (EP) and `Re-TROS - Cut Off! [2005]` (Album) are one group in the Release Map. This only groups releases; it does not make recordings count as the same recording.

@@ -1,5 +1,9 @@
 # Music Collection Cleaner - Continuity Handoff
 
+## Checkpoint 2026-11-16 - MCC v0.5.85 - Under construction ⚠️
+
+`_album_editions_related_by_titles` now requires equal `release_type` (no Album+EP families). `_fingerprint_pcm_rescue_candidate(..., same_title_and_album_slot=True)` is passed when the pair's `candidate_reasons` contain `same_base_title` and `same_album_track_slot`: looser fingerprint bounds (score <=9, good >=0.80, median <=9, p90 <=13, overlap >=0.995, coverage >=0.98) but acceptance still needs `_PCMIdentityVerifier.verify_mastering`. Release Map "unique" is unchanged (essential acoustic group); it only drops for a track once its group merges with another edition's. A display-only "same song within 8 s elsewhere" rule was tried and rejected: it broke the logged Bully/Pablo retention tests. Open: real-audio run on the Cut Off! pair.
+
 ## Checkpoint 2026-11-16 - MCC v0.5.84 - Under construction ⚠️
 
 `_album_editions_related_by_titles` (album tag via `_release_album_title_key` + >=80% shared normalized track titles, >=4) is OR-ed with the audio rule in `_album_clusters` only; `_related_album_releases`, dominance and replacement logic still use audio/barcode. Cause in the logged case: the two Cut Off! editions had no shared acoustic group (different masters) and different artist tags. Release Map JS: the "Move to group" target list skips a family only if it has the same key AND the same column (`releaseColumnKind`). Open: optimizer behaviour with title-only families was not run on real data.
