@@ -83,6 +83,8 @@ class FileOperationFailures(unittest.TestCase):
 
     def test_musicbrainz_switch_defaults_on_and_blocks_requests_when_off(self):
         self.assertTrue(mcc._organizer_options({})["enable_musicbrainz"])
+        self.assertTrue(mcc._organizer_options({})["enable_cover_art"])
+        self.assertFalse(mcc._organizer_options({'organizer_options': {'enable_cover_art': False}})["enable_cover_art"])
         self.assertFalse(mcc._organizer_options({'organizer_options': {'enable_musicbrainz': False}})["enable_musicbrainz"])
         mcc._MUSICBRAINZ_ENABLED[0] = False
         try:

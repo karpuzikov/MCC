@@ -2,6 +2,11 @@
 
 Historical release notes and testing status retained from the original README.
 
+## v0.5.153 - Cover art switch (Under construction ⚠️)
+
+- Changed: the MusicBrainz checkbox is labelled "Get data from MusicBrainz".
+- Added: "Download cover art" checkbox (default on). Off = no artwork is downloaded after Copy/Move.
+
 ## v0.5.152 - Copy only audio, CUE and log files (Under construction ⚠️)
 
 - Fixed: Copy/Move also copied every other file in a release folder (playlists such as .m3u, images, text). Only audio, .cue and .log files are copied now; the rest stays in the source.
