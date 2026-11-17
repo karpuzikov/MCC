@@ -1,6 +1,6 @@
 # Music Collection Cleaner - Continuity Handoff
 
-## Checkpoint 2026-11-17 - MCC v0.5.132 - Under construction ⚠️
+## Checkpoint 2026-11-17 - MCC v0.5.133 - Under construction ⚠️
 
 Design-system audit fixes: embedded Inter/JetBrains Mono (`APP_FONT_FACE_CSS`), `--type-*` styles for all text, 40/28/64 px control and bar heights. CSS now hand-edited (the converter script no longer applies). Not run: Windows 11/WebView2.
 

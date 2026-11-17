@@ -2,6 +2,11 @@
 
 Historical release notes and testing status retained from the original README.
 
+## v0.5.133 - Warning icon colour (Under construction ⚠️)
+
+- Changed (styling only): the warning sign in release rows and notices uses the text form (no yellow emoji), so it follows the colour tokens.
+- Checked: v0.5.132 run on Windows 11/WebView2 (main window, Release Map, details panel) by screenshot; computed-style audit 0 violations; all tests, ruff.
+
 ## v0.5.132 - Design audit pass on the running UI (Under construction ⚠️)
 
 - Changed (styling only): removed the symbol-font family (icons fall back through the Inter stack); `b`/`strong` inherit the type style (no 700 weight); the Browse button uses the drawn folder icon instead of the yellow emoji; icon masks keep 14 px.
