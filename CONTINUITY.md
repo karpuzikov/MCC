@@ -1,5 +1,9 @@
 # Music Collection Cleaner - Continuity Handoff
 
+## Checkpoint 2026-11-17 - MCC v0.5.139 - Under construction ⚠️
+
+`#changeBar` now sits inside `#toolbar` (`display:contents`, toolbar wraps); `#exportBar` is a wrapping flex row; `.releaseGroup` is a canvas-coloured card with 8px gap. DESIGN.md has the "Don't waste space" principle.
+
 ## Checkpoint 2026-11-17 - MCC v0.5.138 - Under construction ⚠️
 
 Release Map unified with the main window: columns are `.releaseColumn` cards, `#changeBar` is an always-visible bar (the View popover and `#viewMenuBtn` are removed), `#exportBar` is compact. "Picks & patterns" renamed "Keeps and Skips". `tests/visual_qa.py` no longer clicks `#viewMenuBtn`.

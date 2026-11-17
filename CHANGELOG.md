@@ -2,6 +2,13 @@
 
 Historical release notes and testing status retained from the original README.
 
+## v0.5.139 - No wasted space (Under construction ⚠️)
+
+- Changed: Release Map title bar and view bar are one row; the Copy/Move bar and its options are one row; "Filter changes" and "Sources" labels removed.
+- Changed: every release in a column is its own card, so releases no longer run together.
+- Added: "Don't waste space" principle in DESIGN.md.
+- Checked: Release Map rendered in headless Chrome at 1920 px, computed-style audit (0 violations), all `tests/test_*.py`. **Not run:** Windows 11/WebView2.
+
 ## v0.5.138 - Release Map looks like the main window (Under construction ⚠️)
 
 - Changed: Release Map columns are cards (same surface, radius and row style as the main window); folder rows are compact.

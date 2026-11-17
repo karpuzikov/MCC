@@ -16,6 +16,7 @@ Adapted from a public exchange-style DESIGN.md (VoltAgent/awesome-design-md). Br
 - **Display weight stays 700** (`hero-display`, `display-lg`).
 - **No gradients, no glows.**
 - **Numbers in mono.** Counts, sizes, durations, versions use the `numeric` family with tabular figures.
+- **Don't waste space.** No empty bars or rows: merge rows and put controls side by side. Separate items in a list (releases) with their own card.
 
 ## Color
 
