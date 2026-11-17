@@ -513,7 +513,7 @@ class NamingRules(unittest.TestCase):
 
 class AutomaticBatch(unittest.TestCase):
     @staticmethod
-    def identity(folder, files, default_artist=""):
+    def identity(folder, files, default_artist="", **_options):
         name = folder.name
         catalog = mlo.catalog(name)[0]
         title = re.sub(r"^\d{4}-\d\d-\d\d - ", "", name).split(" [")[0]
