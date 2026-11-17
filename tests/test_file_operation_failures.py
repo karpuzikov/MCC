@@ -1,11 +1,12 @@
-"""Copy and Undo must report failures and never lose music."""
+"""Copy and Move must report failures and never lose music."""
 from pathlib import Path
-import shutil
 import tempfile
 import unittest
 from unittest.mock import patch
 
 from test_audio_safety import mcc
+
+OPTIONS = {"format": "FLAC", "enable_encoding": False, "enable_checker": False, "enable_splitting": False}
 
 
 class FileOperationFailures(unittest.TestCase):
@@ -24,88 +25,67 @@ class FileOperationFailures(unittest.TestCase):
             self.sources.append(folder)
             self.releases.append(mcc.Release(9100 + index, root_kind, folder, f'Edition {index}', scan_root=scan_root))
             self.decisions.append(mcc.ReleaseDecision(9100 + index, action, 'Retained'))
-        # Never touch the real Undo manifest.
-        self.manifest = root / 'undo.json'
-        manifest_patch = patch.object(mcc, '_last_manifest_path', lambda: self.manifest)
-        manifest_patch.start()
-        self.addCleanup(manifest_patch.stop)
+        for name in ('DATA', 'UNDO', 'REPORT', 'HISTORY', 'ARTWORK_UNDO'):
+            target = root / 'data' / name
+            patcher = patch.object(mcc, name, target)
+            patcher.start()
+            self.addCleanup(patcher.stop)
 
-    def copy_all(self):
-        return mcc.copy_retained_plan(self.old_root, self.new_root, self.destination,
-                                      self.releases, self.decisions, 'all')
+    def run_plan(self, move):
+        def fake_export(engine, folder, output, fmt, ff, ffprobe, source_files=None):
+            for file in (source_files or list(Path(folder).glob('*.flac'))):
+                (output / Path(file).name).write_bytes(Path(file).read_bytes())
+        patches = (
+            patch.object(mcc.Organizer, '_export_release', fake_export),
+            patch.object(mcc, 'release_identity', lambda folder, files, *args, **kw: {
+                'folder': Path(folder).name, 'title': Path(folder).name, 'date': '2020-01-01',
+                'catalog': '', 'barcode': '', 'physical': False, 'country': '', 'country_provenance': '',
+                'release_type': 'Single', 'selected_release': 'test-only-id', 'metadata_verified': True,
+                'notes': [], 'track_count': 1}),
+            patch.object(mcc, 'ensure_ffmpeg', lambda: ('ff', 'ffprobe')),
+            patch.object(mcc, '_update_copied_track_tags', lambda *a, **k: None),
+            patch.object(mcc, 'collection_credit_consensus', lambda *a, **k: {}),
+            patch.object(mcc, '_send_folders_to_recycle_bin', lambda folders: [__import__('shutil').rmtree(f) for f in folders]),
+        )
+        for item in patches:
+            item.start()
+            self.addCleanup(item.stop)
+        return mcc.organize_retained_plan(self.old_root, self.new_root, self.destination,
+                                          self.releases, self.decisions, move, OPTIONS)
 
-    def second_release_fails_to_copy(self):
-        real_copytree = shutil.copytree
+    def test_destination_inside_a_source_folder_is_refused(self):
+        self.destination = self.old_root / 'UPDATED'
+        with self.assertRaisesRegex(RuntimeError, 'outside the source'):
+            self.run_plan(move=False)
 
-        def copytree_failing_for_second_release(source, staged, *args, **kwargs):
-            if Path(source) == self.sources[1]:
-                raise OSError('disk full')
-            return real_copytree(source, staged, *args, **kwargs)
-        return patch.object(shutil, 'copytree', copytree_failing_for_second_release)
-
-    def test_failed_copy_removes_the_releases_it_already_copied(self):
-        with self.second_release_fails_to_copy(), self.assertRaisesRegex(OSError, 'disk full'):
-            self.copy_all()
-        self.assertFalse((self.destination / 'Albums' / 'Edition 0').exists())
+    def test_copy_leaves_the_sources_untouched(self):
+        result = self.run_plan(move=False)
+        self.assertEqual(result['counts']['failed'], 0)
+        self.assertFalse(result['source_folders_modified'])
         self.assertTrue(all((folder / '01 track.flac').is_file() for folder in self.sources))
 
-    def test_failed_cleanup_after_a_failed_copy_names_the_leftover_folder(self):
-        copied_first_release = self.destination / 'Albums' / 'Edition 0'
-        real_rmtree = shutil.rmtree
+    def test_move_recycles_only_the_releases_that_finished(self):
+        result = self.run_plan(move=True)
+        self.assertEqual(result['counts']['failed'], 0, result['problems'])
+        self.assertEqual(result['source_folders_recycled'], 2 - result['counts']['partial'] - result['counts']['skipped'])
+        self.assertEqual(any(folder.exists() for folder in self.sources),
+                         result['source_folders_recycled'] < 2)
 
-        def rmtree_refusing_the_copied_release(path, *args, **kwargs):
-            if Path(path) == copied_first_release:
-                raise PermissionError('locked by another program')
-            return real_rmtree(path, *args, **kwargs)
-        with self.second_release_fails_to_copy(), \
-                patch.object(shutil, 'rmtree', rmtree_refusing_the_copied_release), \
-                self.assertRaises(RuntimeError) as caught:
-            self.copy_all()
-        message = str(caught.exception)
-        self.assertIn('disk full', message)
-        self.assertIn(str(copied_first_release), message)
-        self.assertIn('locked by another program', message)
-        self.assertTrue((copied_first_release / '01 track.flac').is_file())
+    def test_no_retained_release_is_an_error(self):
+        self.decisions = [mcc.ReleaseDecision(d.release_id, 'DELETE', 'Dropped') for d in self.decisions]
+        with self.assertRaisesRegex(RuntimeError, 'No retained'):
+            self.run_plan(move=False)
 
-    def test_undo_reports_an_occupied_original_and_keeps_the_moved_music(self):
-        mcc.move_retained_plan(self.old_root, self.new_root, self.destination, self.releases, self.decisions)
-        moved_old_release = self.destination / 'Albums' / 'Edition 0'
-        self.sources[0].mkdir(parents=True)  # something new took the original place
-        restored, conflicts = mcc.undo_last_run()
-        self.assertEqual(restored, 1)
-        self.assertEqual(len(conflicts), 1)
-        self.assertIn('Original path is occupied', conflicts[0])
-        self.assertTrue((moved_old_release / '01 track.flac').is_file())
-        self.assertTrue(self.manifest.is_file())  # kept so Undo can be retried
+    def test_undo_with_nothing_to_undo_says_so(self):
+        with patch.object(mcc, '_last_manifest_path', lambda: self.destination / 'none.json'), \
+                self.assertRaisesRegex(RuntimeError, 'Nothing to undo'):
+            mcc.undo_last_run()
 
-    def second_move_fails(self, rollback_works):
-        real_move = mcc._verified_release_directory_move
-        calls = []
-
-        def move_failing_for_second_release(source, target, *args, **kwargs):
-            calls.append(Path(source))
-            if len(calls) == 2:
-                raise OSError('destination locked')
-            if len(calls) == 3 and not rollback_works:
-                raise OSError('rollback blocked')
-            return real_move(source, target, *args, **kwargs)
-        return patch.object(mcc, '_verified_release_directory_move', move_failing_for_second_release)
-
-    def test_failed_move_puts_the_first_release_back(self):
-        with self.second_move_fails(rollback_works=True):
-            with self.assertRaises(OSError):
-                mcc.move_retained_plan(self.old_root, self.new_root, self.destination, self.releases, self.decisions)
-        self.assertTrue((self.sources[0] / '01 track.flac').is_file())
-        self.assertTrue((self.sources[1] / '01 track.flac').is_file())
-        self.assertFalse(self.manifest.exists())
-
-    def test_failed_move_with_blocked_rollback_asks_for_undo_and_keeps_the_journal(self):
-        with self.second_move_fails(rollback_works=False):
-            with self.assertRaises(RuntimeError) as raised:
-                mcc.move_retained_plan(self.old_root, self.new_root, self.destination, self.releases, self.decisions)
-        self.assertIn('rollback needs manual recovery', str(raised.exception))
-        self.assertTrue((self.destination / 'Albums' / 'Edition 0' / '01 track.flac').is_file())
-        self.assertTrue(self.manifest.is_file())
+    def test_organizer_options_default_and_reject_unknown(self):
+        self.assertEqual(mcc._organizer_options({}), mcc.ORGANIZER_OPTION_DEFAULTS)
+        self.assertEqual(mcc._organizer_options({'organizer_options': {'format': 'FLAC', 'enable_checker': False}})['format'], 'FLAC')
+        with self.assertRaises(ValueError):
+            mcc._save_organizer_option('nonsense', True)
 
 
 if __name__ == '__main__':

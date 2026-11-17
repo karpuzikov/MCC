@@ -1,5 +1,9 @@
 # Music Collection Cleaner - Continuity Handoff
 
+## Checkpoint 2026-11-17 - MCC v0.5.124
+
+Music Library Organizer v0.3.23 is merged into MCC: Copy/Move call `organize_retained_plan` (class `Organizer`, `organize_groups`). Move = Copy + Recycle Bin for finished releases; Undo removes the last Copy's output. Options saved in `organizer_options`. Not run: Windows 11/WebView2, real encoders/MusicBrainz.
+
 ## Checkpoint 2026-11-17 - MCC v0.5.123
 
 Window titles no longer say "Under construction ⚠️"; release titles drop the suffix from v0.5.123 on. Not run: Windows 11/WebView2.

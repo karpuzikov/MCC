@@ -2,6 +2,16 @@
 
 Historical release notes and testing status retained from the original README.
 
+## v0.5.124 - Organizer merged into Copy/Move
+
+- Changed: Copy and Move run the former Music Library Organizer v0.3.23 pipeline on every retained release: MusicBrainz folder name, tags, ALAC/FLAC encoding, CUE split, AudioChecker log, cover art, hash-verified staging then rename. Duplicate files found inside a release (`plan_intra_release_duplicates`) are left out of the output.
+- Changed: Move writes the same output as Copy, then sends the source folders of fully finished releases to the Recycle Bin; partial or failed releases stay in place. The old rename-based Move and its journal are gone; `undo_last_run` still restores a journal left by v0.5.123 or older.
+- Changed: Undo last run deletes the output of the last Copy (artwork first, then releases; files changed since are kept). Move has no Undo; the Recycle Bin is the way back.
+- Added: main window options Encode audio, AudioChecker, Split CUE and Format (ALAC/FLAC), saved under `organizer_options` in the settings file. Defaults: all on, ALAC.
+- Added: `mutagen` is installed with pywebview into the dependency folder. Encoders and the AudioChecker engine are downloaded by the Organizer code on first use, as before.
+- Tests: `tests/test_organizer_engine.py` (107, ported from the Organizer; HTML/bridge/single-instance/log-API tests dropped), `tests/test_naming_table.py`, rewritten `tests/test_file_operation_failures.py`.
+- Checked: all `tests/test_*.py`, ruff pyflakes rules; main window rendered in headless Chrome. **Not run:** Windows 11/WebView2; real Copy/Move with refalac64/flac, MusicBrainz and the Recycle Bin; Organizer log file and worker-count settings (not carried over: workers fixed at 4).
+
 ## v0.5.123 - Out of construction
 
 - Changed: removed the "Under construction ⚠️" label from the Release Map and main window titles, the README and the release title. No other code changes.
