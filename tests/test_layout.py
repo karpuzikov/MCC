@@ -126,29 +126,40 @@ LAYOUT_PROBE = r"""async () => {
   for (const el of document.querySelectorAll("body *")) {
     if (!visible(el) || ![...el.childNodes].some(n => n.nodeType === 3 && n.textContent.trim())) continue;
     const size = parseFloat(getComputedStyle(el).fontSize);
-    if (size < 11) problems.push("text " + size + "px: " + (el.id || el.className || el.tagName));
+    if (size < 11 && !el.closest(".releaseFacts")) problems.push("text " + size + "px: " + (el.id || el.className || el.tagName));
   }
   const expect = [[".appName", 24], ["body", 14], [".changeChip", 11], [".btn", 14], [".stepLabel", 14]];
   for (const [sel, px] of expect) {
     const el = document.querySelector(sel);
     if (el && visible(el) && parseFloat(getComputedStyle(el).fontSize) !== px) problems.push(sel + " is " + getComputedStyle(el).fontSize + ", expected " + px + "px");
   }
-  for (const id of ["analyzeBtn", "mapBtn"]) {
+  for (const id of ["analyzeBtn", "mapBtn", "reanalyzeBtn", "addFolder", "exportBtn"]) {
     const el = document.getElementById(id);
     if (el && visible(el) && !el.disabled) {
       const cs = getComputedStyle(el);
-      if (cs.backgroundColor !== "rgb(43, 196, 212)" || cs.color !== "rgb(16, 16, 16)" || cs.opacity !== "1" || cs.paddingTop !== "5px" || cs.borderTopWidth !== "0px" && cs.borderTopColor !== "rgb(43, 196, 212)") problems.push("#" + id + " is not the teal primary button");
+      if (cs.backgroundColor !== "rgb(43, 196, 212)" || cs.color !== "rgb(16, 16, 16)" || cs.opacity !== "1" || cs.paddingTop !== "5px" || cs.fontWeight !== "600" || cs.fontSize !== "14px") problems.push("#" + id + " is not the teal step button");
     }
   }
-  for (const id of ["reanalyzeBtn", "undoBtn"]) {
+  for (const id of ["undoBtn", "personalPicks"]) {
     const el = document.getElementById(id);
-    if (el && visible(el) && !el.disabled && (getComputedStyle(el).color !== "rgb(242, 242, 242)" || getComputedStyle(el).opacity !== "1")) problems.push("#" + id + " is dimmed or not #f2f2f2");
+    if (el && visible(el) && !el.disabled && (getComputedStyle(el).backgroundColor !== "rgba(0, 0, 0, 0)" || getComputedStyle(el).borderTopWidth !== "1px")) problems.push("#" + id + " is not outlined");
   }
+  for (const el of document.querySelectorAll(".stepLabel")) {
+    const cs = getComputedStyle(el);
+    if (visible(el) && (cs.fontSize !== "14px" || cs.lineHeight !== "18px" || cs.fontWeight !== "600" || cs.color !== "rgb(242, 242, 242)")) problems.push("step label style: " + el.textContent);
+  }
+  if (/Replaced/i.test(document.body.innerText) || document.getElementById("changesReplacedBtn")) problems.push("Replaced is still shown");
   for (const el of document.querySelectorAll(".releaseFacts")) {
     if (!visible(el)) continue;
     const cs = getComputedStyle(el);
-    if (parseFloat(cs.fontSize) !== 11 || cs.color !== "rgb(139, 148, 158)" || cs.backgroundColor !== "rgba(0, 0, 0, 0)" || cs.borderTopWidth !== "0px") problems.push("source markers not plain 11px #8b949e");
+    if (parseFloat(cs.fontSize) !== 10 || cs.fontWeight !== "500" || el.textContent.includes(" /") || el.textContent.includes("/ ")) problems.push("row markers are not 10px/500 without spaces around slashes");
+    const row = el.closest(".releaseRow"), name = row.querySelector(".releaseName");
+    if (Math.abs(el.getBoundingClientRect().right - row.getBoundingClientRect().right) > 0.5) problems.push("row markers are not right-aligned");
+    const sym = row.querySelector(".rowMarker");
+    if (sym && sym.getBoundingClientRect().right > name.getBoundingClientRect().left + 0.5) problems.push("status symbol sits inside the name");
   }
+  const xs = new Set([...document.querySelectorAll(".releaseRow .releaseName")].filter(visible).map(e => Math.round(e.getBoundingClientRect().left * 2) / 2));
+  if (document.getElementById("columns") && xs.size > 3) problems.push("folder names start at " + xs.size + " different x positions");
   const selectGroup = document.getElementById("albumGroupSelect");
   if (selectGroup && visible(selectGroup) && getComputedStyle(selectGroup).borderTopWidth !== "1px") problems.push("Group control is not outlined");
   const secondary = document.querySelector(".track .dur,.track .note");
@@ -156,7 +167,7 @@ LAYOUT_PROBE = r"""async () => {
   // Spacing: neighbours and container edges are 4, 8 or 12 px apart.
   const ok = v => [4, 8, 12].some(x => Math.abs(v - x) <= 0.5);
   const name = el => (el.id ? "#" + el.id : el.tagName.toLowerCase() + (typeof el.className === "string" && el.className.trim() ? "." + el.className.trim().split(/\s+/).join(".") : ""));
-  const leaves = [...document.querySelectorAll("button,input,select,summary,label,.stepLabel,.appName,.versionTag,.buildState,.sectionLabel,.releaseColumnHeader,.releaseGroupTitle,.releaseName,.rowMarker,.discHead,#releaseName,#releasePath,.field,.track .titleText,.track .dur,.track .num,.track .note,#progressText,#progressPercent")]
+  const leaves = [...document.querySelectorAll("button,input,select,summary,label,.stepLabel,.appName,.versionTag,.buildState,.sectionLabel,.releaseColumnHeader,.releaseGroupTitle,.releaseName,.discHead,#releaseName,#releasePath,.field,.track .titleText,.track .dur,.track .num,.track .note,#progressText,#progressPercent")]
     .filter(visible).filter(el => !el.closest("#modalBackdrop,.trackActionGroup,#auditBanner") && !(el.parentElement && el.parentElement.closest("button,label,summary")));
   for (const el of leaves) {
     const r = el.getBoundingClientRect();

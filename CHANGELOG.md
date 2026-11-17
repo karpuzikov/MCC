@@ -2,6 +2,16 @@
 
 Historical release notes and testing status retained from the original README.
 
+## v0.5.147 - Marker text, one step-button style, Replaced removed (Under construction ⚠️)
+
+- Changed: row markers are text `WEB/CD/CUE/LOG 100%` (Inter 500 10px, right-aligned; related #2bc4d4, unrelated and slashes #8b949e at 45%; skipped rows 50% / 25%). LOG shows the score only when scored. No trophy.
+- Changed: details markers WEB CD CUE LOG are small boxes (#1a1a1a, radius 2px, 11px, line-height 8px) with equal glyph-to-edge gaps (measured at 1920x1080).
+- Changed: status symbol (+, ↑, ⊘) sits in the 12px indent left of the folder name.
+- Removed: "Replaced" (chip, row status, details); REPLACE from the engine shows as Upgraded.
+- Changed: + Add folder, Scan, Release Map, Re-scan, Copy/Move share one teal style; Undo last export and Keeps and Skips stay outlined.
+- Changed: type scale body 14/18, step labels 14/18, markers 10; Versions/Remixes/Live panel padding 2px.
+- Added: --type-marker, --pad-tight and --mkbox-pad-* tokens.
+
 ## v0.5.146 - Markers restored, button fixes (Under construction ⚠️)
 
 - Restored: CD/WEB, CUE, LOG, LOG %, ✓ markers on every release row (right side, before the status marker) and under the details title; plain 11px #8b949e text, 4px apart.

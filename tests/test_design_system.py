@@ -42,10 +42,10 @@ class DesignSystemTests(unittest.TestCase):
     def test_text_uses_only_the_type_scale(self):
         css = _stylesheet_without_tokens()
         self.assertNotRegex(css, r"font-size:|font-weight:|font-family:(?!var\()|font:\s*\d")
-        scale = {"page-title": "700 24px/24px", "card-title": "600 16px/16px", "step-label": "600 14px/14px",
-                 "tab": "600 14px/14px", "button": "600 14px/14px", "body": "400 14px/20px", "row-title": "600 14px/18px",
+        scale = {"page-title": "700 24px/24px", "card-title": "600 16px/16px", "step-label": "600 14px/18px",
+                 "tab": "600 14px/14px", "button": "600 14px/14px", "body": "400 14px/18px", "row-title": "600 14px/18px",
                  "mono-body": "400 14px/18px", "secondary": "400 12px/16px", "table-header": "600 12px/12px",
-                 "mono-small": "400 12px/12px", "chip": "500 11px/11px"}
+                 "mono-small": "400 12px/12px", "chip": "500 11px/11px", "marker": "500 10px/10px"}
         root = mcc.APP_STYLE_CSS[: mcc.APP_STYLE_CSS.index("}", mcc.APP_STYLE_CSS.index(":root"))]
         self.assertEqual(dict(re.findall(r"--type-([a-z-]+):(\d{3} \d+px/\d+px)", root)), scale)
         self.assertEqual(set(re.findall(r"var\(--type-([a-z-]+)\)", css)), set(scale))
@@ -58,7 +58,7 @@ class DesignSystemTests(unittest.TestCase):
                 value = declaration.split(":", 1)[1]
                 if selector.strip() == ".btn.primary" and value.strip() == "var(--pad-primary)":
                     continue  # primary buttons: 5px, per DESIGN.md
-                leftover = re.sub(r"var\(--space-[123]\)|var\(--icon-size\)|calc|\b0\b|auto|[\d.]+(?![\d.]*px)|[-*+() ]", "", value)
+                leftover = re.sub(r"var\(--space-[123]\)|var\(--pad-tight\)|var\(--mkbox-pad-[a-z]+\)|var\(--icon-size\)|calc|\b0\b|auto|[\d.]+(?![\d.]*px)|[-*+() ]", "", value)
                 if leftover:
                     bad.append((selector.strip()[-40:], declaration))
         for html in PAGES:

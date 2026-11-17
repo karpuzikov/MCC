@@ -1,6 +1,6 @@
 # Music Collection Cleaner (MCC)
 
-**Version: 0.5.146 - Under construction ⚠️**
+**Version: 0.5.147 - Under construction ⚠️**
 
 ## Download and run
 
