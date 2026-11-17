@@ -19,12 +19,10 @@ MCC finds them and keeps the smallest set of releases that still has every song 
 
 When the same songs exist in several versions, MCC prefers the better source, best first:
 
-1. 100% - Log - Cue
-2. 100% - Log
-3. 100% - Log - Cue (trumpable)
-4. FLAC, log with non-audio deductions
-5. FLAC, log with audio deductions (same level as plain FLAC)
-6. FLAC
+1. CD: 100% - Log - Cue
+2. CD: 100% - Log
+3. CD: >100% - Log
+4. WEB/Digital
 
 ## Safety
 
