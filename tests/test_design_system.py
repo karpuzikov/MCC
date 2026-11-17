@@ -42,8 +42,8 @@ class DesignSystemTests(unittest.TestCase):
     def test_text_uses_type_tokens_with_line_height_equal_to_font_size_on_controls(self):
         css = _stylesheet_without_tokens()
         self.assertNotRegex(css, r"font-size:|font-weight:|font-family:(?!var\()")
-        for token, spec in (("type-button", "600 13px/13px"), ("type-chip", "500 12px/12px"),
-                            ("type-step", "600 13px/13px"), ("type-field", "400 13px/13px"), ("type-path", "400 12px/12px")):
+        for token, spec in (("type-button", "600 14px/14px"), ("type-chip", "500 13px/13px"),
+                            ("type-step", "600 14px/14px"), ("type-field", "400 14px/14px"), ("type-path", "400 13px/13px")):
             self.assertIn("--%s:%s " % (token, spec), mcc.APP_STYLE_CSS)
 
     def test_equal_padding_and_no_fixed_control_heights(self):

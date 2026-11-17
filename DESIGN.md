@@ -10,7 +10,7 @@ Reference mockup (1024×768 and 1920×1080, Main + Release Map): https://claude.
 2. **Teal is the accent** (`primary` #2bc4d4): primary buttons, logo, selection, essential tracks, links, star. `primary-soft` #6fd8e3 for the focus ring.
 3. **Green means "added"** (`status-added` #00d992) and nothing else: `+` / `↑` at the end of a release row and the Added/Upgraded chips.
 4. **Equal padding on all sides inside every element.** Buttons, chips, inputs, selects, paths 4px; primary buttons 5px; bars and panels 8px; release board 4px. Line-height = font-size on buttons and fields so the padding reads equal. No fixed control heights: height = content + padding.
-5. **Text buttons are outlined** (1px `hairline`, radius 6px, 600 13px). **Icon buttons are never outlined**: no border, no padding, SVG viewBox cropped to the drawn shape, all icons 14px tall, 1.5px non-scaling stroke.
+5. **Text buttons are outlined** (1px `hairline`, radius 6px, 600 14px). **Icon buttons are never outlined**: no border, no padding, SVG viewBox cropped to the drawn shape, all icons 14px tall, 1.5px non-scaling stroke.
 6. **Lines go between elements, never around them.** 1px `hairline` vertical line between neighbours in a row, horizontal line between stacked items. No line on icon buttons, none beside flex spacers. No boxes or fills around content groups.
 7. **Every pixel goes to content** (release/track titles, folder names, paths). 8px row gap, 4px gap between track number and title, no decorative spacing.
 8. **Never truncate.** No ellipsis, no "…" in labels; long names and paths wrap.
@@ -31,7 +31,7 @@ Reference mockup (1024×768 and 1920×1080, Main + Release Map): https://claude.
 ## Typography
 
 - **Inter** (bundled woff2) for everything; **JetBrains Mono** only for the activity log, version tag and track numbers.
-- Step labels 13/13 600 `ink`; buttons 13/13 600; chips 12/12 500; body 13/18; paths Inter 12/12 `body`; section labels 11px 600 uppercase 2px tracking `body`.
+- Step labels 14/14 600 `ink`; buttons 14/14 600; chips 13/13 500; body 14/20; paths Inter 13/13 `body`; section labels 12px 600 uppercase 2px tracking `body`.
 
 ## Layout
 
@@ -69,13 +69,13 @@ Source: `project/tokens.json` of the MCC design system. In the app every token i
 
 | Type style | Spec |
 | --- | --- |
-| `step-label` | Inter 600 13px/13px |
-| `button-md` | Inter 600 13px/13px |
-| `caption-strong` (chips) | Inter 500 12px/12px |
-| body | Inter 400 13px/18px |
-| path | Inter 400 12px/12px |
-| section label | Inter 600 11px/16px, uppercase, 2px tracking |
-| `code` | JetBrains Mono 400 13px/18px |
+| `step-label` | Inter 600 14px/14px |
+| `button-md` | Inter 600 14px/14px |
+| `caption-strong` (chips) | Inter 500 13px/13px |
+| body | Inter 400 14px/20px |
+| path | Inter 400 13px/13px |
+| section label | Inter 600 12px/18px, uppercase, 2px tracking |
+| `code` | JetBrains Mono 400 14px/20px |
 
 | Spacing | Value | Use |
 | --- | --- | --- |

@@ -2,6 +2,11 @@
 
 Historical release notes and testing status retained from the original README.
 
+## v0.5.143 - Larger text (Under construction ⚠️)
+
+- Changed: every type style 1px larger (buttons and step labels 14px, body 14/20, chips and paths 13px, section labels 12px, title 17px); DESIGN.md updated.
+- Checked: all `tests/test_*.py` incl. layout at 1024x720 to 2560x1440. **Not run:** Windows 11/WebView2.
+
 ## v0.5.142 - MCC design system (Under construction ⚠️)
 
 - Changed: DESIGN.md is the MCC design system (teal #2bc4d4 accent, green only for additions, equal 4/5/8px padding, outlined text buttons, unoutlined cropped 14px icons, lines between elements, no ellipsis, no Close buttons, 6px radius).
