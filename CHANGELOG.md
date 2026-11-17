@@ -2,6 +2,10 @@
 
 Historical release notes and testing status retained from the original README.
 
+## v0.5.152 - Copy only audio, CUE and log files (Under construction ⚠️)
+
+- Fixed: Copy/Move also copied every other file in a release folder (playlists such as .m3u, images, text). Only audio, .cue and .log files are copied now; the rest stays in the source.
+
 ## v0.5.151 - Barcode match no longer needs a similar title (Under construction ⚠️)
 
 - Fixed: a MusicBrainz release found by exact barcode was dropped when its title differed (e.g. an added "(Remix)" qualifier). The title is now only compared when there is no barcode; medium and track count still must match.

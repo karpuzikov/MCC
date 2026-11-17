@@ -445,6 +445,8 @@ class NamingRules(unittest.TestCase):
                 '    TITLE "Track"\n    INDEX 01 00:00:00\n',
                 encoding="utf-8")
             (source / "original.log").write_text("Exact Audio Copy rip log", encoding="utf-8")
+            (source / "playlist.m3u").write_text("01 Track.flac", encoding="utf-8")
+            (source / "cover.jpg").write_bytes(b"image")
             checker_source = source / "audiochecker.log"
             checker_source.write_text("historic WEB report", encoding="utf-8")
             app = mlo.Organizer()
@@ -457,6 +459,7 @@ class NamingRules(unittest.TestCase):
             self.assertFalse((dest / "audiochecker.log").exists())
             self.assertTrue((dest / "CAT001.cue").exists())
             self.assertTrue((dest / "CAT001.log").exists())
+            self.assertEqual(sorted(p.name for p in dest.iterdir()), ["01 Track.flac", "CAT001.cue", "CAT001.log"])
             self.assertEqual(checker_source.read_text(encoding="utf-8"), "historic WEB report")
             self.assertEqual((dest / "01 Track.flac").read_bytes(), b"placeholder-audio")
 
