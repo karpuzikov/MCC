@@ -2,6 +2,12 @@
 
 Historical release notes and testing status retained from the original README.
 
+## v0.5.137 - Picks & patterns merged (Under construction ⚠️)
+
+- Changed: Personal Picks and Classify patterns are one dialog, "Picks & patterns" (one button on the main window). One compact list holds phrases, exact titles, saved patterns and new (unclassified) patterns; each row has Keep / Skip / Remix / Live buttons, a pencil (edit) and a cross (remove). Phrases and exact titles are always Keep (the other buttons are disabled); new patterns stay "New" until a button is chosen.
+- Changed: Save writes picks and categories together (`savePersonalPicks`) and drops resolved pending patterns. Removed the separate pattern manager (`getPatternManager`, `savePatternManager`, `openPendingPatterns`); the post-scan "Classify patterns" prompt is unchanged. shortcut: the old deferred-review branch in `_complete_pattern_review` is now unreachable, remove when that flow is next touched.
+- Checked: dialog rendered and clicked in headless Chrome (no script errors), computed-style audit, all `tests/test_*.py`, ruff. **Not run:** Windows 11/WebView2, saving through the real bridge.
+
 ## v0.5.136 - Copy options only in the Release Map (Under construction ⚠️)
 
 - Changed: Encode audio, Format, AudioChecker and Split CUE are removed from the main window (they belong to Copy/Move, which starts in the Release Map). The saved options and the Release Map switches are unchanged; the main window no longer reads or writes them.
