@@ -2,6 +2,12 @@
 
 Historical release notes and testing status retained from the original README.
 
+## v0.5.122 - ANSI rip logs are scored (Under construction ⚠️)
+
+- Fixed: "LOG not scored" for EAC logs saved in a Windows code page instead of UTF-16/UTF-8. hey-bro-check-log guesses the encoding with chardet (confidence 0.62 on such a log, below its 0.7 cut-off), falls back to UTF-8 and answers "Could not decode log file". `score_rip_log_file` now retries from a UTF-8 copy decoded as Windows-1252, Windows-1251, then Latin-1, and keeps the first recognised result.
+- Reproduced with hey-bro-check-log 1.3.2 on an ANSI copy of an EAC V1.3 log (100% after the retry). New `tests/test_rip_log_encoding.py` uses a fake scorer.
+- Checked: all `tests/test_*.py`, ruff pyflakes rules. **Not run:** Windows 11/WebView2; MCC end to end on the user's actual log file (reproduced from a re-encoded copy of its text); logs in other code pages or non-English EAC logs.
+
 ## v0.5.121 - No badge outlines (Under construction ⚠️)
 
 - Fixed: the CUE, LOG, medium and plan badges drew a text-coloured outline in Classic and SB 2026, because `border:1px solid` (no colour) in a later rule reset the border colour to the text colour. The shorthand now uses `transparent`; badge fills were lightened slightly so they stay visible without a border. Neon Arcade keeps its neon borders.
