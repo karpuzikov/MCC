@@ -2,8 +2,6 @@
 
 **Version: 0.5.123**
 
-Finds the best combination of releases in your music collection and removes unnecessary repeated songs, keeping every wanted unique recording.
-
 ## Download and run
 
 1. Download the `.pyw` file from the **[latest release](https://github.com/karpuzikov/MCC/releases/latest)**.
