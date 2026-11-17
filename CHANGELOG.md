@@ -2,6 +2,11 @@
 
 Historical release notes and testing status retained from the original README.
 
+## v0.5.135 - Logging next to Close (Under construction ⚠️)
+
+- Changed (layout): the Logging switch and its logs-folder button moved from the options card to the footer, next to Close. Behaviour unchanged.
+- Checked: both pages render in headless Chrome, computed-style audit 0 violations, all `tests/test_*.py`, ruff. **Not run:** Windows 11/WebView2.
+
 ## v0.5.134 - Buttons inside cards (Under construction ⚠️)
 
 - Changed (styling only): secondary and icon buttons inside a card use `surface-elevated`, so Personal Picks, Classify patterns and the folder buttons are visible on the `surface-card` toolbar.
