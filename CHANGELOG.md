@@ -2,6 +2,11 @@
 
 Historical release notes and testing status retained from the original README.
 
+## v0.5.132 - Design audit pass on the running UI (Under construction ⚠️)
+
+- Changed (styling only): removed the symbol-font family (icons fall back through the Inter stack); `b`/`strong` inherit the type style (no 700 weight); the Browse button uses the drawn folder icon instead of the yellow emoji; icon masks keep 14 px.
+- Checked: computed-style audit of both windows and the Copy dialog in headless Chrome (type style, colour token, radius, shadow, control height): 0 violations; app launched on Windows 11/WebView2 and inspected by screenshot. All `tests/test_*.py`, ruff pyflakes rules.
+
 ## v0.5.131 - Design system audit fixes (Under construction ⚠️)
 
 - Changed (styling only): Inter and JetBrains Mono (latin + cyrillic, variable woff2, SIL OFL) are embedded as `@font-face` in `APP_FONT_FACE_CSS`; every text uses a `DESIGN.md` type style from `--type-*` tokens (caption 12/500, body-sm 13/400, body-md 14/400, button 14/600, title-sm 16/600, number-sm 14/500 mono); the 12px/600 text is gone and bold emphasis inside rows was dropped.
