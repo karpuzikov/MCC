@@ -1,5 +1,9 @@
 # Music Collection Cleaner - Continuity Handoff
 
+## Checkpoint 2026-11-17 - MCC v0.5.138 - Under construction ⚠️
+
+Release Map unified with the main window: columns are `.releaseColumn` cards, `#changeBar` is an always-visible bar (the View popover and `#viewMenuBtn` are removed), `#exportBar` is compact. "Picks & patterns" renamed "Keeps and Skips". `tests/visual_qa.py` no longer clicks `#viewMenuBtn`.
+
 ## Checkpoint 2026-11-17 - MCC v0.5.137 - Under construction ⚠️
 
 Design-system audit fixes: embedded Inter/JetBrains Mono (`APP_FONT_FACE_CSS`), `--type-*` styles for all text, 40/28/64 px control and bar heights. CSS now hand-edited (the converter script no longer applies). Not run: Windows 11/WebView2.

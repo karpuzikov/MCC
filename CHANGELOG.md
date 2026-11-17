@@ -2,6 +2,14 @@
 
 Historical release notes and testing status retained from the original README.
 
+## v0.5.138 - Release Map looks like the main window (Under construction ⚠️)
+
+- Changed: Release Map columns are cards (same surface, radius and row style as the main window); folder rows are compact.
+- Changed: the "View" dropdown is gone; Changes / Full map / filters / source legend are one always-visible bar.
+- Changed: the Copy/Move bar at the bottom is compact (40 px controls, one row of paths, one row of options).
+- Changed: "Picks & patterns" is renamed "Keeps and Skips" (button and dialog).
+- Checked: Release Map rendered in headless Chrome (Changes and Full map), computed-style audit (0 violations), all `tests/test_*.py`. **Not run:** Windows 11/WebView2.
+
 ## v0.5.137 - Picks & patterns merged (Under construction ⚠️)
 
 - Changed: Personal Picks and Classify patterns are one dialog, "Picks & patterns" (one button on the main window). One compact list holds phrases, exact titles, saved patterns and new (unclassified) patterns; each row has Keep / Skip / Remix / Live buttons, a pencil (edit) and a cross (remove). Phrases and exact titles are always Keep (the other buttons are disabled); new patterns stay "New" until a button is chosen.
