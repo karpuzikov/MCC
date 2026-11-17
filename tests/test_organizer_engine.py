@@ -308,8 +308,9 @@ class UserCorrections20261014(unittest.TestCase):
             dict(verified, physical=True, country_provenance=
                  "MusicBrainz release-territory-fallback (not verified pressing)"),
             [], []))
-        self.assertTrue(mlo.completion_reasons(
-            dict(verified, metadata_verified=False), [], checker))
+        # No MusicBrainz match is a note ("No MusicBrainz match"), never a PARTIAL reason.
+        self.assertEqual(mlo.completion_reasons(
+            dict(verified, metadata_verified=False), [], checker), [])
 
 
 class RebuildMissingImageCue(unittest.TestCase):

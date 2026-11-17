@@ -2,6 +2,12 @@
 
 Historical release notes and testing status retained from the original README.
 
+## v0.5.150 - MusicBrainz switch, no false PARTIAL (Under construction ⚠️)
+
+- Changed: a release with no MusicBrainz match is no longer PARTIAL; it is Done with the note "No MusicBrainz match". PARTIAL stays for real unmet requirements (CUE fidelity, region, barcode/catalog, AudioChecker).
+- Added: "MusicBrainz" checkbox next to AudioChecker (default on). Off = no MusicBrainz request is made (edition lookup and cover lookup via MusicBrainz).
+- shortcut: with MusicBrainz off, CD releases without a source-labelled region still report "No physical release region verified".
+
 ## v0.5.149 - FLAC encoder download fix (Under construction ⚠️)
 
 - Fixed: flac.exe could not be installed (CERTIFICATE_VERIFY_FAILED from ftp.osuosl.org). The download now tries the Xiph GitHub release first, then osuosl; both must match the same pinned SHA-256.

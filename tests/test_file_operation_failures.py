@@ -81,6 +81,16 @@ class FileOperationFailures(unittest.TestCase):
                 self.assertRaisesRegex(RuntimeError, 'Nothing to undo'):
             mcc.undo_last_run()
 
+    def test_musicbrainz_switch_defaults_on_and_blocks_requests_when_off(self):
+        self.assertTrue(mcc._organizer_options({})["enable_musicbrainz"])
+        self.assertFalse(mcc._organizer_options({'organizer_options': {'enable_musicbrainz': False}})["enable_musicbrainz"])
+        mcc._MUSICBRAINZ_ENABLED[0] = False
+        try:
+            with self.assertRaisesRegex(RuntimeError, "turned off"):
+                mcc.mb_json("release/x")
+        finally:
+            mcc._MUSICBRAINZ_ENABLED[0] = True
+
     def test_organizer_options_default_and_reject_unknown(self):
         self.assertEqual(mcc._organizer_options({}), mcc.ORGANIZER_OPTION_DEFAULTS)
         self.assertEqual(mcc._organizer_options({'organizer_options': {'format': 'FLAC', 'enable_checker': False}})['format'], 'FLAC')
