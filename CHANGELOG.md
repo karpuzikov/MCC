@@ -2,6 +2,11 @@
 
 Historical release notes and testing status retained from the original README.
 
+## v0.5.151 - Barcode match no longer needs a similar title (Under construction ⚠️)
+
+- Fixed: a MusicBrainz release found by exact barcode was dropped when its title differed (e.g. an added "(Remix)" qualifier). The title is now only compared when there is no barcode; medium and track count still must match.
+- Added: test for it.
+
 ## v0.5.150 - MusicBrainz switch, no false PARTIAL (Under construction ⚠️)
 
 - Changed: a release with no MusicBrainz match is no longer PARTIAL; it is Done with the note "No MusicBrainz match". PARTIAL stays for real unmet requirements (CUE fidelity, region, barcode/catalog, AudioChecker).
