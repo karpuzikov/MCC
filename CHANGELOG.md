@@ -2,6 +2,12 @@
 
 Historical release notes and testing status retained from the original README.
 
+## v0.5.121 - No badge outlines (Under construction ⚠️)
+
+- Fixed: the CUE, LOG, medium and plan badges drew a text-coloured outline in Classic and SB 2026, because `border:1px solid` (no colour) in a later rule reset the border colour to the text colour. The shorthand now uses `transparent`; badge fills were lightened slightly so they stay visible without a border. Neon Arcade keeps its neon borders.
+- Checked: all `tests/test_*.py`, ruff pyflakes rules; details header rendered in headless Chrome. **Not run:** Windows 11/WebView2; SB 2026 layer screenshot; other `border:Npx solid;` shorthands outside the badges.
+- Note: "LOG not scored" means the rip-log checker did not recognise the `.log` file or failed on it; the badge tooltip lists the file and reason. Behaviour unchanged.
+
 ## v0.5.120 - Centred buttons everywhere (Under construction ⚠️)
 
 - Changed: icons (close ×, remove ✕, track menu ⋯, folder, star ☆/★) are CSS masks on a 14 px box centred with `inset:0; margin:auto`; they inherit the button text colour. The glyph text stays in the DOM with `font-size:0`. New class `drawnFolder` marks every folder button.

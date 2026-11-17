@@ -1,5 +1,9 @@
 # Music Collection Cleaner - Continuity Handoff
 
+## Checkpoint 2026-11-17 - MCC v0.5.121 - Under construction ⚠️
+
+Badges (`.mediumBadge,.ripMark,.planBadge`) use `border:1px solid transparent`; Classic/SB colour them by fill only. Not run: Windows 11/WebView2.
+
 ## Checkpoint 2026-11-16 - MCC v0.5.120 - Under construction ⚠️
 
 Centring is global in `APP_THEME_CSS`: icon masks via `--icon` custom property on `#closeDetailsBtn,.clearBtn,.rowMenuBtn,.starBtn,.drawnFolder`; `button{text-box:trim-both cap alphabetic}`. Not run: Windows 11/WebView2.
