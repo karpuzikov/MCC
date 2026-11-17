@@ -2,6 +2,14 @@
 
 Historical release notes and testing status retained from the original README.
 
+## v0.5.129 - Karpuzikov design system (Under construction ⚠️)
+
+- Changed (styling only): both windows and all dialogs use one shared stylesheet (`APP_STYLE_CSS`) built from `DESIGN.md`: exact colour tokens in `:root` (dark only), Inter / JetBrains Mono stacks, radius tokens, 4px-snapped spacing, type scale 12/13/14/16/20/24, flat surfaces (`canvas` > `surface-card` > `surface-elevated`), focus ring `0 0 0 2px rgba(59,130,246,.5)` on every focusable control. No colour literals outside `:root`; no gradients, glows or shadows other than the focus ring.
+- Changed: buttons use the compact secondary/primary specs (28 px high, existing layout kept): Analyze and Copy are the lime primary; success/danger use `positive`/`negative`.
+- Removed: Neon Arcade, Classic and SB 2026 themes and the Theme selector (they conflict with the system); the `ui_theme` setting is no longer written. Connection lines in the Release Map read their colours from the tokens. Window titles show "Under construction ⚠️" again.
+- Tests: `tests/test_design_system.py` replaces `tests/test_ui_theme.py`.
+- Checked: all `tests/test_*.py`, ruff pyflakes rules; both windows and the Copy dialog rendered in headless Chrome. **Not run:** Windows 11/WebView2; Inter and JetBrains Mono are not bundled, so Windows falls back to Segoe UI / Consolas unless they are installed; Release Map states other than the test fixture (ignored, pending, search match, Re-Analyze markers) and the other dialogs were not inspected; control heights stay 28-30 px instead of the 40 px / 64 px specs to keep the layout.
+
 ## v0.5.128 - Unified main window and Release Map
 
 - Changed: toggle switches and select styles moved to the shared theme CSS; the Release Map footer uses the same switches as the main window instead of native checkboxes.

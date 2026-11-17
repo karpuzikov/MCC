@@ -1,3 +1,10 @@
+## MCC v0.5.129 - Karpuzikov design system restyle (2026-11-17)
+
+- Styling only: colours, fonts, radii, spacing, focus ring, button/input/card specs from `DESIGN.md`; themes removed. No behaviour or layout changes intended.
+- Headless Chrome (Linux, 1400x700 and 1486x700): main window, Release Map with details open, Changes view, Copy dialog: INSPECTED. `tests/test_design_system.py`: PASS.
+- Windows 11 WebView2 at the user's viewport/DPI, Inter/JetBrains Mono rendering, remaining Release Map states (ignored, pending, search, Re-Analyze markers), other dialogs: NOT RUN.
+- v0.5.129 is **Under construction ⚠️**.
+
 ## Two MCC framework variants - actual Windows acceptance pending (2026-10-21)
 
 **Contract**: Deliver two complete working dark MCC 0.5.56 apps, native QFluentWidgets and Flet, with full feature and measurement parity, NOT just screenshot mockups. Both must launch from a **Windows double-click** with no manual Python/pip setup. Preserve fixed release positions on docked details, responsive widths, scrolling, keyboard accessibility, data safety, Undo and app settings.
