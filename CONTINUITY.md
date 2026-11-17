@@ -1,5 +1,9 @@
 # Music Collection Cleaner - Continuity Handoff
 
+## Checkpoint 2026-11-17 - MCC v0.5.140 - Under construction ⚠️
+
+Release Map padding reduced to 8px (`#toolbar`, `#columns`, `.releaseColumn`, `#exportBar`); release card gap 4px. Main window padding not yet reviewed.
+
 ## Checkpoint 2026-11-17 - MCC v0.5.139 - Under construction ⚠️
 
 `#changeBar` now sits inside `#toolbar` (`display:contents`, toolbar wraps); `#exportBar` is a wrapping flex row; `.releaseGroup` is a canvas-coloured card with 8px gap. DESIGN.md has the "Don't waste space" principle.

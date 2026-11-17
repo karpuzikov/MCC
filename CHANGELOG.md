@@ -2,6 +2,11 @@
 
 Historical release notes and testing status retained from the original README.
 
+## v0.5.140 - Tighter padding (Under construction ⚠️)
+
+- Changed: Release Map padding around the window, title bar, columns and Copy/Move bar cut to 8 px; gap between release cards 4 px. Main window not changed.
+- Checked: Release Map rendered in headless Chrome, computed-style audit (0 violations), all `tests/test_*.py`. **Not run:** Windows 11/WebView2.
+
 ## v0.5.139 - No wasted space (Under construction ⚠️)
 
 - Changed: Release Map title bar and view bar are one row; the Copy/Move bar and its options are one row; "Filter changes" and "Sources" labels removed.
