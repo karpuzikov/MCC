@@ -4,7 +4,7 @@
 
 ## Download and run
 
-1. Run once in a terminal (installs Python and WebView2; MCC downloads the rest by itself on first start):
+1. Run once in a terminal:
 
 ```
 winget install -e --id Python.Python.3.12 && winget install -e --id Microsoft.EdgeWebView2Runtime
