@@ -2,6 +2,12 @@
 
 Historical release notes and testing status retained from the original README.
 
+## v0.5.144 - MCC type scale (Under construction ⚠️)
+
+- Changed: one type scale for both windows (`page-title` 24, `card-title` 16, `step-label`/`tab`/`button` 14, `body` 14/20, `row-title` 14/18, `mono-body` 14/18, `secondary` 12/16, `table-header` 12 caps, `mono-small` 12, `chip` 11); no other font sizes; buttons, chips and fields have line-height = font-size.
+- Changed: DESIGN.md replaced with the MCC design system README.
+- Checked: all `tests/test_*.py`; layout at 1024x720 and 1920x1080 (and 4 more sizes): Step 4 toolbar and Step 5 footer fit, 0px overflow. **Not run:** Windows 11/WebView2.
+
 ## v0.5.143 - Larger text (Under construction ⚠️)
 
 - Changed: every type style 1px larger (buttons and step labels 14px, body 14/20, chips and paths 13px, section labels 12px, title 17px); DESIGN.md updated.

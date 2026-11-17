@@ -39,12 +39,16 @@ class DesignSystemTests(unittest.TestCase):
             self.assertEqual(html.count("@font-face"), 4)
             self.assertNotIn("fonts.googleapis", html)
 
-    def test_text_uses_type_tokens_with_line_height_equal_to_font_size_on_controls(self):
+    def test_text_uses_only_the_type_scale(self):
         css = _stylesheet_without_tokens()
-        self.assertNotRegex(css, r"font-size:|font-weight:|font-family:(?!var\()")
-        for token, spec in (("type-button", "600 14px/14px"), ("type-chip", "500 13px/13px"),
-                            ("type-step", "600 14px/14px"), ("type-field", "400 14px/14px"), ("type-path", "400 13px/13px")):
-            self.assertIn("--%s:%s " % (token, spec), mcc.APP_STYLE_CSS)
+        self.assertNotRegex(css, r"font-size:|font-weight:|font-family:(?!var\()|font:\s*\d")
+        scale = {"page-title": "700 24px/24px", "card-title": "600 16px/16px", "step-label": "600 14px/14px",
+                 "tab": "600 14px/14px", "button": "600 14px/14px", "body": "400 14px/20px", "row-title": "600 14px/18px",
+                 "mono-body": "400 14px/18px", "secondary": "400 12px/16px", "table-header": "600 12px/12px",
+                 "mono-small": "400 12px/12px", "chip": "500 11px/11px"}
+        root = mcc.APP_STYLE_CSS[: mcc.APP_STYLE_CSS.index("}", mcc.APP_STYLE_CSS.index(":root"))]
+        self.assertEqual(dict(re.findall(r"--type-([a-z-]+):(\d{3} \d+px/\d+px)", root)), scale)
+        self.assertEqual(set(re.findall(r"var\(--type-([a-z-]+)\)", css)), set(scale))
 
     def test_equal_padding_and_no_fixed_control_heights(self):
         for selector, pad in ((".btn", "var(--pad-control)"), (".changeChip", "var(--pad-control)"),
