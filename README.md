@@ -13,9 +13,9 @@ Needs Windows 11 and Python 3.
 
 ## What it does
 
-You have albums you already own and new ones you downloaded. Many contain the same songs.
+Music collections fill up with the same songs on deluxe editions, singles, remasters and compilations.
 
-MCC listens to them, finds the repeats, and picks the smallest set of releases that still has every song you want. Songs are matched by how they sound, not by their names. It shows its choices on a map you can click through, and you decide what to copy or move.
+MCC finds them and keeps the smallest set of releases that still has every song you want. Songs are matched by how they sound, not by their names. You see its choices on a map, and you decide what to copy or move.
 
 ## Safety
 
