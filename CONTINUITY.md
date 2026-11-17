@@ -1,5 +1,9 @@
 # Music Collection Cleaner - Continuity Handoff
 
+## Checkpoint 2026-11-17 - MCC v0.5.142 - Under construction ⚠️
+
+New stylesheet from scratch (`APP_STYLE_CSS`): `.sep` rows draw lines between non-control neighbours, `.sepv` stacks. Icons: `MCC_ICON_SVG` name -> (viewBox, w, h, class, shapes), `_icon_svg`. Scaling: `_css_zoom_factor` (pure), `_window_monitor_metrics` (ctypes), `_start_css_zoom_watcher` polls the window's monitor every 1s and sets `form.browser.webview.ZoomFactor` + `form.MinimumSize` on the UI thread; UI size saved as `ui_size_percent`. Board: `.boardCol` (albums/EPs) + `.boardRest` (display:contents at >=1600px). Track rows carry `disc`. Export: one `exportDestination` + `exportMode` ("all" copy / "new" move).
+
 ## Checkpoint 2026-11-17 - MCC v0.5.141 - Under construction ⚠️
 
 DESIGN.md is now VoltAgent. `:root` holds the VoltAgent tokens plus aliases for the old names (`--surface-card`, `--accent`, `--negative`, ...), so older rules keep working. Icons: `MCC_ICON_SVG` + `{{icon:name}}` placeholders, `{{app:version}}`, both replaced in `_apply_app_theme`. `#changeBar` is again its own row (`.segmented` view switch). `body.running` shows the Live pill.

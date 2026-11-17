@@ -1,4 +1,4 @@
-"""The shared stylesheet uses only DESIGN.md tokens: colours live in :root, no glows or gradients, one stylesheet per page."""
+"""The shared stylesheet follows DESIGN.md (MCC): tokens in :root, the 11 rules, the step layout."""
 import re
 import unittest
 
@@ -10,64 +10,75 @@ def _stylesheet_without_tokens():
     return css[css.index("}", css.index(":root")) + 1:]
 
 
+def _rule(selector):
+    return re.search(r"(?m)^" + re.escape(selector) + r"\s*\{([^}]*)\}", mcc.APP_STYLE_CSS).group(1)
+
+
+PAGES = (mcc._webview_main_html(), mcc._webview_release_map_html())
+
+
 class DesignSystemTests(unittest.TestCase):
     def test_colours_are_defined_only_in_root_tokens(self):
         self.assertEqual(re.findall(r"#[0-9a-fA-F]{3,8}\b|rgba?\([^)]*\)|hsla?\([^)]*\)", _stylesheet_without_tokens()), [])
+        for token in ("--canvas:#101010", "--primary:#2bc4d4", "--primary-soft:#6fd8e3", "--status-added:#00d992",
+                      "--hairline:#3d3a39", "--canvas-soft:#1a1a1a"):
+            self.assertIn(token, mcc.APP_STYLE_CSS)
 
     def test_every_used_variable_is_defined(self):
         css = mcc.APP_STYLE_CSS
-        defined = set(re.findall(r"(--[a-z0-9-]+)\s*:", css))
-        self.assertEqual(set(re.findall(r"var\((--[a-z0-9-]+)", css)) - defined, {"--visible-columns"})
+        self.assertEqual(set(re.findall(r"var\((--[a-z0-9-]+)", css)) - set(re.findall(r"(--[a-z0-9-]+)\s*:", css)), set())
 
     def test_flat_look_only_the_focus_ring_casts_a_shadow(self):
         css = _stylesheet_without_tokens()
         self.assertNotRegex(css, r"gradient|text-shadow|backdrop-filter|blur\(")
-        for value in re.findall(r"box-shadow:([^;}]*)", css):
-            self.assertIn(value.strip(), {"var(--focus-ring)", "var(--focus-ring-inset)"})
+        self.assertEqual(set(re.findall(r"box-shadow:([^;}]*)", css)), {"var(--focus-ring)"})
 
-    def test_both_windows_share_one_stylesheet(self):
-        for html in (mcc._webview_main_html(), mcc._webview_release_map_html()):
+    def test_both_windows_share_one_stylesheet_and_bundled_fonts(self):
+        for html in PAGES:
             self.assertEqual(html.count("<style"), 1)
-            self.assertIn("--canvas:#101010", html)
+            self.assertEqual(html.count("@font-face"), 4)
+            self.assertNotIn("fonts.googleapis", html)
 
-    def test_scripts_do_not_reference_the_removed_theme_styles(self):
-        for html in (mcc._webview_main_html(), mcc._webview_release_map_html()):
-            self.assertNotRegex(html, r'neonTheme|sbTheme|"Theme"\)|uiTheme|setTheme')
-
-    def test_font_families_come_from_tokens(self):
-        self.assertNotRegex(_stylesheet_without_tokens(), r"font-family:(?!var\()")
-
-
-    def test_fonts_are_bundled_for_latin_and_cyrillic(self):
-        faces = re.findall(r'@font-face\{font-family:"([^"]+)".*?unicode-range:([^;]+);', mcc.APP_FONT_FACE_CSS, re.S)
-        self.assertEqual(sorted({name for name, _ in faces}), ["Inter", "JetBrains Mono"])
-        self.assertEqual(len(faces), 4)
-        self.assertNotIn("http", re.sub(r"data:font/woff2;base64,[A-Za-z0-9+/=]+", "", mcc.APP_FONT_FACE_CSS).replace("github.com", ""))
-        self.assertIn(mcc.APP_FONT_FACE_CSS, mcc._apply_app_theme("/*APP_THEME*/"))
-
-    def test_every_text_uses_a_design_md_type_style(self):
+    def test_text_uses_type_tokens_with_line_height_equal_to_font_size_on_controls(self):
         css = _stylesheet_without_tokens()
-        self.assertNotRegex(css, r"font-size:|font-weight:")
-        root = mcc.APP_STYLE_CSS[: mcc.APP_STYLE_CSS.index("}", mcc.APP_STYLE_CSS.index(":root"))]
-        defined = set(re.findall(r"--type-([a-z-]+):", root))
-        used = set(re.findall(r"font:var\(--type-([a-z-]+)\)", css))
-        self.assertTrue(used <= defined, used - defined)
-        for name, spec in {"body-md": "400 14px/20px", "button": "600 16px/24px", "eyebrow": "600 14px/20px"}.items():
-            self.assertIn("--type-%s:%s " % (name, spec), root)
+        self.assertNotRegex(css, r"font-size:|font-weight:|font-family:(?!var\()")
+        for token, spec in (("type-button", "600 13px/13px"), ("type-chip", "500 12px/12px"),
+                            ("type-step", "600 13px/13px"), ("type-field", "400 13px/13px"), ("type-path", "400 12px/12px")):
+            self.assertIn("--%s:%s " % (token, spec), mcc.APP_STYLE_CSS)
 
-    def test_control_sizes_come_from_tokens(self):
-        root = mcc.APP_STYLE_CSS[: mcc.APP_STYLE_CSS.index("}", mcc.APP_STYLE_CSS.index(":root"))]
-        for token in ("--control-height:44px", "--control-height-footer:48px", "--radius-md:6px", "--radius-lg:8px", "--radius-pill:9999px"):
-            self.assertIn(token, root)
-        for selector in (".btn,.iconBtn", ".field,.pathInput,#search,.exportPath", "select "):
-            rule = re.search(r"(?m)^" + re.escape(selector) + r"[^{]*\{([^}]*)\}", mcc.APP_STYLE_CSS).group(1)
-            self.assertIn("height:var(--control-height)", rule)
-        self.assertNotRegex(_stylesheet_without_tokens(), r"(?<![-\w])height:\s*(?:28|32|36|40|44|48)px")
+    def test_equal_padding_and_no_fixed_control_heights(self):
+        for selector, pad in ((".btn", "var(--pad-control)"), (".changeChip", "var(--pad-control)"),
+                              (".field,select", "var(--pad-control)")):
+            rule = _rule(selector)
+            self.assertIn("padding:%s;" % pad, rule)
+            self.assertNotRegex(rule, r"(?<![-\w])height:")
+        self.assertIn("padding:var(--pad-primary)", _rule(".btn.primary"))
 
-    def test_pages_use_line_icons_not_emoji(self):
-        for html in (mcc._webview_main_html(), mcc._webview_release_map_html()):
-            self.assertNotRegex(html, "[\U0001F300-\U0001FAFF\u2605\u2606\u2715\u2B06]")
-            self.assertNotIn("{{icon:", html)
+    def test_icon_buttons_are_never_outlined_and_icons_are_cropped(self):
+        rule = _rule(".iconBtn")
+        self.assertIn("border:0", rule)
+        self.assertIn("padding:0", rule)
+        for name, (view_box, _w, height, _cls, _shapes) in mcc.MCC_ICON_SVG.items():
+            if name not in {"dots", "music", "arrow", "swap", "chevron"}:
+                self.assertEqual(height, 14, name)
+            self.assertNotEqual(view_box, "0 0 24 24") if name != "music" else None
+        self.assertIn("vector-effect:non-scaling-stroke", mcc.APP_STYLE_CSS)
+
+    def test_no_pills_no_ellipsis_no_close_buttons_no_emoji(self):
+        self.assertNotIn("9999px", mcc.APP_STYLE_CSS)
+        self.assertNotIn("ellipsis", mcc.APP_STYLE_CSS)
+        for html in PAGES:
+            self.assertNotRegex(html, r'id="closeBtn"|>Close<')
+            self.assertNotRegex(html, "[\U0001F300-\U0001FAFF★☆⬆]")
+            self.assertNotRegex(html[html.index("</style>"):], r"…|\.\.\.(?![.\w])")
+
+    def test_step_layout_and_scan_wording(self):
+        main, release_map = PAGES
+        steps = ["Step 1: Select folders", "Step 2: Scan selected folders", "Step 3: Open the map"]
+        self.assertEqual([main.index(x) for x in steps], sorted(main.index(x) for x in steps))
+        self.assertLess(release_map.index("Step 4: Check the scan result"), release_map.index("Step 5: Save results"))
+        for html in PAGES:
+            self.assertNotRegex(html, r"(?<![A-Za-z])Analy[sz]")
 
 
 if __name__ == "__main__":

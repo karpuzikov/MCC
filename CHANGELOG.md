@@ -2,6 +2,17 @@
 
 Historical release notes and testing status retained from the original README.
 
+## v0.5.142 - MCC design system (Under construction ⚠️)
+
+- Changed: DESIGN.md is the MCC design system (teal #2bc4d4 accent, green only for additions, equal 4/5/8px padding, outlined text buttons, unoutlined cropped 14px icons, lines between elements, no ellipsis, no Close buttons, 6px radius).
+- Changed: main window is Step 1 Select folders, Step 2 Scan selected folders, Step 3 Open the map, Activity log; Analyze is called Scan in the UI; the next step's button is teal; Close button removed; Audio I/O workers, UI size and Logging moved to Advanced.
+- Changed: Release Map has Step 4 (view, filter chips, Re-scan) and Step 5 (one destination, Copy into / Move into toggle, Browse and Show in Explorer icons); rows show the folder name with + ↑ ↔ markers; tracks grouped by disc with numbers restarting per disc; board 2 columns below 1600px CSS, 3 at 1600px+; details 360/520px.
+- Removed: Keep release button, OLD/NEW legend, plan badges, upgrade summary line, release counts, Close buttons.
+- Added: physical-size scaling: WebView2 ZoomFactor so 1 CSS px = 0.2645 mm (WMI/EDID width, current resolution, Windows scale; clamp 0.75-2.0; times UI size 80-150%); re-applied on monitor/DPI change; minimum window 1024x720 CSS px.
+- Added: `tests/test_display_scaling.py`, `tests/test_layout.py` (Playwright at 6 viewports, screenshots in `tests/screens/`); design-system tests rewritten for the MCC rules.
+- shortcut: releases pinned with the removed Keep release button stay pinned; unpin only by editing settings, upgrade when the user asks for it back.
+- Checked: all `tests/test_*.py` incl. layout at 1024x720 to 2560x1440. **Not run:** Windows 11/WebView2 (ZoomFactor, WMI/EDID lookup, monitor change).
+
 ## v0.5.141 - VoltAgent restyle (Under construction ⚠️)
 
 - Changed: both windows restyled to the VoltAgent design system (DESIGN.md replaced): #101010 canvas, #00d992 accent, hairline-bordered cards, Inter + JetBrains Mono, 44px controls (48px main footer), 6/8px radii, 32px window and 24px card padding, dashed section dividers.

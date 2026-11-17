@@ -1,97 +1,89 @@
-# DESIGN.md - VoltAgent
+# MCC
 
-A developer-focused look: one near-black canvas, one electric-green accent, hairline-bordered cards, Inter paired with a mono face.
+Design system for Music Collection Cleaner (karpuzikov/MCC). Built on the VoltAgent design language (near-black canvas, hairline edges, Inter + mono) and reshaped through review into a dense, tool-first Windows UI with a teal accent.
 
-> Source: an inspired interpretation of VoltAgent's design language from [awesome-design-md](https://github.com/VoltAgent/awesome-design-md/tree/main/design-md/voltagent). Not an official VoltAgent asset; no logo files are included.
+Reference mockup (1024×768 and 1920×1080, Main + Release Map): https://claude.ai/artifact/JeQLrRKajL14iEBXzWBqYd
 
-## Key characteristics
+## Rules
 
-- **One accent.** `primary` (#00d992) carries every CTA, status pill, live indicator. No second accent.
-- **One surface.** `canvas` (#101010) is the only page background. Dark only, no light mode.
-- **Hairlines are elevation.** Cards, buttons and inputs get 1px solid `hairline` (#3d3a39). No fills, no shadows.
-- **One ornament.** A 1px dashed `divider-dashed` rule between sections.
-- **Two faces.** Inter for text; JetBrains Mono (SF Mono substitute) for anything you could type at a terminal: paths, logs, counters, versions.
-- **Tight corners.** 6px buttons and inputs, 8px cards, pills only for tags.
-
-## Content
-
-- Sentence case everywhere. Uppercase only in eyebrows (Inter 600, 2.52px tracking).
-- Numbers render in mono.
+1. **Dark only.** `canvas` #101010 is the only surface.
+2. **Teal is the accent** (`primary` #2bc4d4): primary buttons, logo, selection, essential tracks, links, star. `primary-soft` #6fd8e3 for the focus ring.
+3. **Green means "added"** (`status-added` #00d992) and nothing else: `+` / `↑` at the end of a release row and the Added/Upgraded chips.
+4. **Equal padding on all sides inside every element.** Buttons, chips, inputs, selects, paths 4px; primary buttons 5px; bars and panels 8px; release board 4px. Line-height = font-size on buttons and fields so the padding reads equal. No fixed control heights: height = content + padding.
+5. **Text buttons are outlined** (1px `hairline`, radius 6px, 600 13px). **Icon buttons are never outlined**: no border, no padding, SVG viewBox cropped to the drawn shape, all icons 14px tall, 1.5px non-scaling stroke.
+6. **Lines go between elements, never around them.** 1px `hairline` vertical line between neighbours in a row, horizontal line between stacked items. No line on icon buttons, none beside flex spacers. No boxes or fills around content groups.
+7. **Every pixel goes to content** (release/track titles, folder names, paths). 8px row gap, 4px gap between track number and title, no decorative spacing.
+8. **Never truncate.** No ellipsis, no "…" in labels; long names and paths wrap.
+9. **No explanation text.** Guidance comes from layout, step labels and tooltips only.
+10. **No Close buttons.** The window's title-bar ✕ closes.
+11. **No pill radius on anything with padding** (radius 6px), so equal padding stays visible.
 
 ## Colors
 
-| Token | Value | Use |
-| --- | --- | --- |
-| `primary` | #00d992 | Primary CTAs, live dot, progress fill, NEW, selected border |
-| `primary-soft` | #2fd6a1 | Ghost-button labels, focus ring (2px) |
-| `primary-deep` | #10b981 | Inline links |
-| `on-primary` | #101010 | Text on `primary` |
-| `canvas` | #101010 | The only page surface |
-| `canvas-soft` | #1a1a1a | Inputs, paths, code, log |
-| `canvas-text-soft` | #f5f6f7 | Text inside `canvas-soft` code/paths |
-| `ink` | #f2f2f2 | Default text |
-| `ink-strong` | #ffffff | High-emphasis text |
-| `body` | #bdbdbd | Secondary text |
-| `mute` | #8b949e | Captions, fine print |
-| `hairline` | #3d3a39 | 1px edge of every card, button, input, row divider |
-| `divider-dashed` | rgba(79,93,117,.4) | 1px dashed rule between sections |
-
-No error/warning palette: success uses `primary`, missing or removed states use `mute`.
-
-Contrast on `canvas`: `ink` 17:1, `body` 10.1:1, `mute` 6.2:1, `primary` 10.3:1; `on-primary` on `primary` 10.3:1. `hairline` is 1.7:1: an input also needs its placeholder and the `primary-soft` focus ring to read as a control.
+| Role | Token |
+| --- | --- |
+| Surface | `canvas` #101010 · `canvas-soft` #1a1a1a (inputs, paths, menus, panels, essential highlight) |
+| Lines | `hairline` #3d3a39 |
+| Text | `ink` #f2f2f2 · `body` #bdbdbd (paths, secondary) · `mute` #8b949e (labels, skipped) |
+| Accent | `primary` #2bc4d4 · `primary-soft` #6fd8e3 · `on-primary` #101010 |
+| Status | `status-added` #00d992 |
 
 ## Typography
 
-- **Inter** 400/500/600/700; **JetBrains Mono** 400/500. Both bundled as woff2 (`@font-face`), never loaded from the system.
-
-| Style | Spec | Use |
-| --- | --- | --- |
-| `display-lg` | 36/40 400 | Section headlines |
-| `display-md` | 24/32 700 | Detail titles |
-| `display-sm` | 20/28 600 | Card titles |
-| `eyebrow` | 14/20 600, uppercase, 2.52px | Section labels (12/16 for small) |
-| `body-md` | 16/26 400 | Paragraphs |
-| `body-sm` | 14/20 400 | UI text, inputs |
-| `caption` | 12/16 400-500 | Field labels, fine print |
-| `button-md` | 16/24 600 | Button labels |
-| `code` | 13/18 mono | Paths, log, counters, version, filter pills |
+- **Inter** (bundled woff2) for everything; **JetBrains Mono** only for the activity log, version tag and track numbers.
+- Step labels 13/13 600 `ink`; buttons 13/13 600; chips 12/12 500; body 13/18; paths Inter 12/12 `body`; section labels 11px 600 uppercase 2px tracking `body`.
 
 ## Layout
 
-- 4px base. Spacing 2, 4, 8, 12, 16, 20, 24, 32, 40, 48, 64.
-- Window padding 32px; card padding 24px.
-- Buttons and inputs 44px tall (12px padding + 24px line); main footer buttons 48px.
+**Main window** — top bar (logo, name, version, Under construction) · Step 1: Select folders (rows: ★ | role label 120px | path | Browse icon | Show in Explorer icon | ✕; then + Add folder | Remixes | Live recordings | Keeps and Skips | Advanced ▸) · Step 2: Scan selected folders (Scan + progress) · Step 3: Open the map (teal Release Map → | Undo last export) · Activity log fills the rest. The next step's button is the teal one.
 
-## Radius
+**Release Map** — top bar (logo, Release Map, version, Under construction, Search) · toolbar: Step 4: Check the scan result | Changes / Full map / All links | + Added · ↑ Upgraded · ↔ Replaced · ~~Removed~~ · ⊘ Ignored | Re-scan · board · details panel · footer: Step 5: Save results | Copy into/Move into toggle | destination | Browse | Show in Explorer | teal Copy/Move; second row Encode to + format | AudioChecker | Split CUE.
 
-`radius-sm` 6px buttons and inputs · `radius-md` 8px cards and dialogs · `radius-pill` 9999px tags, filter chips, OLD/NEW legend only.
+- **Board:** 2 columns at ≤1280px CSS (Albums | Singles + Compilations stacked), 3 columns at ≥1600px. Group title 13/600 `ink`; folder rows indented 12px below; 12px between groups; 1px lines between rows; square corners.
+- **Release row:** folder name exactly as on disk. Skip = `mute` + line-through; Keep = plain `ink`; Add = `ink` + green `+` at end; Upgrade = green `↑`; Replace = white `↔`. Full path in tooltip.
+- **Details panel** (360px / 520px): release name + ✕; path | Show in Explorer | Ignore; tracks grouped under DISC N headers, numbers restart per disc; Versions N / Remixes N / Live N outlined buttons open an inline list (title · length · Retained/Available/Ignored); grey Remix/Live note; ⋯ menu (Mark Remix/Live, Ignore, To Personal Picks); essential = teal on `canvas-soft`; gem = essential + teal diamond.
 
-## Elevation
+## Scaling
 
-Flat. Every card and button: 1px solid `hairline` on `canvas`. A selected item gets a 1px `primary` border. No shadows, no gradients.
+All sizes are CSS px. MCC applies a WebView2 ZoomFactor so 1 CSS px = 0.2645 mm on every monitor (physical size from WMI/EDID, native resolution, Windows scale), clamped 0.75–2.0, recomputed on monitor/DPI change, multiplied by a user "UI size" (80–150%) in Advanced. Unknown display size → Windows scaling and a log warning. Minimum window 1024×720 CSS px.
 
-## Components
+## Tokens
 
-- **Buttons:** primary (green fill, `on-primary` label), outline (canvas + hairline), ghost (`primary-soft` label, no border). `button-md`, 0 16px, 6px radius.
-- **Segmented control:** hairline frame, 2px inset, 36px segments; active segment `canvas-soft` + `ink-strong`.
-- **Tag / pill:** canvas, hairline, `body-sm`, 4px 12px, pill radius. Live/status dot 6px `primary`.
-- **Card:** canvas, 1px hairline, 24px padding, 8px radius.
-- **Input / path:** `canvas-soft` fill, hairline, 44px, 6px radius; paths in mono.
-- **Checkbox:** 18px, hairline, checked = `primary` fill.
-- **Icons:** inline line SVGs (24px grid, 1.8 stroke, `currentColor`), `body` or `ink`; green only for live/status/active. No emoji.
+Source: `project/tokens.json` of the MCC design system. In the app every token is a CSS variable in `APP_STYLE_CSS` `:root`.
 
-## Release Map change kinds
+| Token | Value |
+| --- | --- |
+| `primary` | #2bc4d4 |
+| `primary-soft` | #6fd8e3 |
+| `primary-deep` | #2bc4d4 |
+| `on-primary` | #101010 |
+| `canvas` | #101010 |
+| `canvas-soft` | #1a1a1a |
+| `canvas-text-soft` | #f5f6f7 |
+| `ink` | #f2f2f2 |
+| `ink-strong` | #ffffff |
+| `body` | #bdbdbd |
+| `mute` | #8b949e |
+| `hairline` | #3d3a39 |
+| `status-added` | #00d992 |
 
-| Kind | Glyph | Color |
+| Type style | Spec |
+| --- | --- |
+| `step-label` | Inter 600 13px/13px |
+| `button-md` | Inter 600 13px/13px |
+| `caption-strong` (chips) | Inter 500 12px/12px |
+| body | Inter 400 13px/18px |
+| path | Inter 400 12px/12px |
+| section label | Inter 600 11px/16px, uppercase, 2px tracking |
+| `code` | JetBrains Mono 400 13px/18px |
+
+| Spacing | Value | Use |
 | --- | --- | --- |
-| Added | + | `primary` |
-| Upgraded | ↑ | `primary-soft` |
-| Replaced | ↔ | `ink` |
-| Removed | − | `mute`, line-through |
-| Ignored | ⊘ | `mute` |
+| `space-xs` | 4px | Control padding, board padding |
+| (primary) | 5px | Primary button padding |
+| `space-sm` | 8px | Bar/panel padding, row gap |
+| `space-md` | 12px | Group gap, row indent |
 
-## Do / Don't
-
-**Do** reserve green for CTAs and live status · keep `canvas` the only surface · build cards with hairlines · pair Inter with mono · 6px buttons, 8px cards, pills only for tags · keep all colors as CSS variables in one shared stylesheet.
-
-**Don't** add a light mode · use green as body text · add shadows or gradients · hardcode colors per widget · use emoji as icons.
+| Radius | Value |
+| --- | --- |
+| `radius-sm` | 6px (buttons, inputs, chips, paths) |

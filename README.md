@@ -1,6 +1,6 @@
 # Music Collection Cleaner (MCC)
 
-**Version: 0.5.141 - Under construction ⚠️**
+**Version: 0.5.142 - Under construction ⚠️**
 
 ## Download and run
 
@@ -34,6 +34,6 @@ When the same songs exist in several versions, MCC prefers the better source, be
 
 ## Safety
 
-Analysis never changes your files. Copy and Move run only when you click them. Use **Copy** first. Move sends originals to the Recycle Bin.
+Scanning never changes your files. Copy and Move run only when you click them. Use **Copy** first. Move sends originals to the Recycle Bin.
 
 [Changelog](CHANGELOG.md) · [Previous versions](version-history/) · [Development notes](CONTINUITY.md)

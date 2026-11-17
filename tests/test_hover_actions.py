@@ -167,8 +167,8 @@ process.stdout.write(JSON.stringify(input.tracks.map(t=>status(t,{kind:'retained
 
     def render_track_rows(self,nodes):
         html=map_html()
-        code=html[html.index('  let tracks="";',html.index('function openDetails(')):
-                  html.index('  let ignoreRelease="";',html.index('function openDetails('))]
+        code=(html[html.index('function discNumbering('):html.index('function openDetails(')]
+              +html[html.index('  const allTracks=n.tracks||[];'):html.index('  let ignoreRelease="";',html.index('function openDetails('))])
         status=html[html.index('function exclusionStatus('):html.index('function closeDetails(')]
         return self.run_js(r'''
 const input=JSON.parse(require('fs').readFileSync(0,'utf8'));
@@ -319,19 +319,18 @@ process.stdout.write(JSON.stringify(evaluate(input.node,()=>({}))));
 const input=JSON.parse(require('fs').readFileSync(0,'utf8'));
 const state=input.state,selectedId=1,current=state.nodes.find(n=>n.id===selectedId);
 let replacementCache=null;
-const essential={textContent:' · 2 essential',hidden:false};
 const reason={textContent:''},releaseRow={dataset:{},querySelector:()=>reason,setAttribute:()=>{},getAttribute:()=>''};
 const rowEls=new Map([['1',releaseRow]]);
 const rows=current.tracks.map(t=>{
   const classes=new Set(['track','unique']);
   const row={dataset:{index:t.index},hasGem:t.isGem,status:{},button:{setAttribute:()=>{}},
     classList:{toggle:(c,on)=>on?classes.add(c):classes.delete(c)},classes};
-  row.querySelector=s=>s==='.status'?row.status:s==='.ignoreTrack'?row.button:
+  row.querySelector=s=>s==='.ignoreTrack'?row.button:
     s==='.trackGem'?(row.hasGem?{remove:()=>row.hasGem=false}:null):
-    s==='.versionsCell'?{insertAdjacentHTML:()=>row.hasGem=true}:null;
+    s==='.dur'?{insertAdjacentHTML:(where,html)=>{if(html.includes('trackGem'))row.hasGem=true;}}:null;
   return row;
 });
-const document={getElementById:id=>id==='essentialCount'?essential:null,querySelectorAll:()=>rows};
+const document={getElementById:()=>null,querySelectorAll:()=>rows};
 const getNode=id=>state.nodes.find(n=>Number(n.id)===Number(id));
 const applyRootPatch=()=>{},receiveState=()=>{throw Error('Unexpected full-state fallback')};
 const changeKind=()=> 'added',replacementMap=()=>({}),paintReanalyzeHighlight=()=>{};
@@ -340,7 +339,7 @@ eval(input.policy+'\n'+input.toggle);
 const results=[];
 for(const p of input.payloads){
   receiveTrackToggle(JSON.stringify(p));
-  results.push({count:current.uniqueCount,hidden:essential.hidden,label:essential.textContent,
+  results.push({count:current.uniqueCount,
     titles:uniqueAddedTitles(current),reason:reason.textContent,gem:current.isGem,
     rows:rows.map(r=>({index:r.dataset.index,highlight:r.classes.has('unique'),gem:r.hasGem}))});
 }
@@ -348,14 +347,12 @@ process.stdout.write(JSON.stringify(results));
 ''',{'state':initial,'payloads':payloads,'policy':policy,'toggle':toggle,'status':status})
         for result,count,titles,gem in zip(results,[1,0,0,1],[['Rare'],[],[],['Rare']],[True,False,False,True]):
             self.assertEqual(result['count'],count)
-            self.assertEqual(result['hidden'],count==0)
-            self.assertEqual(result['label'],str(count)+' essential (highlighted)')
             self.assertEqual(result['titles'],titles)
             self.assertEqual(result['gem'],gem)
             self.assertEqual([r['highlight'] for r in result['rows']],['Song' in titles,'Rare' in titles])
             self.assertEqual([r['gem'] for r in result['rows']],[False,gem])
             if titles:self.assertEqual(result['reason'],'Retained for: '+'; '.join(titles))
-            else:self.assertIn('Re-Analyze',result['reason'])
+            else:self.assertIn('Re-scan',result['reason'])
 
     def test_one_ignore_action_preserves_saved_categories_and_restore(self):
         html = map_html()
