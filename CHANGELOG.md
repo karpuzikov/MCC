@@ -2,6 +2,11 @@
 
 Historical release notes and testing status retained from the original README.
 
+## v0.5.134 - Buttons inside cards (Under construction ⚠️)
+
+- Changed (styling only): secondary and icon buttons inside a card use `surface-elevated`, so Personal Picks, Classify patterns and the folder buttons are visible on the `surface-card` toolbar.
+- Checked on Windows 11/WebView2 by screenshot: Personal Picks, Classify patterns, pending review, Release Map, View menu, Show all links, focus and hover. **Not run:** Copy dialog, Undo last run (they change files).
+
 ## v0.5.133 - Warning icon colour (Under construction ⚠️)
 
 - Changed (styling only): the warning sign in release rows and notices uses the text form (no yellow emoji), so it follows the colour tokens.
