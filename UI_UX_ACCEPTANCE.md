@@ -1,3 +1,10 @@
+## MCC v0.5.131 - Design system audit fixes (2026-11-17)
+
+- Fonts: Inter and JetBrains Mono load from the embedded `@font-face`; no system-font fallback in normal use.
+- Type: every text uses a `--type-*` style; no ad-hoc font-size or font-weight.
+- Sizes: buttons/inputs/selects 40 px, compact 28 px, bars 64 px.
+- v0.5.131 is **Under construction ⚠️**.
+
 ## MCC v0.5.129 - Karpuzikov design system restyle (2026-11-17)
 
 - Styling only: colours, fonts, radii, spacing, focus ring, button/input/card specs from `DESIGN.md`; themes removed. No behaviour or layout changes intended.

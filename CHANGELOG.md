@@ -2,6 +2,12 @@
 
 Historical release notes and testing status retained from the original README.
 
+## v0.5.131 - Design system audit fixes (Under construction ⚠️)
+
+- Changed (styling only): Inter and JetBrains Mono (latin + cyrillic, variable woff2, SIL OFL) are embedded as `@font-face` in `APP_FONT_FACE_CSS`; every text uses a `DESIGN.md` type style from `--type-*` tokens (caption 12/500, body-sm 13/400, body-md 14/400, button 14/600, title-sm 16/600, number-sm 14/500 mono); the 12px/600 text is gone and bold emphasis inside rows was dropped.
+- Changed: buttons, inputs and selects are 40 px (`--control-height`), compact in-row buttons and badges 28 px (`--control-height-compact`), top bar and footer 64 px (`--bar-height`). List rows keep their heights.
+- Checked: both windows rendered in headless Chrome (fonts load, no overflow), `tests/test_design_system.py` extended, all `tests/test_*.py`, ruff pyflakes rules. **Not run:** Windows 11/WebView2.
+
 ## v0.5.130 - Fix "Desktop bridge failed" (Under construction ⚠️)
 
 - Fixed: v0.5.129 failed on start with "Cannot set properties of null (setting 'media')": the main window script still switched the removed theme style elements. Removed that line.
