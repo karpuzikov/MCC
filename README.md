@@ -21,7 +21,7 @@ When the same songs exist in several versions, MCC prefers the better source, be
 
 1. CD: 100% - Log - Cue
 2. CD: 100% - Log
-3. CD: >100% - Log
+3. CD: <100% - Log
 4. WEB/Digital
 
 ## Safety
