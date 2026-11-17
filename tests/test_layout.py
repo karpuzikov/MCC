@@ -61,7 +61,7 @@ def map_fixture():
         nodes.append(dict(
             id=i + 1, name=path.rsplit("\\", 1)[1], title=title, rootKind=root, sourceRoot=path.rsplit("\\", 1)[0],
             path=path, kind=state, action=action, releaseType=kind, sourceMedium="CD", sourceRank=2 if root == "recycle" else 1,
-            includedTracks=len(tracks), uniqueCount=1 if i == 0 else 0, reason="", displayGroupKey=title.lower(),
+            includedTracks=len(tracks), uniqueCount=1 if i == 0 else 0, reason="", displayGroupKey=title.lower(), displayGroupTitle=title,
             tracks=tracks, auditIssues=[], hasCue=i == 0, hasRipLog=i == 0, ripLogPercent=100 if i == 0 else None,
             upgradeFrom=[dict(id=2, name=nodes[0]["name"] if nodes else "", upgradeReason="Better CD rip log", sourceRank=1)] if i == 0 else [],
             forceKeep=False, manualRemoved=False, releaseBlocked=False))
@@ -122,6 +122,63 @@ LAYOUT_PROBE = r"""async () => {
     if (getComputedStyle(el).textOverflow === "ellipsis" && visible(el)) problems.push("ellipsis style: " + (el.id || el.className));
   }
   if (/…|\.\.\./.test(document.body.innerText)) problems.push("ellipsis text");
+  // Text never smaller than 11px; key sizes per the type scale.
+  for (const el of document.querySelectorAll("body *")) {
+    if (!visible(el) || ![...el.childNodes].some(n => n.nodeType === 3 && n.textContent.trim())) continue;
+    const size = parseFloat(getComputedStyle(el).fontSize);
+    if (size < 11) problems.push("text " + size + "px: " + (el.id || el.className || el.tagName));
+  }
+  const expect = [[".appName", 24], ["body", 14], [".changeChip", 11], [".btn", 14], [".stepLabel", 14]];
+  for (const [sel, px] of expect) {
+    const el = document.querySelector(sel);
+    if (el && visible(el) && parseFloat(getComputedStyle(el).fontSize) !== px) problems.push(sel + " is " + getComputedStyle(el).fontSize + ", expected " + px + "px");
+  }
+  // Spacing: neighbours and container edges are 4, 8 or 12 px apart.
+  const ok = v => [4, 8, 12].some(x => Math.abs(v - x) <= 0.5);
+  const name = el => (el.id ? "#" + el.id : el.tagName.toLowerCase() + (typeof el.className === "string" && el.className.trim() ? "." + el.className.trim().split(/\s+/).join(".") : ""));
+  const leaves = [...document.querySelectorAll("button,input,select,summary,label,.stepLabel,.appName,.versionTag,.buildState,.sectionLabel,.releaseColumnHeader,.releaseGroupTitle,.releaseName,.rowMarker,.discHead,#releaseName,#releasePath,.field,.track .titleText,.track .dur,.track .num,.track .note,#progressText,#progressPercent")]
+    .filter(visible).filter(el => !el.closest("#modalBackdrop,.trackActionGroup,#auditBanner") && !(el.parentElement && el.parentElement.closest("button,label,summary")));
+  for (const el of leaves) {
+    const r = el.getBoundingClientRect();
+    const sibs = [...el.parentElement.children].filter(x => x !== el && visible(x) && !x.classList.contains("gap"));
+    const right = sibs.map(x => x.getBoundingClientRect()).filter(b => b.left >= r.right - 0.5 && b.top < r.bottom && r.top < b.bottom);
+    let next = el.nextElementSibling;
+    while (next && !visible(next) && !next.classList.contains("gap")) next = next.nextElementSibling;
+    const spread = getComputedStyle(el.parentElement).justifyContent === "space-between";
+    if (right.length && !spread && !(next && next.classList.contains("gap"))) {
+      const d = Math.min(...right.map(b => b.left - r.right));
+      if (!ok(d)) problems.push("spacing " + d.toFixed(1) + "px to neighbour: " + name(el));
+    }
+    // Walk up to the nearest padded/bordered box; stop early if something sits to the left on the same line.
+    let box = el.parentElement, leftNeighbour = false, level = el, lineEdge = null;
+    while (box && box !== document.body) {
+      // A divider line centred in the gap to the left counts as the container edge.
+      if (getComputedStyle(level, "::before").content !== "none" && getComputedStyle(level, "::before").width === "1px") {
+        lineEdge = level.getBoundingClientRect().left - 4; break;
+      }
+      const rowFlow = /^(flex|inline-flex)$/.test(getComputedStyle(box).display) && getComputedStyle(box).flexDirection === "row";
+      leftNeighbour = [...box.children].some(x => x !== level && visible(x) && (() => {
+        const b = x.getBoundingClientRect();
+        const sameLine = b.right <= r.left + 0.5 && (rowFlow || (b.top < r.bottom && r.top < b.bottom));
+        const alignedAbove = b.bottom <= r.top + 0.5 && Math.abs(b.left - r.left) <= 0.5;  // stacked under an aligned sibling
+        return sameLine || alignedAbove; })());
+      const cs = getComputedStyle(box);
+      if (leftNeighbour || parseFloat(cs.paddingLeft) || parseFloat(cs.borderLeftWidth) || parseFloat(cs.marginLeft) || box.matches(".releaseRows,#mainContent")) break;
+      level = box; box = box.parentElement;
+    }
+    if (!leftNeighbour) {
+      let edge = 0;
+      if (lineEdge !== null) edge = lineEdge;
+      else if (box && box !== document.body) {
+        const cs = getComputedStyle(box);
+        // An indent made with margin counts from where the margin starts.
+        edge = box.getBoundingClientRect().left + (parseFloat(cs.borderLeftWidth) || 0)
+          - (parseFloat(cs.paddingLeft) || parseFloat(cs.borderLeftWidth) ? 0 : parseFloat(cs.marginLeft) || 0);
+      }
+      const d = r.left - edge;
+      if (!ok(d)) problems.push("spacing " + d.toFixed(1) + "px to container edge: " + name(el) + " in " + (box && box !== document.body ? name(box) : "window"));
+    }
+  }
   return [...new Set(problems)];
 }"""
 

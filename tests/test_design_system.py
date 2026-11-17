@@ -50,9 +50,24 @@ class DesignSystemTests(unittest.TestCase):
         self.assertEqual(dict(re.findall(r"--type-([a-z-]+):(\d{3} \d+px/\d+px)", root)), scale)
         self.assertEqual(set(re.findall(r"var\(--type-([a-z-]+)\)", css)), set(scale))
 
+    def test_spacing_uses_only_space_1_2_3(self):
+        self.assertIn("--space-1:4px; --space-2:8px; --space-3:12px;", mcc.APP_STYLE_CSS)
+        bad = []
+        for selector, declarations in re.findall(r"([^{}]+)\{([^}]*)\}", _stylesheet_without_tokens()):
+            for declaration in re.findall(r"(?:margin|padding|gap|row-gap|column-gap)[-a-z]*:[^;]+", declarations):
+                value = declaration.split(":", 1)[1]
+                if selector.strip() == ".btn.primary" and value.strip() == "var(--pad-primary)":
+                    continue  # primary buttons: 5px, per DESIGN.md
+                leftover = re.sub(r"var\(--space-[123]\)|var\(--icon-size\)|calc|\b0\b|auto|[\d.]+(?![\d.]*px)|[-*+() ]", "", value)
+                if leftover:
+                    bad.append((selector.strip()[-40:], declaration))
+        for html in PAGES:
+            bad += re.findall(r"(?:margin|padding|gap)[-a-z]*:\s*\d+px", html[html.index("</style>"):])
+        self.assertEqual(bad, [])
+
     def test_equal_padding_and_no_fixed_control_heights(self):
-        for selector, pad in ((".btn", "var(--pad-control)"), (".changeChip", "var(--pad-control)"),
-                              (".field,select", "var(--pad-control)")):
+        for selector, pad in ((".btn", "var(--space-1)"), (".changeChip", "var(--space-1)"),
+                              (".field,select", "var(--space-1)")):
             rule = _rule(selector)
             self.assertIn("padding:%s;" % pad, rule)
             self.assertNotRegex(rule, r"(?<![-\w])height:")

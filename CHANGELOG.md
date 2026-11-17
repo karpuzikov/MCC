@@ -2,6 +2,18 @@
 
 Historical release notes and testing status retained from the original README.
 
+## v0.5.145 - Scaling fix, spacing pass (Under construction ⚠️)
+
+- Fixed: display sizes implying under 80 or over 350 PPI (TVs report e.g. 160 cm) are rejected; the window then uses ZoomFactor 1.0 x UI size and logs "Display size unknown, using Windows scaling". Before, such a size hit the 0.75 clamp.
+- Added: each window logs its monitor, physical width and source (WMI/EDID/override), pixel width, Windows scale, mm per CSS px and ZoomFactor to the activity log.
+- Added: "Display size (inches)" in Advanced (empty = auto) overrides WMI/EDID.
+- Changed: Release Map and Undo last export stay enabled while the map is open (Release Map brings it to front); Re-scan is a normal button; chips with 0 stay readable.
+- Removed: CD/CUE/LOG row and Group dropdown in the Release Map details.
+- Changed: spacing uses only --space-1/2/3 (4/8/12 px); divider lines sit centred in the 8px gap; folder labels size to the longest label; board column padding 8px each side; rows indented 12px.
+- Added: layout test checks text >= 11px, title 24px, body 14px, chips 11px, and 4/8/12px distances to neighbours and container edges.
+- shortcut: manual album-group moves made with the removed Group dropdown stay in place; no UI to reset them.
+- Checked: all `tests/test_*.py`; side-by-side with the 1920x1080 mockup board. **Not run:** Windows 11/WebView2 (zoom, WMI/EDID).
+
 ## v0.5.144 - MCC type scale (Under construction ⚠️)
 
 - Changed: one type scale for both windows (`page-title` 24, `card-title` 16, `step-label`/`tab`/`button` 14, `body` 14/20, `row-title` 14/18, `mono-body` 14/18, `secondary` 12/16, `table-header` 12 caps, `mono-small` 12, `chip` 11); no other font sizes; buttons, chips and fields have line-height = font-size.
