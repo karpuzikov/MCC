@@ -30,6 +30,10 @@ class DesignSystemTests(unittest.TestCase):
             self.assertEqual(html.count("<style"), 1)
             self.assertIn("--canvas:#0B0E11", html)
 
+    def test_scripts_do_not_reference_the_removed_theme_styles(self):
+        for html in (mcc._webview_main_html(), mcc._webview_release_map_html()):
+            self.assertNotRegex(html, r'neonTheme|sbTheme|"Theme"\)|uiTheme|setTheme')
+
     def test_font_families_come_from_tokens(self):
         self.assertNotRegex(_stylesheet_without_tokens(), r"font-family:(?!var\()")
 

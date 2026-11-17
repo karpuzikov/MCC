@@ -2,6 +2,11 @@
 
 Historical release notes and testing status retained from the original README.
 
+## v0.5.130 - Fix "Desktop bridge failed" (Under construction ⚠️)
+
+- Fixed: v0.5.129 failed on start with "Cannot set properties of null (setting 'media')": the main window script still switched the removed theme style elements. Removed that line.
+- Checked: `renderState` run with a sample state in headless Chrome without page errors; all `tests/test_*.py`, ruff pyflakes rules. **Not run:** Windows 11/WebView2.
+
 ## v0.5.129 - Karpuzikov design system (Under construction ⚠️)
 
 - Changed (styling only): both windows and all dialogs use one shared stylesheet (`APP_STYLE_CSS`) built from `DESIGN.md`: exact colour tokens in `:root` (dark only), Inter / JetBrains Mono stacks, radius tokens, 4px-snapped spacing, type scale 12/13/14/16/20/24, flat surfaces (`canvas` > `surface-card` > `surface-elevated`), focus ring `0 0 0 2px rgba(59,130,246,.5)` on every focusable control. No colour literals outside `:root`; no gradients, glows or shadows other than the focus ring.
