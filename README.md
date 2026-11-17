@@ -13,9 +13,13 @@ Needs Windows 11 and Python 3.
 
 ## What it does
 
-Music collections fill up with the same songs on deluxe editions, singles, remasters and compilations.
+**Main idea:** keep each unique song while keeping the total file count as low as possible.
 
-MCC finds them and keeps the smallest set of releases that still has every song you want. Songs are matched by how they sound, not by their names. You see its choices on a map, and you decide what to copy or move.
+- Keeps the best edition of each album
+- Preserves unique songs
+- Keeps the total file count as low as possible
+- Preserving remixes and live versions is an option
+- You can manually pick which songs to keep
 
 When the same songs exist in several versions, MCC prefers the better source, best first:
 
