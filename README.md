@@ -1,6 +1,6 @@
 # Music Collection Cleaner (MCC)
 
-**Version: 0.5.135 - Under construction ⚠️**
+**Version: 0.5.136 - Under construction ⚠️**
 
 ## Download and run
 
@@ -23,7 +23,7 @@ winget install -e --id Python.Python.3.12 && winget install -e --id Microsoft.Ed
 - Preserving remixes and live versions is an option
 - You can manually pick which songs to keep
 - Star a folder (**Mark as main folder**) to keep it as the base; other folders are compared against it
-- Copy and Move also name folders by MusicBrainz, tag, encode to ALAC or FLAC, split CUE images and write AudioChecker logs
+- Copy and Move also name folders by MusicBrainz, tag, encode to ALAC or FLAC, split CUE images and write AudioChecker logs (options: Encode, Format, AudioChecker, Split CUE are in the Release Map)
 
 When the same songs exist in several versions, MCC prefers the better source, best first:
 

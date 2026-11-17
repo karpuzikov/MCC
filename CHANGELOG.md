@@ -2,6 +2,11 @@
 
 Historical release notes and testing status retained from the original README.
 
+## v0.5.136 - Copy options only in the Release Map (Under construction ⚠️)
+
+- Changed: Encode audio, Format, AudioChecker and Split CUE are removed from the main window (they belong to Copy/Move, which starts in the Release Map). The saved options and the Release Map switches are unchanged; the main window no longer reads or writes them.
+- Checked: main page renders without script errors, computed-style audit 0 violations, all `tests/test_*.py`, ruff. **Not run:** Windows 11/WebView2.
+
 ## v0.5.135 - Logging next to Close (Under construction ⚠️)
 
 - Changed (layout): the Logging switch and its logs-folder button moved from the options card to the footer, next to Close. Behaviour unchanged.
