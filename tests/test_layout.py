@@ -156,7 +156,7 @@ LAYOUT_PROBE = r"""async () => {
     const row = el.closest(".releaseRow"), name = row.querySelector(".releaseName");
     if (Math.abs(el.getBoundingClientRect().right - row.getBoundingClientRect().right) > 0.5) problems.push("row markers are not right-aligned");
     const sym = row.querySelector(".rowMarker");
-    if (sym && sym.getBoundingClientRect().right > name.getBoundingClientRect().left + 0.5) problems.push("status symbol sits inside the name");
+    if (sym) { const ink = sym.getBoundingClientRect(); if (ink.right > name.getBoundingClientRect().left - 1.5) problems.push("status symbol touches the name"); }
   }
   const xs = new Set([...document.querySelectorAll(".releaseRow .releaseName")].filter(visible).map(e => Math.round(e.getBoundingClientRect().left * 2) / 2));
   if (document.getElementById("columns") && xs.size > 3) problems.push("folder names start at " + xs.size + " different x positions");
@@ -268,6 +268,25 @@ class LayoutTests(unittest.TestCase):
                     page.click('.releaseRow[data-id="1"]')
                     page.wait_for_selector("#details.open")
                     self._check(page, errors, "map-full", size)
+            browser.close()
+
+    def test_unscanned_map_offers_rescan_and_main_window_labels(self):
+        map_init = ("window.__fixture=" + json.dumps(dict(map_fixture(), editable=False), ensure_ascii=False) + ";window.__calls=[];window.pywebview={api:{"
+                    "getState:()=>JSON.stringify(window.__fixture),requestScan:()=>window.__calls.push('scan'),"
+                    "getOrganizer:()=>JSON.stringify({format:'ALAC',enable_encoding:true,enable_checker:true,enable_splitting:false})}};")
+        with sync_playwright() as p:
+            browser = p.chromium.launch(executable_path=CHROME, args=["--no-sandbox"])
+            page, errors = self._open(browser, VIEWPORTS[0], self.map_html, map_init)
+            page.wait_for_selector(".releaseRow")
+            self.assertFalse(page.is_disabled("#reanalyzeBtn"))
+            self.assertTrue(page.is_visible("#scanNote"))
+            page.click("#reanalyzeBtn")
+            self.assertEqual(page.evaluate("window.__calls"), ["scan"])
+            page, errors = self._open(browser, VIEWPORTS[0], self.main_html)
+            page.evaluate("s=>renderState(s)", dict(MAIN_STATE, mapOpen=True, showActivity=False))
+            self.assertEqual(page.eval_on_selector_all(".roleLabel", "e=>e.map(x=>x.textContent)")[1:], ["Folder 2", "Folder 3"])
+            self.assertFalse(page.is_disabled("#openLogs"))
+            self.assertFalse(page.is_visible("#activity"))
             browser.close()
 
 

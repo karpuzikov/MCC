@@ -45,7 +45,8 @@ class DesignSystemTests(unittest.TestCase):
         scale = {"page-title": "700 24px/24px", "card-title": "600 16px/16px", "step-label": "600 14px/18px",
                  "tab": "600 14px/14px", "button": "600 14px/14px", "body": "400 14px/18px", "row-title": "600 14px/18px",
                  "mono-body": "400 14px/18px", "secondary": "400 12px/16px", "table-header": "600 12px/12px",
-                 "mono-small": "400 12px/12px", "chip": "500 11px/8px", "marker": "500 10px/10px"}
+                 "mono-small": "400 12px/12px", "chip": "500 11px/8px", "marker": "500 10px/10px",
+                 "status-symbol": "500 11px/18px", "mono-log": "400 12px/16px"}
         root = mcc.APP_STYLE_CSS[: mcc.APP_STYLE_CSS.index("}", mcc.APP_STYLE_CSS.index(":root"))]
         self.assertEqual(dict(re.findall(r"--type-([a-z-]+):(\d{3} \d+px/\d+px)", root)), scale)
         self.assertEqual(set(re.findall(r"var\(--type-([a-z-]+)\)", css)), set(scale))

@@ -2,6 +2,15 @@
 
 Historical release notes and testing status retained from the original README.
 
+## v0.5.154 - UI fixes (Under construction ⚠️)
+
+- Fixed: the ignored-release icon no longer touches the folder name.
+- Fixed: release path is 12px; "Move to group" button has no empty space and a readable dark list.
+- Changed: Activity log is 12px and can be hidden (Advanced > Activity log).
+- Changed: source rows are "Folder 1", "Folder 2", ...; warning triangles inside the app are yellow.
+- Fixed: the logs and Show in Explorer buttons work while the Release Map is open.
+- Added: Re-scan in the Release Map runs Scan when nothing was scanned this session, with a note explaining why Copy/Move is hidden.
+
 ## v0.5.153 - Cover art switch (Under construction ⚠️)
 
 - Changed: the MusicBrainz checkbox is labelled "Get data from MusicBrainz".
