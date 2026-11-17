@@ -2,6 +2,13 @@
 
 Historical release notes and testing status retained from the original README.
 
+## v0.5.128 - Unified main window and Release Map
+
+- Changed: toggle switches and select styles moved to the shared theme CSS; the Release Map footer uses the same switches as the main window instead of native checkboxes.
+- Changed: the same 1px `--line` divider above the footer/export bar and below the top bar in both windows.
+- Changed: Classic theme Copy button uses the primary style, Move the default button style (Neon Arcade and SB 2026 keep their own colours); destination path text is 13 px like the main window's path fields.
+- Checked: all `tests/test_*.py`, ruff pyflakes rules; both windows rendered in headless Chrome. **Not run:** Windows 11/WebView2; Neon Arcade and SB 2026 layers.
+
 ## v0.5.127 - Format next to Encode
 
 - Changed: the Format picker sits right after "Encode audio to" in the main window and Release Map footer, and is disabled while Encode audio is off (it only applies to encoding).
