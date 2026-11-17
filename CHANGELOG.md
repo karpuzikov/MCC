@@ -2,6 +2,15 @@
 
 Historical release notes and testing status retained from the original README.
 
+## v0.5.141 - VoltAgent restyle (Under construction ⚠️)
+
+- Changed: both windows restyled to the VoltAgent design system (DESIGN.md replaced): #101010 canvas, #00d992 accent, hairline-bordered cards, Inter + JetBrains Mono, 44px controls (48px main footer), 6/8px radii, 32px window and 24px card padding, dashed section dividers.
+- Changed: main window has a title bar (name, version, Under construction), "Sources" and "Activity" eyebrows, a Live pill while running; "+ Add folder" sits with the options; Browse is a text button.
+- Changed: Release Map view switch is one segmented control on its own row with filter pills, OLD/NEW legend and track counts; columns hold one hairline card per release; change kinds + ↑ ↔ − ⊘ with the new colors (Removed struck through).
+- Changed: all emoji icons replaced by inline line SVGs (`MCC_ICON_SVG`); icon masks removed.
+- Styling only: no behavior changes.
+- Checked: both windows and the Keeps and Skips dialog rendered in headless Chrome at 1280/1440 px, all `tests/test_*.py` (design-system tests updated to the new tokens). **Not run:** Windows 11/WebView2.
+
 ## v0.5.140 - Tighter padding (Under construction ⚠️)
 
 - Changed: Release Map padding around the window, title bar, columns and Copy/Move bar cut to 8 px; gap between release cards 4 px. Main window not changed.

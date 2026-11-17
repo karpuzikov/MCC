@@ -1,5 +1,9 @@
 # Music Collection Cleaner - Continuity Handoff
 
+## Checkpoint 2026-11-17 - MCC v0.5.141 - Under construction ⚠️
+
+DESIGN.md is now VoltAgent. `:root` holds the VoltAgent tokens plus aliases for the old names (`--surface-card`, `--accent`, `--negative`, ...), so older rules keep working. Icons: `MCC_ICON_SVG` + `{{icon:name}}` placeholders, `{{app:version}}`, both replaced in `_apply_app_theme`. `#changeBar` is again its own row (`.segmented` view switch). `body.running` shows the Live pill.
+
 ## Checkpoint 2026-11-17 - MCC v0.5.140 - Under construction ⚠️
 
 Release Map padding reduced to 8px (`#toolbar`, `#columns`, `.releaseColumn`, `#exportBar`); release card gap 4px. Main window padding not yet reviewed.

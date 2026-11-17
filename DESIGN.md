@@ -1,116 +1,97 @@
-# DESIGN.md — Karpuzikov design system
+# DESIGN.md - VoltAgent
 
-Default design system for every `karpuzikov` repository. Referenced by `UI_UX_RULES.md`. Live reference: https://claude.ai/artifact/2i6RNr257RAQenkYu1vvbm
+A developer-focused look: one near-black canvas, one electric-green accent, hairline-bordered cards, Inter paired with a mono face.
 
-Dark-first, flat, data-dense UI for tools and dashboards: one loud lime for actions, calm greys for everything else, numbers in a mono face.
+> Source: an inspired interpretation of VoltAgent's design language from [awesome-design-md](https://github.com/VoltAgent/awesome-design-md/tree/main/design-md/voltagent). Not an official VoltAgent asset; no logo files are included.
 
-Adapted from a public exchange-style DESIGN.md (VoltAgent/awesome-design-md). Brand color, brand fonts and product names were replaced; layout rules, spacing, type scale, radii, component patterns and principles are kept as-is.
+## Key characteristics
 
-## Principles
+- **One accent.** `primary` (#00d992) carries every CTA, status pill, live indicator. No second accent.
+- **One surface.** `canvas` (#101010) is the only page background. Dark only, no light mode.
+- **Hairlines are elevation.** Cards, buttons and inputs get 1px solid `hairline` (#3d3a39). No fills, no shadows.
+- **One ornament.** A 1px dashed `divider-dashed` rule between sections.
+- **Two faces.** Inter for text; JetBrains Mono (SF Mono substitute) for anything you could type at a terminal: paths, logs, counters, versions.
+- **Tight corners.** 6px buttons and inputs, 8px cards, pills only for tags.
 
-- **Dark first.** Default theme is Dark. Light exists for docs and print.
-- **Flat.** No shadows except the focus ring. Separate areas by color blocks: `canvas` → `surface-card` → `surface-elevated`.
-- **One accent job.** `primary` is reserved for primary CTAs and display headlines. Never decoration, borders or icons.
-- **Dark text on primary.** Anything on `primary` uses `on-primary`.
-- **Value colors are semantics.** `positive` / `negative` mean up/down, success/failure, add/remove — nothing else.
-- **Display weight stays 700** (`hero-display`, `display-lg`).
-- **No gradients, no glows.**
-- **Numbers in mono.** Counts, sizes, durations, versions use the `numeric` family with tabular figures.
-- **Don't waste space.** No empty bars or rows: merge rows and put controls side by side. Separate items in a list (releases) with their own card.
+## Content
 
-## Color
+- Sentence case everywhere. Uppercase only in eyebrows (Inter 600, 2.52px tracking).
+- Numbers render in mono.
 
-| token | dark | light | use |
-| --- | --- | --- | --- |
-| primary | `#C6F432` | `#C6F432` | Primary CTA fill, display headlines (dark). Light: fill only, never text |
-| primary-active | `#A9D61C` | `#A9D61C` | Hover/pressed primary |
-| primary-disabled | `#2F3A14` | `#E4F2B8` | Disabled primary |
-| on-primary | `#181A20` | `#181A20` | Text/icons on primary |
-| accent | `#2DBDB6` | `#1F8F8A` | One featured module per screen; never a CTA |
-| canvas | `#0B0E11` | `#FFFFFF` | Window/page background |
-| surface-card | `#1E2329` | `#FAFAFA` | Cards, panels, table cards, secondary buttons (dark), footer (light) |
-| surface-elevated | `#2B3139` | `#F5F5F5` | Inputs, hover rows, raised panels |
-| text | `#FFFFFF` | `#181A20` | Headings, high-emphasis text |
-| body | `#EAECEF` | `#181A20` | Body text |
-| muted | `#848E9C` | `#707A8A` | Secondary labels, captions, table headers |
-| muted-strong | `#929AA5` | `#5E6673` | Nav links, meta text |
-| hairline | `#2B3139` | `#EAECEF` | 1px dividers, row lines |
-| border-strong | `#474D57` | `#CDD1D6` | Input borders, strong outlines |
-| positive | `#0ECB81` | `#0ECB81` | Up / success / add |
-| negative | `#F6465D` | `#F6465D` | Down / error / remove |
-| info | `#3B82F6` | `#3B82F6` | Links, info, focus ring |
+## Colors
+
+| Token | Value | Use |
+| --- | --- | --- |
+| `primary` | #00d992 | Primary CTAs, live dot, progress fill, NEW, selected border |
+| `primary-soft` | #2fd6a1 | Ghost-button labels, focus ring (2px) |
+| `primary-deep` | #10b981 | Inline links |
+| `on-primary` | #101010 | Text on `primary` |
+| `canvas` | #101010 | The only page surface |
+| `canvas-soft` | #1a1a1a | Inputs, paths, code, log |
+| `canvas-text-soft` | #f5f6f7 | Text inside `canvas-soft` code/paths |
+| `ink` | #f2f2f2 | Default text |
+| `ink-strong` | #ffffff | High-emphasis text |
+| `body` | #bdbdbd | Secondary text |
+| `mute` | #8b949e | Captions, fine print |
+| `hairline` | #3d3a39 | 1px edge of every card, button, input, row divider |
+| `divider-dashed` | rgba(79,93,117,.4) | 1px dashed rule between sections |
+
+No error/warning palette: success uses `primary`, missing or removed states use `mute`.
+
+Contrast on `canvas`: `ink` 17:1, `body` 10.1:1, `mute` 6.2:1, `primary` 10.3:1; `on-primary` on `primary` 10.3:1. `hairline` is 1.7:1: an input also needs its placeholder and the `primary-soft` focus ring to read as a control.
 
 ## Typography
 
-Text: **Inter** (fallback `-apple-system, "Segoe UI", Roboto, sans-serif`). Numbers: **JetBrains Mono** (fallback `ui-monospace, Consolas, monospace`).
+- **Inter** 400/500/600/700; **JetBrains Mono** 400/500. Both bundled as woff2 (`@font-face`), never loaded from the system.
 
-| style | size | weight | line-height | tracking | family |
-| --- | --- | --- | --- | --- | --- |
-| hero-display | 64px | 700 | 1.1 | -1px | sans |
-| display-lg | 48px | 700 | 1.1 | -0.5px | sans |
-| display-md | 40px | 600 | 1.15 | -0.3px | sans |
-| display-sm | 32px | 600 | 1.2 | 0 | sans |
-| title-lg | 24px | 600 | 1.3 | 0 | sans |
-| title-md | 20px | 600 | 1.35 | 0 | sans |
-| title-sm | 16px | 600 | 1.4 | 0 | sans |
-| number-display | 40px | 700 | 1.1 | -0.3px | numeric |
-| number-md | 16px | 500 | 1.4 | 0 | numeric |
-| number-sm | 14px | 500 | 1.4 | 0 | numeric |
-| body-md | 14px | 400 | 1.5 | 0 | sans |
-| body-sm | 13px | 400 | 1.5 | 0 | sans |
-| caption | 12px | 500 | 1.4 | 0 | sans |
-| button | 14px | 600 | 1 | 0 | sans |
-| nav-link | 14px | 500 | 1.4 | 0 | sans |
+| Style | Spec | Use |
+| --- | --- | --- |
+| `display-lg` | 36/40 400 | Section headlines |
+| `display-md` | 24/32 700 | Detail titles |
+| `display-sm` | 20/28 600 | Card titles |
+| `eyebrow` | 14/20 600, uppercase, 2.52px | Section labels (12/16 for small) |
+| `body-md` | 16/26 400 | Paragraphs |
+| `body-sm` | 14/20 400 | UI text, inputs |
+| `caption` | 12/16 400-500 | Field labels, fine print |
+| `button-md` | 16/24 600 | Button labels |
+| `code` | 13/18 mono | Paths, log, counters, version, filter pills |
 
-## Spacing (4px base)
+## Layout
 
-`xxs` 4 · `xs` 8 · `sm` 12 · `md` 16 · `lg` 24 · `xl` 32 · `xxl` 48 · `section` 80 (px)
+- 4px base. Spacing 2, 4, 8, 12, 16, 20, 24, 32, 40, 48, 64.
+- Window padding 32px; card padding 24px.
+- Buttons and inputs 44px tall (12px padding + 24px line); main footer buttons 48px.
 
 ## Radius
 
-`xs` 2 · `sm` 4 · `md` 6 · `lg` 8 · `xl` 12 · `pill` 9999 (px)
+`radius-sm` 6px buttons and inputs · `radius-md` 8px cards and dialogs · `radius-pill` 9999px tags, filter chips, OLD/NEW legend only.
 
 ## Elevation
 
-Flat. Only shadow: focus ring `0 0 0 2px rgba(59,130,246,0.5)` on every focusable control.
+Flat. Every card and button: 1px solid `hairline` on `canvas`. A selected item gets a 1px `primary` border. No shadows, no gradients.
 
 ## Components
 
-| component | spec |
-| --- | --- |
-| button-primary | `primary` fill, `on-primary` text, padding 12×24, height 40, radius md, `button` style |
-| button-primary-pill | same colors, padding 14×32, radius pill |
-| button-secondary (dark) | `surface-card` fill, `text` color, radius md |
-| button-secondary (light) | `canvas` fill, 1px `hairline` border, `text` color |
-| button-positive / button-negative | solid `positive` / `negative`, radius sm, padding 8×20 |
-| button-compact | `primary`, height 28 |
-| top-nav / toolbar | height 64, `nav-link` style |
-| table-card | `surface-card`, radius xl, padding 24 |
-| search-input (dark) | `surface-elevated`, radius lg, height 40 |
-| text-input (light) | `canvas`, 1px `border-strong`, radius md, height 40 |
-| badge | radius lg, height 40 |
-| footer | `surface-card`, 64px vertical padding |
+- **Buttons:** primary (green fill, `on-primary` label), outline (canvas + hairline), ghost (`primary-soft` label, no border). `button-md`, 0 16px, 6px radius.
+- **Segmented control:** hairline frame, 2px inset, 36px segments; active segment `canvas-soft` + `ink-strong`.
+- **Tag / pill:** canvas, hairline, `body-sm`, 4px 12px, pill radius. Live/status dot 6px `primary`.
+- **Card:** canvas, 1px hairline, 24px padding, 8px radius.
+- **Input / path:** `canvas-soft` fill, hairline, 44px, 6px radius; paths in mono.
+- **Checkbox:** 18px, hairline, checked = `primary` fill.
+- **Icons:** inline line SVGs (24px grid, 1.8 stroke, `currentColor`), `body` or `ink`; green only for live/status/active. No emoji.
 
-## Breakpoints
+## Release Map change kinds
 
-mobile < 768 · tablet 768–1024 · desktop 1024–1440 · wide > 1440.
+| Kind | Glyph | Color |
+| --- | --- | --- |
+| Added | + | `primary` |
+| Upgraded | ↑ | `primary-soft` |
+| Replaced | ↔ | `ink` |
+| Removed | − | `mute`, line-through |
+| Ignored | ⊘ | `mute` |
 
-## Iconography
+## Do / Don't
 
-No logo yet: plain type for names. Icons: line icons, 1.5px stroke, `currentColor`, 16/20/24px.
+**Do** reserve green for CTAs and live status · keep `canvas` the only surface · build cards with hairlines · pair Inter with mono · 6px buttons, 8px cards, pills only for tags · keep all colors as CSS variables in one shared stylesheet.
 
-## CSS variables (drop-in)
-
-```css
-:root{--primary:#C6F432;--primary-active:#A9D61C;--primary-disabled:#2F3A14;--on-primary:#181A20;--accent:#2DBDB6;
---canvas:#0B0E11;--surface-card:#1E2329;--surface-elevated:#2B3139;--text:#FFFFFF;--body:#EAECEF;--muted:#848E9C;
---muted-strong:#929AA5;--hairline:#2B3139;--border-strong:#474D57;--positive:#0ECB81;--negative:#F6465D;--info:#3B82F6;
---font-sans:Inter,-apple-system,"Segoe UI",Roboto,sans-serif;--font-numeric:"JetBrains Mono",ui-monospace,Consolas,monospace;
---radius-xs:2px;--radius-sm:4px;--radius-md:6px;--radius-lg:8px;--radius-xl:12px;--radius-pill:9999px;
---focus-ring:0 0 0 2px rgba(59,130,246,.5)}
-```
-
-## Accessibility notes
-
-- `muted` on dark lifted from source `#707A8A` to `#848E9C` for 4.5:1 on `canvas`.
-- `primary` on white fails as text — fill only in Light.
+**Don't** add a light mode · use green as body text · add shadows or gradients · hardcode colors per widget · use emoji as icons.
