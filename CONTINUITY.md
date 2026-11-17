@@ -1,5 +1,9 @@
 # Music Collection Cleaner - Continuity Handoff
 
+## Checkpoint 2026-11-17 - MCC v0.5.126
+
+Organizer options also in the Release Map footer. Not run: Windows 11/WebView2.
+
 ## Checkpoint 2026-11-17 - MCC v0.5.125
 
 Star tooltip renamed to "Mark as main folder". Not run: Windows 11/WebView2.

@@ -2,6 +2,12 @@
 
 Historical release notes and testing status retained from the original README.
 
+## v0.5.126 - Options in the Release Map
+
+- Added: Encode audio, AudioChecker, Split CUE and Format controls in the Release Map footer (same saved settings as the main window); bridge methods `getOrganizer`/`setOrganizerOption`.
+- Changed: the Move confirmation text and tooltip describe the Recycle Bin behaviour.
+- Checked: all `tests/test_*.py`, ruff pyflakes rules; footer rendered in headless Chrome (callback stubbed, so initial checkbox state not shown). **Not run:** Windows 11/WebView2.
+
 ## v0.5.125 - Main folder
 
 - Changed: the star tooltip "Mark as existing discography" is now "Mark as main folder".
