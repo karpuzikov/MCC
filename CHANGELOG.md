@@ -2,6 +2,11 @@
 
 Historical release notes and testing status retained from the original README.
 
+## v0.5.123 - Out of construction
+
+- Changed: removed the "Under construction ⚠️" label from the Release Map and main window titles, the README and the release title. No other code changes.
+- Checked: all `tests/test_*.py`, ruff pyflakes rules. **Not run:** Windows 11/WebView2.
+
 ## v0.5.122 - ANSI rip logs are scored (Under construction ⚠️)
 
 - Fixed: "LOG not scored" for EAC logs saved in a Windows code page instead of UTF-16/UTF-8. hey-bro-check-log guesses the encoding with chardet (confidence 0.62 on such a log, below its 0.7 cut-off), falls back to UTF-8 and answers "Could not decode log file". `score_rip_log_file` now retries from a UTF-8 copy decoded as Windows-1252, Windows-1251, then Latin-1, and keeps the first recognised result.

@@ -1,5 +1,9 @@
 # Music Collection Cleaner - Continuity Handoff
 
+## Checkpoint 2026-11-17 - MCC v0.5.123
+
+Window titles no longer say "Under construction ⚠️"; release titles drop the suffix from v0.5.123 on. Not run: Windows 11/WebView2.
+
 ## Checkpoint 2026-11-17 - MCC v0.5.122 - Under construction ⚠️
 
 `score_rip_log_file` (above `score_cd_rip_logs`) wraps the pinned scorer and retries from a UTF-8 BOM copy decoded as cp1252, cp1251, latin-1 when it answers "Could not decode log file". Not run: Windows 11/WebView2.
