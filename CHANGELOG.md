@@ -2,6 +2,14 @@
 
 Historical release notes and testing status retained from the original README.
 
+## v0.5.146 - Markers restored, button fixes (Under construction ⚠️)
+
+- Restored: CD/WEB, CUE, LOG, LOG %, ✓ markers on every release row (right side, before the status marker) and under the details title; plain 11px #8b949e text, 4px apart.
+- Restored: Group control in the release details (existing feature), as an outlined text button.
+- Changed: Scan and Release Map are both the teal primary button at full opacity; only disabled buttons dim.
+- Added: layout test checks Scan/Release Map style, Re-scan/Undo colour, marker style and Group outline.
+- shortcut: 15.6" 4K @250% gives ZoomFactor 1.18 (345 mm panel), not 0.94; test asserts 1.18.
+
 ## v0.5.145 - Scaling fix, spacing pass (Under construction ⚠️)
 
 - Fixed: display sizes implying under 80 or over 350 PPI (TVs report e.g. 160 cm) are rejected; the window then uses ZoomFactor 1.0 x UI size and logs "Display size unknown, using Windows scaling". Before, such a size hit the 0.75 clamp.

@@ -133,6 +133,26 @@ LAYOUT_PROBE = r"""async () => {
     const el = document.querySelector(sel);
     if (el && visible(el) && parseFloat(getComputedStyle(el).fontSize) !== px) problems.push(sel + " is " + getComputedStyle(el).fontSize + ", expected " + px + "px");
   }
+  for (const id of ["analyzeBtn", "mapBtn"]) {
+    const el = document.getElementById(id);
+    if (el && visible(el) && !el.disabled) {
+      const cs = getComputedStyle(el);
+      if (cs.backgroundColor !== "rgb(43, 196, 212)" || cs.color !== "rgb(16, 16, 16)" || cs.opacity !== "1" || cs.paddingTop !== "5px" || cs.borderTopWidth !== "0px" && cs.borderTopColor !== "rgb(43, 196, 212)") problems.push("#" + id + " is not the teal primary button");
+    }
+  }
+  for (const id of ["reanalyzeBtn", "undoBtn"]) {
+    const el = document.getElementById(id);
+    if (el && visible(el) && !el.disabled && (getComputedStyle(el).color !== "rgb(242, 242, 242)" || getComputedStyle(el).opacity !== "1")) problems.push("#" + id + " is dimmed or not #f2f2f2");
+  }
+  for (const el of document.querySelectorAll(".releaseFacts")) {
+    if (!visible(el)) continue;
+    const cs = getComputedStyle(el);
+    if (parseFloat(cs.fontSize) !== 11 || cs.color !== "rgb(139, 148, 158)" || cs.backgroundColor !== "rgba(0, 0, 0, 0)" || cs.borderTopWidth !== "0px") problems.push("source markers not plain 11px #8b949e");
+  }
+  const selectGroup = document.getElementById("albumGroupSelect");
+  if (selectGroup && visible(selectGroup) && getComputedStyle(selectGroup).borderTopWidth !== "1px") problems.push("Group control is not outlined");
+  const secondary = document.querySelector(".track .dur,.track .note");
+  if (secondary && visible(secondary) && ![12, 14].includes(parseFloat(getComputedStyle(secondary).fontSize))) problems.push("secondary text size " + getComputedStyle(secondary).fontSize);
   // Spacing: neighbours and container edges are 4, 8 or 12 px apart.
   const ok = v => [4, 8, 12].some(x => Math.abs(v - x) <= 0.5);
   const name = el => (el.id ? "#" + el.id : el.tagName.toLowerCase() + (typeof el.className === "string" && el.className.trim() ? "." + el.className.trim().split(/\s+/).join(".") : ""));
