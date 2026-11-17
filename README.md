@@ -4,10 +4,14 @@
 
 ## Download and run
 
-1. Download the `.pyw` file from the **[latest release](https://github.com/karpuzikov/MCC/releases/latest)**.
-2. Double-click it.
+1. Run once in a terminal (installs Python and WebView2; MCC downloads the rest by itself on first start):
 
-Needs Windows 11 and Python 3.
+```
+winget install -e --id Python.Python.3.12 && winget install -e --id Microsoft.EdgeWebView2Runtime
+```
+
+2. Download the `.pyw` file from the **[latest release](https://github.com/karpuzikov/MCC/releases/latest)**.
+3. Double-click it.
 
 ## What it does
 
