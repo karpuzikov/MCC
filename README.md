@@ -13,12 +13,9 @@ Needs Windows 11 and Python 3.
 
 ## What it does
 
-- Compares your existing library (OLD) with new releases (NEW).
-- Recognises the same recording by its sound, not its title.
-- Keeps unique recordings; Remix, Live, Explicit/Clean and Personal Picks rules apply.
-- Prefers the best source quality, including CD rip logs.
-- Shows everything on an interactive **Release Map**.
-- **Copy** or **Move** the kept releases to a folder you choose; Undo for completed moves.
+You have albums you already own and new ones you downloaded. Many contain the same songs.
+
+MCC listens to them, finds the repeats, and picks the smallest set of releases that still has every song you want. Songs are matched by how they sound, not by their names. It shows its choices on a map you can click through, and you decide what to copy or move.
 
 ## Safety
 
