@@ -2,6 +2,11 @@
 
 Historical release notes and testing status retained from the original README.
 
+## v0.5.149 - FLAC encoder download fix (Under construction ⚠️)
+
+- Fixed: flac.exe could not be installed (CERTIFICATE_VERIFY_FAILED from ftp.osuosl.org). The download now tries the Xiph GitHub release first, then osuosl; both must match the same pinned SHA-256.
+- Added: test that a failing first source falls back to the second.
+
 ## v0.5.148 - UI consistency pass (Under construction ⚠️)
 
 - Changed: one control height, 24px, for outlined buttons, primary buttons (no border), inputs, selects and the Copy into toggle; chips and tag buttons 18px (11px on an 8px line, 4px padding); icon buttons a uniform 14px box.

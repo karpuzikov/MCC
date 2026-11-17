@@ -613,6 +613,22 @@ class NativeEncoderCompliance(unittest.TestCase):
             with self.assertRaisesRegex(RuntimeError, "SHA-256 verification failed"):
                 mlo._fetch_official_archive(mlo._QAAC_ZIP_URL, mlo._QAAC_ZIP_SHA256)
 
+    def test_flac_download_falls_back_to_the_second_source(self):
+        import hashlib
+        from unittest.mock import patch, MagicMock
+        good = MagicMock()
+        good.__enter__.return_value.read.return_value = b"archive"
+        calls = []
+        def fake(request, timeout=0):
+            calls.append(request.full_url)
+            if len(calls) == 1:
+                raise OSError("CERTIFICATE_VERIFY_FAILED")
+            return good
+        with patch.object(mlo.urllib.request, "urlopen", side_effect=fake):
+            data = mlo._fetch_official_archive(mlo._FLAC_ZIP_GITHUB_URL, hashlib.sha256(b"archive").hexdigest(), mlo._FLAC_ZIP_URL)
+        self.assertEqual(data, b"archive")
+        self.assertEqual(calls, [mlo._FLAC_ZIP_GITHUB_URL, mlo._FLAC_ZIP_URL])
+
     def test_native_encoder_only_no_ffmpeg_encode(self):
         from unittest.mock import patch
         from types import SimpleNamespace
