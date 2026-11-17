@@ -2,6 +2,11 @@
 
 Historical release notes and testing status retained from the original README.
 
+## v0.5.125 - Main folder
+
+- Changed: the star tooltip "Mark as existing discography" is now "Mark as main folder".
+- Checked: all `tests/test_*.py`, ruff pyflakes rules. **Not run:** Windows 11/WebView2.
+
 ## v0.5.124 - Organizer merged into Copy/Move
 
 - Changed: Copy and Move run the former Music Library Organizer v0.3.23 pipeline on every retained release: MusicBrainz folder name, tags, ALAC/FLAC encoding, CUE split, AudioChecker log, cover art, hash-verified staging then rename. Duplicate files found inside a release (`plan_intra_release_duplicates`) are left out of the output.
