@@ -2,6 +2,11 @@
 
 Historical release notes and testing status retained from the original README.
 
+## v0.5.127 - Format next to Encode
+
+- Changed: the Format picker sits right after "Encode audio to" in the main window and Release Map footer, and is disabled while Encode audio is off (it only applies to encoding).
+- Checked: all `tests/test_*.py`, ruff pyflakes rules; main window rendered in headless Chrome. **Not run:** Windows 11/WebView2.
+
 ## v0.5.126 - Options in the Release Map
 
 - Added: Encode audio, AudioChecker, Split CUE and Format controls in the Release Map footer (same saved settings as the main window); bridge methods `getOrganizer`/`setOrganizerOption`.

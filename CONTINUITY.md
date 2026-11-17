@@ -1,5 +1,9 @@
 # Music Collection Cleaner - Continuity Handoff
 
+## Checkpoint 2026-11-17 - MCC v0.5.127
+
+Format picker next to Encode audio, disabled when encoding is off. Not run: Windows 11/WebView2.
+
 ## Checkpoint 2026-11-17 - MCC v0.5.126
 
 Organizer options also in the Release Map footer. Not run: Windows 11/WebView2.
