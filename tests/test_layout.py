@@ -160,6 +160,14 @@ LAYOUT_PROBE = r"""async () => {
   }
   const xs = new Set([...document.querySelectorAll(".releaseRow .releaseName")].filter(visible).map(e => Math.round(e.getBoundingClientRect().left * 2) / 2));
   if (document.getElementById("columns") && xs.size > 3) problems.push("folder names start at " + xs.size + " different x positions");
+  for (const el of document.querySelectorAll(".btn:not(.tagBtn),input.field,select,.btn.primary")) {
+    if (visible(el) && !el.closest("#modalBackdrop") && Math.abs(el.getBoundingClientRect().height - 24) > 0.5) problems.push("control height " + el.getBoundingClientRect().height.toFixed(1) + "px (expected 24): " + (el.id || el.className));
+  }
+  for (const el of document.querySelectorAll(".changeChip,.tagBtn")) {
+    if (visible(el) && Math.abs(el.getBoundingClientRect().height - 18) > 0.5) problems.push("chip height " + el.getBoundingClientRect().height.toFixed(1) + "px (expected 18): " + (el.id || el.className));
+  }
+  const rowHeights = new Set([...document.querySelectorAll(".track,.releaseRow")].filter(visible).filter(e => e.getBoundingClientRect().height < 30).map(e => e.getBoundingClientRect().height.toFixed(1)));
+  if (rowHeights.size > 1) problems.push("single-line rows have different heights: " + [...rowHeights].join(", "));
   const selectGroup = document.getElementById("albumGroupSelect");
   if (selectGroup && visible(selectGroup) && getComputedStyle(selectGroup).borderTopWidth !== "1px") problems.push("Group control is not outlined");
   const secondary = document.querySelector(".track .dur,.track .note");

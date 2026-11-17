@@ -2,6 +2,16 @@
 
 Historical release notes and testing status retained from the original README.
 
+## v0.5.148 - UI consistency pass (Under construction ⚠️)
+
+- Changed: one control height, 24px, for outlined buttons, primary buttons (no border), inputs, selects and the Copy into toggle; chips and tag buttons 18px (11px on an 8px line, 4px padding); icon buttons a uniform 14px box.
+- Changed: every single-line release and track row is the same height (rows always reserve their divider); Versions/Remixes/Live tag buttons use chip type instead of 14px bold.
+- Changed: release details: markers on the left with Ignore and Group on the right, path on its own full-width row (it no longer wraps to four lines).
+- Changed: dividers only between functional groups, not inside a label+field, the options row or the organizer row; select gets a chevron.
+- Changed: DESIGN.md rewritten for the size system (spacing, control, chip and row heights, markers, no Replaced).
+- Added: layout test checks control, chip and row heights.
+- Note: Add folder, Scan, Keeps and Skips and the folder settings are disabled on purpose while a scan runs or the Release Map is open.
+
 ## v0.5.147 - Marker text, one step-button style, Replaced removed (Under construction ⚠️)
 
 - Changed: row markers are text `WEB/CD/CUE/LOG 100%` (Inter 500 10px, right-aligned; related #2bc4d4, unrelated and slashes #8b949e at 45%; skipped rows 50% / 25%). LOG shows the score only when scored. No trophy.
