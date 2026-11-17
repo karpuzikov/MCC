@@ -2,52 +2,26 @@
 
 **Version: 0.5.123**
 
-Music Collection Cleaner compares existing music releases with new ones, finds the best combination of editions, and helps preserve every wanted unique recording while removing unnecessary redundancy.
+Finds the best combination of releases in your music collection and removes unnecessary repeated songs, keeping every wanted unique recording.
 
 ## Download and run
 
-**[Music Collection Cleaner v0.05.123.pyw](Music%20Collection%20Cleaner%20v0.05.123.pyw)** - latest single-file Windows Python application.
+1. Download the `.pyw` file from the **[latest release](https://github.com/karpuzikov/MCC/releases/latest)**.
+2. Double-click it.
 
-Open with Python 3 on Windows 11 (or run from a console with `python "Music Collection Cleaner v0.05.123.pyw"`). The application checks or installs supported dependencies; the FFmpeg and Chromaprint downloads are pinned to exact versions and refused unless their SHA-256 matches. The GUI uses Microsoft Edge WebView2 through pywebview; it is not a terminal-based replacement.
-
-Source-level regression checks: `python tests/<file>.py` from the repository root for each file in `tests/`.
-
-[Latest release](https://github.com/karpuzikov/MCC/releases/latest) · [Previous versions](version-history/) · [Changelog](CHANGELOG.md)
+Needs Windows 11 and Python 3.
 
 ## What it does
 
-- Analyze two pools: the existing library (OLD) and candidate additions (NEW).
-- Identify recordings through acoustic fingerprints, independently of titles; a successful comparison decides identity.
-- Preserve unique wanted recordings; apply Remix, Live, Explicit/Clean and Personal Picks rules.
-- Compare original, expanded, Deluxe, Special and other editions, including strict acoustic-superset detection.
-- Prefer high-quality sources and CD rip logs among truly equivalent choices; use dynamic range only as an eligible final mastering tie-break.
-- Optimize retained complete releases and physical track count across the library, not just isolated duplicate pairs.
-- Inspect an interactive chronological **Release Map** with connections, per-track coverage, replacement explanations, Ignore/Restore and Re-Analyze.
-- Explicitly **Copy OLD + NEW** or **Move OLD + NEW** retained releases into the selected destination; Undo for supported completed moves.
-- Log comparisons, validate incomplete/corrupt inputs, choose I/O worker counts with drive awareness, and manage spawned subprocesses.
+- Compares your existing library (OLD) with new releases (NEW).
+- Recognises the same recording by its sound, not its title.
+- Keeps unique recordings; Remix, Live, Explicit/Clean and Personal Picks rules apply.
+- Prefers the best source quality, including CD rip logs.
+- Shows everything on an interactive **Release Map**.
+- **Copy** or **Move** the kept releases to a folder you choose; Undo for completed moves.
 
-## Safety and testing
+## Safety
 
-Analysis does not change source files. File operations require explicit user action. Use **Copy** for initial real-world testing.
+Analysis never changes your files. Copy and Move run only when you click them. Use **Copy** first.
 
-**Move limits:** **Move** renames folders on the same drive only, after writing an Undo journal; a cross-volume Move is refused before any file changes, so use **Copy** or a destination on the same drive. No Windows test of this migrated version has been completed.
-
-Required real-world regression cases include Cross the Line 14 vs 18 tracks, Starboy, Bangarang, Skrillex, destination collisions, worker/process cleanup, and Copy/Move/Undo on disposable test folders.
-
-## Compatibility and migration
-
-This project continues **Duplicate Edition Analyzer Lightweight v0.4.9** from the `dea-lightweight-modern` branch of [karpuzikov/userscripts](https://github.com/karpuzikov/userscripts/tree/dea-lightweight-modern/audio-tools/discography-torrent-project/lightweight). It preserves the full WebView2 interface and analysis flow.
-
-Persistent data uses `Documents\Karpuzikov Tools\Music Collection Cleaner\`. On first run, previous analyzer settings, logs, caches, and state are **copied without deleting or overwriting the old program's data** from `Documents\Karpuzikov Tools\Duplicate Edition Analyzer\`. Program dependencies live under the new program's own directory.
-
-The original production **Duplicate Edition Analyzer v0.22.12** and all previous analyzer releases remain in `karpuzikov/userscripts` and are not modified by this migration. Future MCC standalone updater lookup points only at this repository.
-
-## Development
-
-Only the latest version stays in the repository root; every previous version lives in `version-history/`.
-
-- [SOFTWARE_RULES.md](SOFTWARE_RULES.md) - exact current account-wide requirements.
-- [RULES.md](RULES.md) - inherited complete optimizer and behavior rulebook.
-- [CONTINUITY.md](CONTINUITY.md) - authoritative development status, regression contracts, blockers and prior history.
-
-No extra GitHub Actions workflows or unverified EXE downloads are included.
+[Changelog](CHANGELOG.md) · [Previous versions](version-history/) · [Development notes](CONTINUITY.md)
