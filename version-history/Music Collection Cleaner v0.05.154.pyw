@@ -7696,13 +7696,13 @@ def _album_main_artist(rel: Release) -> str:
 
 
 def _album_editions_related_by_audio(a: Release, b: Release) -> bool:
-    """Recognize Album/EP edition families through >=80% PROVEN audio overlap.
+    """Recognize edition families of one release type (Album with Album, EP with EP) through >=80% PROVEN audio overlap.
 
     Denominator is the smaller album's wanted acoustic-group set: an expanded
     deluxe edition may contain many additional unique bonus songs. This rule
     establishes album-family membership, NEVER duplicate recording identity.
     """
-    if a.release_type not in {"album", "ep"} or b.release_type not in {"album", "ep"}:
+    if a.release_type != b.release_type or a.release_type not in {"album", "ep"}:
         return False
     groups_a, groups_b = set(_included_group_sequence(a)), set(_included_group_sequence(b))
     smaller = min(len(groups_a), len(groups_b))
@@ -13918,7 +13918,7 @@ class Organizer:
     """Organizes releases into a destination; sources are never modified."""
     def __init__(self, fmt="ALAC", encoding_workers=4, checker_workers=4,
                  enable_encoding=True, enable_checker=True, enable_splitting=True,
-                 progress_cb=None, enable_musicbrainz=True):
+                 progress_cb=None, enable_musicbrainz=True, log_path=None):
         ensure_data()
         self.fmt = str(fmt)
         self.encoding_workers = int(encoding_workers)
@@ -13938,7 +13938,7 @@ class Organizer:
         self.activity = []
         self.error = ""
         self.lock = threading.RLock()
-        self.log_path = _new_log("run")
+        self.log_path = log_path or _new_log("run")
 
     @property
     def status(self):
@@ -14816,6 +14816,8 @@ def organize_retained_plan(
 
     file_format = str(options.get("format", "ALAC"))
     _MUSICBRAINZ_ENABLED[0] = bool(options.get("enable_musicbrainz", True))
+    for old_log in (DATA / "logs").glob("run-*.log"):
+        old_log.unlink(missing_ok=True)  # one run, one log: a new run replaces the previous run's
     engine = Organizer(
         file_format, options.get("encoding_workers", 4), options.get("checker_workers", 4),
         options.get("enable_encoding", True), options.get("enable_checker", True),
@@ -14829,7 +14831,7 @@ def organize_retained_plan(
     created = [Path(row["target"]) for row in engine.results
                if row["status"] in {"done", "partial"} and Path(row["target"]).is_dir()]
     if created and options.get("enable_cover_art", True):
-        artwork = Organizer(file_format, progress_cb=progress_cb)
+        artwork = Organizer(file_format, progress_cb=progress_cb, log_path=engine.log_path)
         artwork.counts["total"] = len(created)
         artwork._download_artwork(destination.resolve(strict=True), created)
 
@@ -15201,7 +15203,7 @@ APP_STYLE_CSS = r"""
   --type-marker:500 10px/10px var(--font-sans);
   --type-status-symbol:500 11px/18px var(--font-sans);
   --type-mono-log:400 12px/16px var(--font-numeric);
-  --status-warning:#f5c542;
+  --status-warning:#f5c542; --status-length:#ff9e4a;
   --pad-tight:2px; --control-height:24px;
   --mkbox-pad-web:2px 1.5px 2px 1.75px; --mkbox-pad-cd:2px 1.5px 2px 1.4px; --mkbox-pad-cue:2px 1.2px 2px 1.5px; --mkbox-pad-log:2px .85px 2px 1.15px;
   --section-tracking:2px;
@@ -15463,7 +15465,7 @@ select { appearance:none; padding-right:calc(var(--space-3) + var(--space-2)); b
 .track.unique .note { color:var(--primary); }
 .trackGem { flex:none; color:var(--primary); display:inline-flex; }
 .track .dur { width:36px; flex:none; text-align:right; font:var(--type-mono-body); color:var(--mute); }
-.track .dur.differentLength,.lengthDelta { color:var(--primary-soft); }
+.track.unique .dur.differentLength,.track.unique .lengthDelta,.altDuration.changed { color:var(--status-length); }
 .lengthDelta { flex:none; font:var(--type-chip); }
 .rowMenuBtn { color:var(--body); }
 .trackActionGroup { position:fixed; z-index:50; display:none; flex-direction:column; padding:var(--space-1); background:var(--canvas-soft); border-radius:var(--radius); }
@@ -15477,7 +15479,6 @@ select { appearance:none; padding-right:calc(var(--space-3) + var(--space-2)); b
 .altVersion:hover .altTitle { color:var(--primary); }
 .altTitle { flex:1; min-width:0; overflow-wrap:anywhere; color:var(--ink); }
 .altDuration { flex:none; font:var(--type-mono-body); color:var(--mute); }
-.altDuration.changed { color:var(--primary-soft); }
 .altState { flex:none; width:58px; text-align:right; font:var(--type-chip); color:var(--mute); }
 .altState.retained { color:var(--ink); }
 .altState.available { color:var(--status-added); }
@@ -16187,7 +16188,6 @@ function drawConnections() {
   }
 }
 function releaseColumnKind(n) {
-  // A proven mixed Album/EP family shares one column; original type is unchanged.
   const t=String(n.displayGroupKind||n.releaseType||"").toLowerCase();
   if(t==="compilation") return "compilation";
   if(t==="anthology") return "anthology";
@@ -16490,8 +16490,7 @@ function renderFullBoard(nodes) {
     Array.from(grouped.values()).sort(function(a,b){return nodes.indexOf(a[0])-nodes.indexOf(b[0]);}).forEach(function(items){
       const group=document.createElement("div");group.className="releaseGroup";
       const title=document.createElement("div");title.className="releaseGroupTitle";
-      const mixedAlbumEp=items.some(function(n){return n.releaseType==="album";})&&items.some(function(n){return n.releaseType==="ep";});
-      title.textContent=groupTitleForNodes(items)+(mixedAlbumEp?" · Album / EP":"");
+      title.textContent=groupTitleForNodes(items);
       const rows=document.createElement("div");rows.className="releaseRows";
       items.forEach(function(n){appendReleaseRow(rows,n);});
       group.append(title,rows);flow.appendChild(group);

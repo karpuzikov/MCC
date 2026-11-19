@@ -2,6 +2,12 @@
 
 Historical release notes and testing status retained from the original README.
 
+## v0.5.155 - One run, one log; Album and EP never share a group (Under construction ⚠️)
+
+- Fixed: Copy/Move wrote two `run-*.log` files and kept every earlier one. It now writes one, replacing the previous run's.
+- Fixed: an Album and an EP with overlapping audio were put in one group ("Album / EP"). Groups now hold one release type; the label is gone. Example: `[2000] BT - Movement In Still Life [067003015424] CD` no longer sits in `Still Life In Motion`.
+- Changed: a highlighted song whose length differs from another edition shows its length in orange.
+
 ## v0.5.154 - UI fixes (Under construction ⚠️)
 
 - Fixed: the ignored-release icon no longer touches the folder name.

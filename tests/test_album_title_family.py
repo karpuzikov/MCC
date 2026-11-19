@@ -24,6 +24,12 @@ class AlbumTitleFamily(unittest.TestCase):
         with patch.object(mcc, "_manual_album_group_links", return_value={}):
             self.assertEqual(len(mcc._album_clusters([first, second])), 1)
 
+    def test_album_and_ep_sharing_audio_are_not_one_family(self):
+        album = release(0, "album", "Movement", TITLES, 0)
+        ep = release(0, "ep", "Motion", TITLES[:4], 0)
+        self.assertFalse(mcc._album_editions_related_by_audio(album, ep))
+        self.assertTrue(mcc._album_editions_related_by_audio(album, release(0, "album", "Movement", TITLES, 0)))
+
     def test_ep_and_album_are_never_grouped_together(self):
         ep = release(0, "ep", "CUT OFF!", TITLES, 0)
         album = release(20, "album", "Cut Off!", TITLES + ["A Vision Of Christ"], 36)
