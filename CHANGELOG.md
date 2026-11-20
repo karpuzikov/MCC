@@ -2,6 +2,10 @@
 
 Historical release notes and testing status retained from the original README.
 
+## v0.5.157 - A and B sides are Singles (Under construction ⚠️)
+
+- Fixed: a release whose tracks carry only one or two base titles (a maxi-single with an A and a B side, for example `Love Comes Again` / `Traffic`) is a Single.
+
 ## v0.5.156 - Maxi-singles are Singles; one group per title (Under construction ⚠️)
 
 - Fixed: a release whose tracks are mostly one song in several mixes (for example `Blue Skies`, `Always`, `Suddenly`, `Love Comes Again`) is a Single, not an Album. It no longer joins Album groups such as `Always` / `These Re-Imagined Machines`.

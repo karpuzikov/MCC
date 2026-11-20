@@ -89,6 +89,8 @@ class MaxiSingleTypeAndGroups(unittest.TestCase):
     def test_remix_packs_are_singles_and_three_song_sessions_are_not_albums(self):
         mixes = ["Blue Skies (Radio Edit)", "Blue Skies (Delphinium Days)", "Blue Skies (Deep Dish Mix)", "Blue Skies (Rabbit Mix)", "Blue Skies (Dub)"]
         self.assertEqual(mcc.infer_release_type("Blue Skies", "Blue Skies", 5, {}, 40 * 60, [], "", mixes)[0], "single")
+        sides = ["Love Comes Again (Radio Edit)", "Love Comes Again (Mark Norman Remix)", "Traffic (Original Mix)", "Traffic (Max Walder Remix)"]
+        self.assertEqual(mcc.infer_release_type("Love Comes Again", "x", 4, {}, 30 * 60, [], "", sides)[0], "single")
         songs = ["Nocturnal Transmission", "Quark", "Tripping The Light Fantastic", "Flaming June", "Loving You More"]
         self.assertEqual(mcc.infer_release_type("Ima", "Ima", 5, {}, 76 * 60, [], "", songs)[0], "album")
         session = ["Cry To The World", "The Warrior Song", "Da Ka Ne"]
