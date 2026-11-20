@@ -2,6 +2,13 @@
 
 Historical release notes and testing status retained from the original README.
 
+## v0.5.160 - Edition groups by audio and name; Keep on skipped releases (Under construction ⚠️)
+
+- Fixed: Compilations and Anthologies are grouped by edition like Albums: shared audio (>=80% of the smaller release's recordings) or one release name. `A Song Across Wires`, `A Song Across Wires Extended Versions` and `A Song Across Wires Deluxe Edition` are one group.
+- Fixed: a release whose name starts with another's name (`X` / `X Extended Versions`) joins it when >=80% of the smaller tracklist's song titles are shared.
+- Fixed: a group is titled by the release name most of its editions carry (`今 Ima`), not by the shortest album tag (`Ima`).
+- Fixed: a skipped release shows Keep (an ignored one Restore, a kept one Unkeep); Ignore is only on retained releases.
+
 ## v0.5.159 - Same-name editions are one group; live albums are excluded (Under construction ⚠️)
 
 - Fixed: editions with one release name (for example `Emotional Technology` 2CD / WEB, `Ima`) form one group even when their album tags or truncated track titles differ. They must share at least one song title, so unrelated `Greatest Hits` stay apart.

@@ -131,3 +131,40 @@ class SameNameAndLiveRelease(unittest.TestCase):
         studio = release(1, "album", "The Real World Session", TITLES, 10)
         mcc.configure_exclusions([studio], True, True)
         self.assertFalse(any(t.is_live for t in studio.tracks))
+
+
+class EditionNamesAndKeepButton(unittest.TestCase):
+    def test_extended_and_deluxe_editions_join_the_plain_name_and_take_its_title(self):
+        songs = ["Skylarking", "Letting Go", "Tomahawk", "City Life", "Stem The Tides"]
+        folders = ["[2013] BT - A Song Across Wires [ARDI3392] WEB", "[2013] BT - A Song Across Wires [ARMA352] CD",
+                   "[2013] BT - A Song Across Wires Extended Versions [ARDI3394] WEB",
+                   "[2014] BT - A Song Across Wires Deluxe Edition [ARDI3505B] WEB"]
+        rels = []
+        for rid, folder in enumerate(folders):
+            rel = release(rid, "compilation", "A Song Across Wires", songs, rid * 10)
+            rel.title = mcc.release_title_from_folder(folder)
+            rels.append(rel)
+        nodes = [{"id": r.rid, "releaseType": "compilation", "name": f, "path": f"r{r.rid}"} for r, f in zip(rels, folders)]
+        with patch.object(mcc, "_manual_album_group_links", return_value={}):
+            mcc._assign_release_map_display_groups(nodes, rels)
+        self.assertEqual({n["displayGroupKey"] for n in nodes}.__len__(), 1)
+        self.assertEqual({n["displayGroupTitle"] for n in nodes}, {"A Song Across Wires"})
+        unrelated = release(9, "compilation", "A Song", ["Other %d" % i for i in range(5)], 90)
+        unrelated.title = "A Song"
+        self.assertFalse(mcc._album_editions_related_by_titles(rels[0], unrelated))
+
+    def test_group_title_is_the_release_name_not_a_shortened_tag(self):
+        a = release(1, "album", "今 Ima", TITLES[:5], 0)
+        a.title = mcc.release_title_from_folder("[1995] BT - 今 Ima [0630-12345-2] CD")
+        b = release(2, "album", "Ima", TITLES, 20)
+        b.title = mcc.release_title_from_folder("[1996] BT - 今 Ima [9 46356-2] 2CD")
+        nodes = [{"id": r.rid, "releaseType": "album", "name": r.title, "path": f"r{r.rid}", "albumTitles": [r.tracks[0].album]} for r in (a, b)]
+        with patch.object(mcc, "_manual_album_group_links", return_value={}):
+            mcc._assign_release_map_display_groups(nodes, [a, b])
+        self.assertEqual({n["displayGroupTitle"] for n in nodes}, {"今 Ima"})
+
+    def test_skipped_release_offers_keep_not_ignore(self):
+        source = (Path(mcc.__file__)).read_text(encoding="utf-8-sig")
+        code = source[source.index("const releaseAction="):].split(";", 1)[0]
+        self.assertIn('n.kind==="retained"?"Ignore":"Keep"', code)
+        self.assertIn('"toggleKeepRelease"', source)
