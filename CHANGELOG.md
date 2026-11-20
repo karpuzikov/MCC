@@ -2,6 +2,13 @@
 
 Historical release notes and testing status retained from the original README.
 
+## v0.5.161 - Edition names from folders; Display size removed (Under construction ⚠️)
+
+- Fixed: edition grouping reads the release name from the folder, not the album tag, so `[1995] BT - 今 Ima` and `[1996] BT - 今 Ima` (tagged `Ima`) are one group titled `今 Ima`.
+- Fixed: a release with every track excluded (a live album) keeps its full-tracklist type; `Live In Japan` is no longer a Single.
+- Fixed: CJK characters such as `今` fall back to Yu Gothic UI / Microsoft YaHei UI / Malgun Gothic instead of a symbol font.
+- Removed: Display size (inches) in Advanced; the zoom uses the size Windows reports for the monitor.
+
 ## v0.5.160 - Edition groups by audio and name; Keep on skipped releases (Under construction ⚠️)
 
 - Fixed: Compilations and Anthologies are grouped by edition like Albums: shared audio (>=80% of the smaller release's recordings) or one release name. `A Song Across Wires`, `A Song Across Wires Extended Versions` and `A Song Across Wires Deluxe Edition` are one group.

@@ -112,7 +112,7 @@ class SameNameAndLiveRelease(unittest.TestCase):
     def test_editions_with_one_release_name_are_one_family_despite_tags_and_titles(self):
         def edition(rid, folder, album, titles):
             rel = release(rid, "album", album, titles, rid * 50)
-            rel.title = mcc.release_title_from_folder(folder)
+            rel.path = Path(folder)
             return rel
         a = edition(1, "[2003] BT - Emotional Technology [AVTCD-95728] 2CD", "Emotional Technology: CD1", TITLES)
         b = edition(2, "[2004] BT - Emotional Technology [VICP-62739-40] 2CD", "Emotional", ["The", "Knowledge", TITLES[0]])
@@ -126,8 +126,11 @@ class SameNameAndLiveRelease(unittest.TestCase):
     def test_live_album_name_marks_every_track_live(self):
         rel = release(0, "album", "Live In Japan", TITLES, 0)
         rel.title = "10cc - 1993 - Live In Japan"
+        rel.type_source = "heuristic"
         mcc.configure_exclusions([rel], True, True)
         self.assertTrue(all(t.is_live and t.exclude_from_coverage for t in rel.tracks))
+        mcc.refresh_heuristic_release_types([rel])
+        self.assertNotEqual(rel.release_type, "single")
         studio = release(1, "album", "The Real World Session", TITLES, 10)
         mcc.configure_exclusions([studio], True, True)
         self.assertFalse(any(t.is_live for t in studio.tracks))
@@ -142,7 +145,7 @@ class EditionNamesAndKeepButton(unittest.TestCase):
         rels = []
         for rid, folder in enumerate(folders):
             rel = release(rid, "compilation", "A Song Across Wires", songs, rid * 10)
-            rel.title = mcc.release_title_from_folder(folder)
+            rel.path = Path(folder)
             rels.append(rel)
         nodes = [{"id": r.rid, "releaseType": "compilation", "name": f, "path": f"r{r.rid}"} for r, f in zip(rels, folders)]
         with patch.object(mcc, "_manual_album_group_links", return_value={}):
@@ -150,14 +153,14 @@ class EditionNamesAndKeepButton(unittest.TestCase):
         self.assertEqual({n["displayGroupKey"] for n in nodes}.__len__(), 1)
         self.assertEqual({n["displayGroupTitle"] for n in nodes}, {"A Song Across Wires"})
         unrelated = release(9, "compilation", "A Song", ["Other %d" % i for i in range(5)], 90)
-        unrelated.title = "A Song"
+        unrelated.path = Path("A Song")
         self.assertFalse(mcc._album_editions_related_by_titles(rels[0], unrelated))
 
     def test_group_title_is_the_release_name_not_a_shortened_tag(self):
         a = release(1, "album", "今 Ima", TITLES[:5], 0)
-        a.title = mcc.release_title_from_folder("[1995] BT - 今 Ima [0630-12345-2] CD")
+        a.path = Path("[1995] BT - 今 Ima [0630-12345-2] CD")
         b = release(2, "album", "Ima", TITLES, 20)
-        b.title = mcc.release_title_from_folder("[1996] BT - 今 Ima [9 46356-2] 2CD")
+        b.path = Path("[1996] BT - 今 Ima [9 46356-2] 2CD")
         nodes = [{"id": r.rid, "releaseType": "album", "name": r.title, "path": f"r{r.rid}", "albumTitles": [r.tracks[0].album]} for r in (a, b)]
         with patch.object(mcc, "_manual_album_group_links", return_value={}):
             mcc._assign_release_map_display_groups(nodes, [a, b])
