@@ -2,6 +2,12 @@
 
 Historical release notes and testing status retained from the original README.
 
+## v0.5.156 - Maxi-singles are Singles; one group per title (Under construction ⚠️)
+
+- Fixed: a release whose tracks are mostly one song in several mixes (for example `Blue Skies`, `Always`, `Suddenly`, `Love Comes Again`) is a Single, not an Album. It no longer joins Album groups such as `Always` / `These Re-Imagined Machines`.
+- Fixed: the 30-minute rule makes an Album only from 4 or more tracks, so `The Real World Session` (3 songs) is an EP.
+- Fixed: an audio group and a title group with the same name are one group (`Movement In Still Life`, `These Hopeful Machines`).
+
 ## v0.5.155 - One run, one log; Album and EP never share a group (Under construction ⚠️)
 
 - Fixed: Copy/Move wrote two `run-*.log` files and kept every earlier one. It now writes one, replacing the previous run's.

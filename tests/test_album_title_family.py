@@ -83,3 +83,24 @@ class AlbumTitleFamily(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class MaxiSingleTypeAndGroups(unittest.TestCase):
+    def test_remix_packs_are_singles_and_three_song_sessions_are_not_albums(self):
+        mixes = ["Blue Skies (Radio Edit)", "Blue Skies (Delphinium Days)", "Blue Skies (Deep Dish Mix)", "Blue Skies (Rabbit Mix)", "Blue Skies (Dub)"]
+        self.assertEqual(mcc.infer_release_type("Blue Skies", "Blue Skies", 5, {}, 40 * 60, [], "", mixes)[0], "single")
+        songs = ["Nocturnal Transmission", "Quark", "Tripping The Light Fantastic", "Flaming June", "Loving You More"]
+        self.assertEqual(mcc.infer_release_type("Ima", "Ima", 5, {}, 76 * 60, [], "", songs)[0], "album")
+        session = ["Cry To The World", "The Warrior Song", "Da Ka Ne"]
+        self.assertEqual(mcc.infer_release_type("The Real World Session", "x", 3, {}, 42 * 60, [], "", session)[0], "ep")
+
+    def test_family_and_title_group_with_one_name_share_one_key(self):
+        a, b = release(0, "album", "Movement", TITLES, 0), release(0, "album", "Movement", TITLES, 0)
+        c = release(0, "album", "Movement", TITLES[:3], 50)
+        nodes = [{"id": r.rid, "releaseType": "album", "name": f"[1999] BT - Movement [{i}]", "path": f"r{i}"}
+                 for i, r in enumerate((a, b, c))]
+        for i, (node, rel) in enumerate(zip(nodes, (a, b, c))):
+            rel.rid = i
+        with patch.object(mcc, "_manual_album_group_links", return_value={}):
+            mcc._assign_release_map_display_groups(nodes, [a, b, c])
+        self.assertEqual(len({node["displayGroupKey"] for node in nodes}), 1)
