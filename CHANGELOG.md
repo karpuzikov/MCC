@@ -2,6 +2,11 @@
 
 Historical release notes and testing status retained from the original README.
 
+## v0.5.162 - Save Remixes / Save Live OFF ignores them completely (Under construction ⚠️)
+
+- Fixed: with Save Remixes OFF every remix is ignored. The featured-vocalist and main-artist remix exceptions are removed, so `Always (Funkagenda Mix)`, `Suddenly (Ferry Corsten Mix)` and the rest of `These Re-Imagined Machines` no longer count as reasons to keep a release. Only your own Keeps bring a track back.
+- Changed: remix / live tracks excluded by Save Remixes / Save Live OFF are not fingerprinted and not compared.
+
 ## v0.5.161 - Edition names from folders; Display size removed (Under construction ⚠️)
 
 - Fixed: edition grouping reads the release name from the folder, not the album tag, so `[1995] BT - 今 Ima` and `[1996] BT - 今 Ima` (tagged `Ima`) are one group titled `今 Ima`.

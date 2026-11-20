@@ -1,4 +1,4 @@
-"""A remixer in the ARTIST tag of a plain '(Remix)' is not a featured vocalist."""
+"""Save Remixes / Save Live OFF ignores every remix / live track: no exceptions, no fingerprints."""
 from pathlib import Path
 import unittest
 
@@ -11,20 +11,17 @@ def classified(remix_title, remix_artist):
     releases = [mcc.Release(1, "recycle", Path("A"), "A", tracks=[base]),
                 mcc.Release(2, "recycle", Path("B"), "B", tracks=[remix])]
     mcc.configure_exclusions(releases, exclude_remixes=True, exclude_live=False)
-    return remix
+    return base, remix
 
 
 class RemixCredit(unittest.TestCase):
-    def test_remixer_in_artist_tag_is_excluded(self):
-        remix = classified("Song (Remix)", "Band;Some Remixer")
-        self.assertTrue(remix.is_remix)
-        self.assertTrue(remix.exclude_from_coverage)
-        self.assertFalse(remix.remix_feature_exception)
-
-    def test_stated_feature_after_remix_wording_is_kept(self):
-        remix = classified("Song (Remix) feat. Guest", "Band")
-        self.assertTrue(remix.remix_feature_exception)
-        self.assertFalse(remix.exclude_from_coverage)
+    def test_every_remix_is_ignored_and_not_fingerprinted(self):
+        for title, artist in [("Song (Remix)", "Band;Some Remixer"), ("Song (Remix) feat. Guest", "Band"),
+                              ("Song (Funkagenda Mix)", "Band feat. Guest"), ("Song (Band Remix)", "Band")]:
+            with self.subTest(title=title):
+                base, remix = classified(title, artist)
+                self.assertTrue(remix.is_remix and remix.exclude_from_coverage)
+                self.assertEqual(mcc._fingerprint_identity_candidates([base, remix]), [base])
 
 
 if __name__ == "__main__":
