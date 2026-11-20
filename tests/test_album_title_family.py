@@ -106,3 +106,28 @@ class MaxiSingleTypeAndGroups(unittest.TestCase):
         with patch.object(mcc, "_manual_album_group_links", return_value={}):
             mcc._assign_release_map_display_groups(nodes, [a, b, c])
         self.assertEqual(len({node["displayGroupKey"] for node in nodes}), 1)
+
+
+class SameNameAndLiveRelease(unittest.TestCase):
+    def test_editions_with_one_release_name_are_one_family_despite_tags_and_titles(self):
+        def edition(rid, folder, album, titles):
+            rel = release(rid, "album", album, titles, rid * 50)
+            rel.title = mcc.release_title_from_folder(folder)
+            return rel
+        a = edition(1, "[2003] BT - Emotional Technology [AVTCD-95728] 2CD", "Emotional Technology: CD1", TITLES)
+        b = edition(2, "[2004] BT - Emotional Technology [VICP-62739-40] 2CD", "Emotional", ["The", "Knowledge", TITLES[0]])
+        c = edition(3, "[2009] BT - Emotional Technology [BHCD42PE] WEB", "Emotional Technology (Platinum Edition)", TITLES[:3])
+        d = edition(4, "[1995] BT - \u4eca Ima [0630-12345-2] CD", "\u4eca Ima", TITLES[:5])
+        e = edition(5, "[1996] BT - \u4eca Ima [9 46356-2] 2CD", "Ima", TITLES)
+        with patch.object(mcc, "_manual_album_group_links", return_value={}):
+            clusters = mcc._album_clusters([a, b, c, d, e])
+        self.assertEqual(sorted(sorted(r.rid for r in cl) for cl in clusters), [[1, 2, 3], [4, 5]])
+
+    def test_live_album_name_marks_every_track_live(self):
+        rel = release(0, "album", "Live In Japan", TITLES, 0)
+        rel.title = "10cc - 1993 - Live In Japan"
+        mcc.configure_exclusions([rel], True, True)
+        self.assertTrue(all(t.is_live and t.exclude_from_coverage for t in rel.tracks))
+        studio = release(1, "album", "The Real World Session", TITLES, 10)
+        mcc.configure_exclusions([studio], True, True)
+        self.assertFalse(any(t.is_live for t in studio.tracks))

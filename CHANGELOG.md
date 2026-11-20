@@ -2,6 +2,11 @@
 
 Historical release notes and testing status retained from the original README.
 
+## v0.5.159 - Same-name editions are one group; live albums are excluded (Under construction ⚠️)
+
+- Fixed: editions with one release name (for example `Emotional Technology` 2CD / WEB, `Ima`) form one group even when their album tags or truncated track titles differ. They must share at least one song title, so unrelated `Greatest Hits` stay apart.
+- Fixed: a release named `Live In ...`, `Live At ...` or `(Live)` is excluded as Live as a whole, even when no track title says so.
+
 ## v0.5.158 - Highlight = reason to keep (Under construction ⚠️)
 
 - Fixed: a highlighted song is one no other kept release carries (the reason this release was kept). Copies on discarded editions no longer cancel it, so the five longer CD2 versions on `[AVICD60053]` are highlighted. The diamond stays the stricter rule: no other edition at all. Supersedes the v0.5.91 and v0.5.94 highlight rules.
