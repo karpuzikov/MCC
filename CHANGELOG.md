@@ -2,6 +2,10 @@
 
 Historical release notes and testing status retained from the original README.
 
+## v0.5.158 - Highlight = reason to keep (Under construction ⚠️)
+
+- Fixed: a highlighted song is one no other kept release carries (the reason this release was kept). Copies on discarded editions no longer cancel it, so the five longer CD2 versions on `[AVICD60053]` are highlighted. The diamond stays the stricter rule: no other edition at all. Supersedes the v0.5.91 and v0.5.94 highlight rules.
+
 ## v0.5.157 - A and B sides are Singles (Under construction ⚠️)
 
 - Fixed: a release whose tracks carry only one or two base titles (a maxi-single with an A and a B side, for example `Love Comes Again` / `Traffic`) is a Single.

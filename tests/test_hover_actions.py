@@ -112,7 +112,7 @@ process.stdout.write(JSON.stringify(input.tracks.map(t=>status(t,{kind:'retained
         self.assertTrue(all(node['uniqueCount']==0 for node in state['nodes']))
         self.assertFalse(any(t['unique'] for node in state['nodes'] for t in node['tracks']))
 
-    def test_recording_on_any_other_edition_is_never_highlighted(self):
+    def test_recording_only_on_unkept_editions_is_highlighted_as_reason_to_keep(self):
         a=[mcc.Track(1,Path('A/shared.flac'),1,title='Shared',artist='Artist',duration=120,group_id=0),
            mcc.Track(1,Path('A/essential.flac'),2,title='Essential',artist='Artist',duration=120,group_id=1)]
         b=[mcc.Track(2,Path('B/shared.flac'),1,title='Shared',artist='Artist',duration=120,group_id=0),
@@ -120,7 +120,7 @@ process.stdout.write(JSON.stringify(input.tracks.map(t=>status(t,{kind:'retained
         c=[mcc.Track(3,Path('C/essential.flac'),1,title='Essential',artist='Artist',duration=120,group_id=1)]
         releases=[mcc.Release(rid,'recycle',Path(name),name,tracks=tracks)
                   for rid,name,tracks in [(1,'A',a),(2,'B',b),(3,'C',c)]]
-        for retained,expected in [({1,2},[]),({1},[])]:
+        for retained,expected in [({1,2},['Essential']),({1},['Shared','Essential'])]:
             with self.subTest(retained=retained):
                 snapshots=mcc.build_decision_snapshot(releases,a+b+c,retained,
                     [mcc.ReleaseDecision(r.rid,'ADD' if r.rid in retained else 'SKIP','Plan') for r in releases])
@@ -132,7 +132,7 @@ process.stdout.write(JSON.stringify(input.tracks.map(t=>status(t,{kind:'retained
                 self.assertEqual(nodes[1]['tracks'][1]['audioMatchEditions'],1)
                 self.assertFalse(nodes[1]['tracks'][1]['isGem'])
 
-    def test_release_kept_as_better_source_of_an_equivalent_edition_highlights_no_song(self):
+    def test_release_kept_as_better_source_of_an_equivalent_edition_highlights_its_songs(self):
         web=[mcc.Track(1,Path('W/a.flac'),1,title='One',artist='Artist',duration=120,group_id=0),
              mcc.Track(1,Path('W/b.flac'),2,title='Two',artist='Artist',duration=130,group_id=1)]
         cd=[mcc.Track(2,Path('C/a.flac'),1,title='One',artist='Artist',duration=120,group_id=0),
@@ -142,8 +142,9 @@ process.stdout.write(JSON.stringify(input.tracks.map(t=>status(t,{kind:'retained
         snapshots=mcc.build_decision_snapshot(releases,web+cd,{2},
             [mcc.ReleaseDecision(1,'SKIP','Plan'),mcc.ReleaseDecision(2,'ADD','Plan')])
         node=next(n for n in self.ui_state(snapshots)['nodes'] if n['id']==2)
-        self.assertEqual(node['uniqueCount'],0)
-        self.assertFalse(any(t['unique'] for t in node['tracks']))
+        self.assertEqual(node['uniqueCount'],2)
+        self.assertTrue(all(t['unique'] for t in node['tracks']))
+        self.assertFalse(any(t['isGem'] for t in node['tracks']))
         self.assertEqual((node['hasCue'],node['hasRipLog'],node['ripLogPercent']),(True,True,98))
         self.assertEqual(node['ripLogProblems'],['x.log: unrecognized'])
         self.assertEqual(node['ripLogResults'],['a.log: 98% (EAC)','x.log: not recognized - unrecognized'])
@@ -297,7 +298,7 @@ process.stdout.write(JSON.stringify(evaluate(input.node,()=>({}))));
              patch.object(mcc,'_assign_release_map_display_groups'):
             bridge=namespace['ReleaseMapBridge']()
             initial=json.loads(json.dumps(bridge._ui_state))
-            for index,count,gem in [(0,1,True),(2,0,False),(0,0,False),(2,1,True)]:
+            for index,count,gem in [(0,1,True),(2,0,False),(0,1,False),(2,2,True)]:
                 payload=json.loads(bridge.toggleTrack(index));payloads.append(payload)
                 nodes={n['id']:n for n in bridge._ui_state['nodes']}
                 self.assertEqual(nodes[1]['uniqueCount'],count)
@@ -345,7 +346,7 @@ for(const p of input.payloads){
 }
 process.stdout.write(JSON.stringify(results));
 ''',{'state':initial,'payloads':payloads,'policy':policy,'toggle':toggle,'status':status})
-        for result,count,titles,gem in zip(results,[1,0,0,1],[['Rare'],[],[],['Rare']],[True,False,False,True]):
+        for result,count,titles,gem in zip(results,[1,0,1,2],[['Rare'],[],['Song'],['Song','Rare']],[True,False,False,True]):
             self.assertEqual(result['count'],count)
             self.assertEqual(result['titles'],titles)
             self.assertEqual(result['gem'],gem)
