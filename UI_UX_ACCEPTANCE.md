@@ -1,3 +1,14 @@
+## MCC v0.5.166 - Bracketed CD source-name metadata (2026-11-21)
+
+**Scope:** Copy/Move metadata parsing and destination folder naming only. No UI controls or visual layout changed.
+
+- Added source-folder parser coverage for `[YYYY] ARTIST - TITLE [CATALOG] CD`, including offline fallback when MusicBrainz is unavailable.
+- Added mocked MusicBrainz regression for a unique DiscID result and correct release-group date, concrete-release catalog and region.
+- Added mocked exact-DiscID fallback for a concrete edition date when the release-group first-release date is absent.
+- Python compile, targeted organizer tests, full suite and `--ui-self-test`: **NOT RUN**.
+- Native Windows 11/WebView2 Copy, report/log inspection and disposable Copy/Undo reproduction: **NOT RUN**. No visual acceptance claimed.
+- v0.5.166 remains **Under construction ⚠️**.
+
 ## MCC v0.5.165 - Per-release integrity review (2026-11-21)
 
 **Control contract - Release Map details pane, after the track list**

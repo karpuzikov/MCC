@@ -771,6 +771,110 @@ class DiscIDAndWorkers(unittest.TestCase):
             self.assertEqual(mlo.release_folder_target(info),
                              "2006-11-18 - Example [US - CAT-12]")
 
+    def test_bracket_year_cd_folder_keeps_source_date_and_catalog_on_lookup_failure(self):
+        from unittest.mock import patch
+        with tempfile.TemporaryDirectory() as td:
+            folder = Path(td) / "[1997] BT - ESCM [9 46799-2] CD"
+            folder.mkdir()
+            (folder / "rip.cue").write_text(
+                'FILE "image.wav" WAVE\n'
+                '  TRACK 01 AUDIO\n    TITLE "Track 1"\n    INDEX 01 00:00:00\n'
+                '  TRACK 02 AUDIO\n    TITLE "Track 2"\n    INDEX 01 00:02:00\n',
+                encoding="utf-8")
+            (folder / "rip.log").write_text(
+                "1 | 0:00.00 | 0:02.00 | 0 | 149\n"
+                "2 | 0:02.00 | 0:04.00 | 150 | 299\n",
+                encoding="utf-8")
+            (folder / "image.wav").write_bytes(b"synthetic CUE image")
+            with patch.object(mlo, "mb_json", side_effect=RuntimeError("offline")):
+                info = mlo.release_identity(
+                    folder, mlo.collect_files(folder), default_artist="BT")
+            self.assertTrue(info["physical"])
+            self.assertEqual(info["date"], "1997")
+            self.assertEqual(info["catalog"], "9 46799-2")
+            self.assertFalse(info["metadata_verified"])
+            self.assertEqual(mlo.release_folder_target(info),
+                             "1997 - Escm [9 46799-2]")
+
+    def test_bracket_year_cd_folder_uses_unique_discid_release_metadata(self):
+        from unittest.mock import patch
+        with tempfile.TemporaryDirectory() as td:
+            folder = Path(td) / "[1997] BT - ESCM [9 46799-2] CD"
+            folder.mkdir()
+            (folder / "rip.cue").write_text(
+                'FILE "image.wav" WAVE\n'
+                '  TRACK 01 AUDIO\n    TITLE "Track 1"\n    INDEX 01 00:00:00\n'
+                '  TRACK 02 AUDIO\n    TITLE "Track 2"\n    INDEX 01 00:02:00\n',
+                encoding="utf-8")
+            (folder / "rip.log").write_text(
+                "1 | 0:00.00 | 0:02.00 | 0 | 149\n"
+                "2 | 0:02.00 | 0:04.00 | 150 | 299\n",
+                encoding="utf-8")
+            (folder / "image.wav").write_bytes(b"synthetic CUE image")
+            calls = []
+            def fake_mb(path, **kwargs):
+                calls.append(path)
+                if path.startswith("discid/"):
+                    return {"releases": [{"id": "escm-us"}]}
+                if path.startswith("release/escm-us"):
+                    return {
+                        "id": "escm-us", "title": "ESCM",
+                        "barcode": "093624679929", "country": "US", "date": "1997",
+                        "media": [{"format": "CD", "track-count": 2}],
+                        "label-info": [{"catalog-number": "9 46799-2"}],
+                        "release-group": {
+                            "first-release-date": "1997", "primary-type": "Album"},
+                    }
+                raise AssertionError("Unexpected MusicBrainz request: " + path)
+            with patch.object(mlo, "mb_json", side_effect=fake_mb):
+                info = mlo.release_identity(
+                    folder, mlo.collect_files(folder), default_artist="BT")
+            self.assertTrue(any(path.startswith("discid/") for path in calls))
+            self.assertEqual(info["selected_release"], "escm-us")
+            self.assertTrue(info["metadata_verified"], info["notes"])
+            self.assertEqual(info["date"], "1997")
+            self.assertEqual(info["catalog"], "9 46799-2")
+            self.assertEqual(info["country"], "US")
+            self.assertEqual(mlo.release_folder_target(info),
+                             "1997 - Escm [US - 9 46799-2]")
+
+    def test_discid_exact_edition_date_fallback_when_group_date_missing(self):
+        from unittest.mock import patch
+        with tempfile.TemporaryDirectory() as td:
+            folder = Path(td) / "ESCM CD"
+            folder.mkdir()
+            (folder / "rip.cue").write_text(
+                'FILE "image.wav" WAVE\n'
+                '  TRACK 01 AUDIO\n    TITLE "Track 1"\n    INDEX 01 00:00:00\n'
+                '  TRACK 02 AUDIO\n    TITLE "Track 2"\n    INDEX 01 00:02:00\n',
+                encoding="utf-8")
+            (folder / "rip.log").write_text(
+                "1 | 0:00.00 | 0:02.00 | 0 | 149\n"
+                "2 | 0:02.00 | 0:04.00 | 150 | 299\n",
+                encoding="utf-8")
+            (folder / "image.wav").write_bytes(b"synthetic CUE image")
+            def fake_mb(path, **kwargs):
+                if path.startswith("discid/"):
+                    return {"releases": [{"id": "escm-us"}]}
+                if path.startswith("release/escm-us"):
+                    return {
+                        "id": "escm-us", "title": "ESCM",
+                        "barcode": "093624679929", "country": "US",
+                        "date": "1997-01-01",
+                        "media": [{"format": "CD", "track-count": 2}],
+                        "label-info": [{"catalog-number": "9 46799-2"}],
+                        "release-group": {"primary-type": "Album"},
+                    }
+                raise AssertionError("Unexpected MusicBrainz request: " + path)
+            with patch.object(mlo, "mb_json", side_effect=fake_mb):
+                info = mlo.release_identity(
+                    folder, mlo.collect_files(folder), default_artist="BT")
+            self.assertTrue(info["metadata_verified"], info["notes"])
+            self.assertEqual(info["date"], "1997-01-01")
+            self.assertIn("exact matched edition date", " ".join(info["notes"]))
+            self.assertEqual(mlo.release_folder_target(info),
+                             "1997-01-01 - Escm [US - 9 46799-2]")
+
     def test_ambiguous_discid_preserves_original_name(self):
         from unittest.mock import patch
         with tempfile.TemporaryDirectory() as td:

@@ -1,3 +1,34 @@
+## Checkpoint 2026-11-21 - MCC v0.5.166 - Under construction ⚠️
+
+**Current source:** `Music Collection Cleaner v0.05.166.pyw` on `main`, created from v0.5.165. This checkpoint addresses the reported Copy naming defect for source folders such as `[1997] BT - ESCM [9 46799-2] CD`.
+
+### Copy/Move release metadata and destination naming
+
+- Root cause: the source folder parser only recognized dates in `YYYY - Title [identifier]` form and only read a final bracket when it was the final text in the folder name. The supplied bracketed year and trailing `CD` therefore prevented extraction of both `1997` and `9 46799-2`. If MusicBrainz enrichment failed to supply a release-group first date, `release_folder_target()` fell back to title-only `Escm`.
+- MusicBrainz evidence for release `0b000100-eec2-49ee-b4d7-dc3a74210aaf`: BT - ESCM, US CD, Reprise Records catalog `9 46799-2`, barcode `093624679929`, year 1997; the supplied DiscID `q8WuKQeiqYCb2r7k7IBbO9r13Jc-` is listed on this release. Source links: https://musicbrainz.org/release/0b000100-eec2-49ee-b4d7-dc3a74210aaf/discids and https://musicbrainz.org/release/0b000100-eec2-49ee-b4d7-dc3a74210aaf.
+- Added parser support for `[YYYY] ARTIST - TITLE [CATALOG] CD`; `catalog()` and source-region parsing now ignore a terminal `CD` marker. It is also recognized as physical-media evidence; DiscID generation still requires the existing sample-exact CUE/rip-log path.
+- Source year/title/catalog are retained as fallback naming inputs when online enrichment is unavailable. If an exact DiscID-selected release has a concrete release date but the release-group first-release date is absent, that exact edition date is used for naming with a provenance note. A group first-release date remains preferred.
+- No UI controls, audio matching, file transformation, Copy/Move semantics or Undo behavior were changed. The app only changes destination folder naming and release identity metadata fallback.
+
+### Files and regression coverage
+
+- App: `Music Collection Cleaner v0.05.166.pyw`.
+- Tests: `tests/test_organizer_engine.py` adds offline bracketed-folder fallback, unique DiscID release metadata, and concrete-edition-date fallback cases.
+- README, CHANGELOG, UI_UX_ACCEPTANCE and this continuity file updated. Global `SOFTWARE_RULES.md` and `UI_UX_RULES.md` mirrors remain unchanged and were verified identical to `karpuzikov/userscripts`.
+
+### Verification status
+
+- Source edits were constructed against the latest v0.5.165 source and exact anchors; syntax and Python execution have **NOT RUN** in this environment.
+- `py_compile`, `py tests/test_organizer_engine.py`, full test suite and `--ui-self-test`: **NOT RUN**.
+- Native Windows 11/WebView2 Copy, report/log inspection, real ESCM folder reproduction, visual/keyboard acceptance and disposable Copy/Undo: **NOT RUN**.
+- Remains **0.5.166 - Under construction ⚠️**; do not claim fixed/stable until the required target-Windows checks pass. Keep original source audio untouched; validate using a disposable copy.
+
+### Exact next action
+
+On Windows, download the README-linked v0.5.166 file; run `py -m py_compile "Music Collection Cleaner v0.05.166.pyw"`, `py tests/test_organizer_engine.py`, and `py "Music Collection Cleaner v0.05.166.pyw" --ui-self-test`. Then reproduce Copy using a disposable copy of the ESCM source folder and verify the output is `1997 - Escm [US - 9 46799-2]`; inspect `organizer-last-run.json` and the run log to confirm MusicBrainz selected release `0b000100-eec2-49ee-b4d7-dc3a74210aaf`. Do not Move the original folder.
+
+---
+
 ## Checkpoint 2026-11-21 - MCC v0.5.165 - Under construction ⚠️
 
 **Current source:** `Music Collection Cleaner v0.05.165.pyw` on `main` (version `0.5.165`). Base: v0.5.164 commit `2bfc89383b411b6592327a2007edb60cd190a150`. Feature commit `6898158036dad978fbdb8c807839bb98e5051352`; regression test creation `db8edd3ce89b835dfa8bbcf7166fc1baea618b7e`; test quoting fix `7e7321f8f222aa895413188d90ba9036c72a84bb`. The test-file quoting correction is commit `7e7321f8f222aa895413188d90ba9036c72a84bb`.

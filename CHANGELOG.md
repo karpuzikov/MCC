@@ -1,3 +1,11 @@
+## v0.5.166 - Preserve bracketed CD source metadata (Under construction ⚠️)
+
+- Fixed: Copy/Move now parses source folder names in the form `[1997] BT - ESCM [9 46799-2] CD`, retaining the source year and catalog number even when MusicBrainz is unavailable.
+- Fixed: the trailing `CD` marker no longer hides the catalog bracket or prevents physical-CD identification.
+- Fixed: after an exact DiscID match, the selected concrete release date is used as a naming fallback only when the release-group first-release date is missing.
+- Added: regression tests for offline source-name fallback, a unique DiscID result supplying title/date/catalog/country, and a missing release-group date.
+- Verification and real Windows Copy/Move acceptance remain pending.
+
 ## v0.5.165 - Per-release integrity review (Under construction ⚠️)
 
 - Added: audited release details now end with **Approve** and **Ignore** actions. Approve explicitly pins the complete release in the retained plan; Ignore excludes the complete release.
