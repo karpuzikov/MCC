@@ -15226,7 +15226,9 @@ select { appearance:none; padding-right:calc(var(--space-3) + var(--space-2)); b
 .roleLabel { flex:none; font:var(--type-step-label); }
 /* Add folder | Keep options centred in the row | an empty column as wide as Add folder. */
 #folderOptions { display:grid; grid-template-columns:minmax(0,1fr) auto minmax(0,1fr); }
-#folderOptions #addFolder { justify-self:start; }
+#folderOptions #addFolder { grid-area:1 / 1; justify-self:start; }
+#folderOptions .gap { grid-area:1 / 1; }
+#folderOptions #keepOptions { grid-area:1 / 2; }
 #appOptions { color:var(--body); }
 #progressBox { flex:1; min-width:0; display:flex; flex-direction:column; gap:var(--pad-tight); }
 #progressLine { display:flex; justify-content:space-between; gap:var(--space-2); }
@@ -18557,6 +18559,7 @@ def _webview_main_html() -> str:
     <div id="sourceRows"></div>
     <div class="row" id="folderOptions">
       <button class="btn primary" id="addFolder" title="Add another source folder">+ Add folder</button>
+      <div class="gap"></div>
       <div class="row" id="keepOptions">
         <label class="check" title="Checked: remixes participate normally. Unchecked: remixes are ignored."><input type="checkbox" id="saveRemixes">Keep Remixes</label>
         <label class="check" title="Checked: live recordings participate normally. Unchecked: live recordings are ignored."><input type="checkbox" id="saveLive">Keep Live recordings</label>
