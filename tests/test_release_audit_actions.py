@@ -56,7 +56,7 @@ class ReleaseAuditActions(unittest.TestCase):
         self.assertIn('id="auditIgnoreBtn" title="Exclude this release from the retained plan">Ignore', html)
         self.assertIn('bridge.reviewRelease(Number(n.id),"approve"', html)
         self.assertIn('bridge.reviewRelease(Number(n.id),"ignore"', html)
-        self.assertIn("+'<div id="tracks">'+tracks+'</div>'+auditActions;", html)
+        self.assertIn("""+'<div id="tracks">'+tracks+'</div>'+auditActions;""", html)
 
 
 if __name__ == "__main__":
