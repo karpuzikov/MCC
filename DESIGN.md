@@ -50,7 +50,7 @@ Inter (bundled woff2) for everything; JetBrains Mono for durations, activity log
 | `body` | 14/18 | 400 | Inputs, dropdowns, paths, toggles, folder and album names |
 | `row-title` | 14/18 | 600 | Track title, release group title |
 | `mono-body` | 14/18 | 400 mono | Durations |
-| `mono-log` | 12/16 | 400 mono | Activity log (always visible; live level bars above it move while a scan runs) |
+| `mono-log` | 12/16 | 400 mono | Activity log (always visible; a 48px canvas above it shows one animated scene per scan stage) |
 | `secondary` | 12/16 | 400 | Artist, dates, card meta, notes |
 | `table-header` | 12/12 | 600 caps | Column headers, section labels |
 | `secondary-strong` | 12/12 | 700 | Format and meta emphasis |
@@ -64,7 +64,7 @@ Buttons use line-height = font-size so the padding reads equal; chips use the 8p
 
 ## Layout
 
-**Main window** — top bar (logo, name, version, Under construction) · Step 1: Select folders (rows: ★ | role label 120px | path | Browse icon | Show in Explorer icon | ✕; then + Add folder | centred: Keep Remixes | Keep Live recordings | Keeps and Skips; then Audio I/O workers | UI size | Logging | Open logs) · Step 2: Scan selected folders (Scan + progress) · Step 3: Open the map (teal Release Map → | Undo last export) · Activity log fills the rest. Add folder, Scan, Release Map, Re-scan and Copy/Move share one teal style; Undo last export and Keeps and Skips are outlined. Scan, Add folder, Keeps and Skips and the folder settings are disabled (dimmed to 45%) while a scan runs or the Release Map is open.
+**Main window** — top bar (logo, name, version, Under construction) · Step 1: Select folders (rows: ★ | role label 120px | path | Browse icon | Show in Explorer icon | ✕; then + Add folder | centred: Keep Remixes | Keep Live recordings | Keeps and Skips) · Step 2 · Step 3 · stage scene + Activity log · Audio I/O workers | UI size | Logging | Open logs · Step 2: Scan selected folders (Scan + progress) · Step 3: Open the map (teal Release Map → | Undo last export) · Activity log fills the rest. Add folder, Scan, Release Map, Re-scan and Copy/Move share one teal style; Undo last export and Keeps and Skips are outlined. Scan, Add folder, Keeps and Skips and the folder settings are disabled (dimmed to 45%) while a scan runs or the Release Map is open.
 
 **Release Map** — top bar (logo, Release Map, version, Under construction, Search) · toolbar: Step 4: Check the scan result | Changes / Full map / All links | + Added · ↑ Upgraded · ~~Removed~~ · ⊘ Ignored | Re-scan · board · details panel · footer: Step 5: Save results | Copy into/Move into toggle | destination | Browse | Show in Explorer | teal Copy/Move; second row Encode to + format | AudioChecker | Split CUE.
 

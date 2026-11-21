@@ -2,6 +2,11 @@
 
 Historical release notes and testing status retained from the original README.
 
+## v0.5.164 - A scene for every scan stage; settings below the log (Under construction ⚠️)
+
+- Changed: the bars above the Activity log are replaced by one animated scene per stage: tools checked, folders found, track rows read, a CD and its rip log, tracks sorted into kept and ignored, a Chromaprint grid written, two fingerprints compared, releases kept or struck, files flowing into the output folder, MusicBrainz lookups, an AudioChecker spectrum and a cover filling in. A flat line when idle; a still frame with reduced motion.
+- Changed: Audio I/O workers, UI size and Logging moved below the Activity log.
+
 ## v0.5.163 - Main window options always visible; Review next to Copy (Under construction ⚠️)
 
 - Changed: Audio I/O workers, UI size and Logging are always visible; the Advanced toggle is removed.
