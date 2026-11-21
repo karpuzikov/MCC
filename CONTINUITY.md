@@ -1,3 +1,40 @@
+## Checkpoint 2026-11-21 - MCC v0.5.165 - Under construction ⚠️
+
+**Current source:** `Music Collection Cleaner v0.05.165.pyw` on `main` (version `0.5.165`). Base: v0.5.164 commit `2bfc89383b411b6592327a2007edb60cd190a150`. Feature commit `6898158036dad978fbdb8c807839bb98e5051352`; regression tests commit `db8edd3ce89b835dfa8bbcf7166fc1baea618b7e`.
+
+### Per-release integrity / tracklist review
+
+The v0.5.164 scan treated every `audit_issues` entry as a global Copy/Move blocker. The user reported a valid FLAC track that FFmpeg flags with `invalid sync code`; the physical track remained in the warning release and MCC could not proceed.
+
+- The Release Map details pane now places **Approve** and **Ignore** at the bottom, after the track list, for each unresolved audited release.
+- **Approve** calls `reviewRelease(id, "approve")`, which adds the source release ID to `pinned_release_ids` and removes it from `blocked_release_ids`. The existing optimizer's `forced_release_ids` path therefore retains the entire release. It is a user override, not an audio repair: `integrity_error`, audit issue text, and source files are not changed.
+- **Ignore** calls `reviewRelease(id, "ignore")`, which removes the pin and adds the release to `blocked_release_ids`. The complete release is excluded from the retained plan.
+- The pure helpers `_apply_release_audit_decision` and `_unreviewed_release_audit_blockers` implement mutually exclusive Approve/Ignore and count unresolved audited releases. The bridge refreshes `integrity_blockers` from current snapshots plus pinned/blocked IDs. Copy/Move is enabled only when no pending edits and no unresolved audit blockers remain.
+- Both actions mark the plan dirty. **Re-Analyze is required** before Copy/Move. On successful Re-Analyze, the existing path-persistent files `manual_kept_releases.json` and `manual_ignored_releases.json` commit the decision; the next scan restores it by canonical source path.
+- Audit details remain visible after approval/ignore. The bottom state reads `Approved · retained` or `Ignored`; the existing header action offers Unkeep/Restore. The general warning review button still lists all audit warnings; its tooltip reports how many remain unresolved.
+- An approved corrupt/unreadable track is still excluded from acoustic fingerprint matching when `integrity_error` is set. Approval does not prove acoustic identity or repair data; it conservatively retains the entire source release so its original files can be copied through the existing workflow.
+
+### Files and tests
+
+- App: `Music Collection Cleaner v0.05.165.pyw`.
+- Regression tests: `tests/test_release_audit_actions.py`; imports the existing `tests/test_audio_safety.py` module loader, which selects the highest versioned root `.pyw`.
+- Docs updated: `README.md`, `CHANGELOG.md`, `UI_UX_ACCEPTANCE.md`, this file, and canonical verbatim mirror `UI_UX_RULES.md`.
+- README links directly to the versioned `.pyw` on `main`. No GitHub release/tag or binary asset was created in this checkpoint.
+
+### Verification status
+
+- GitHub source and test commits created directly on `main`; readback verification is required before closeout.
+- Source edit-anchor / required-marker checks: PASS (static construction check only).
+- `py_compile`, `tests/test_release_audit_actions.py`, full existing test suite and `--ui-self-test`: **NOT RUN** in this environment.
+- Windows 11 / WebView2 actual click, keyboard, focus, resize, scroll and screenshots: **NOT RUN**. MCC's current visual-review override says not to request/run automated Playwright visual QA; the user supplies screenshots at their discretion. Do not claim visual acceptance.
+- Keep **0.5.165 - Under construction ⚠️** until Python functional tests and the user's Windows runtime review pass.
+
+### Exact next action
+
+On the target Windows installation, download the README-linked `Music Collection Cleaner v0.05.165.pyw`; run `py -m py_compile "Music Collection Cleaner v0.05.165.pyw"`, `py tests/test_release_audit_actions.py`, the existing `py "Music Collection Cleaner v0.05.165.pyw" --ui-self-test`, then reproduce one audited release and verify Approve -> Re-Analyze -> Copy availability and Ignore -> Re-Analyze -> release exclusion. Do not alter the original audio.
+
+---
+
 # Music Collection Cleaner - Continuity Handoff
 
 ## Checkpoint 2026-11-17 - MCC v0.5.142 - Under construction ⚠️
