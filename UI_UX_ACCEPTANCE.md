@@ -1,3 +1,27 @@
+## MCC v0.5.165 - Per-release integrity review (2026-11-21)
+
+**Control contract - Release Map details pane, after the track list**
+
+| Control / state | Action and side effect | Pointer / keyboard / visual feedback |
+|---|---|---|
+| **Approve** | Pins the complete audited release in the retained plan and resolves only that release's audit blocker. Persists through existing source-path Keep state after Re-Analyze. Does not modify the source file or clear the warning. | Native button; click, Enter or Space. Teal primary button. |
+| **Ignore** | Excludes the complete audited release from the retained plan and resolves only that release's audit blocker. Persists through existing source-path Ignore state after Re-Analyze. | Native button; click, Enter or Space. Outlined secondary button. |
+| **Approved · retained** | Indicates the release is pinned and its warning was acknowledged. | Teal state text; existing header action is Unkeep. |
+| **Ignored** | Indicates the release is blocked from the plan. | Muted state text; existing header action is Restore. |
+| **Review required** | Read-only state when the snapshot is not editable. | Warning-coloured state text; no inert action. |
+
+- Buttons are shown only for an unresolved audited release; the existing header Keep/Ignore action is hidden in that state to avoid duplicate actions. After review, the existing Unkeep/Restore affordance remains.
+- Original audit warnings and `integrity_error` evidence remain visible. Approve is an explicit user override that conservatively retains the entire release; it is not decoder repair or proof that the track matches other releases.
+- Both decisions mark the plan pending and require Re-Analyze. Copy/Move remains blocked until every audited release is Approved or Ignored and the plan is recalculated.
+- Existing source-path persistence is reused: `manual_kept_releases.json` for Approve, `manual_ignored_releases.json` for Ignore.
+
+**Verification**
+- Static source construction checks: PASS (expected helper, action, CSS, button, bridge and state markers are present; not executable acceptance).
+- Added `tests/test_release_audit_actions.py`: **NOT RUN**.
+- Python compilation, full unit suite and `--ui-self-test`: **NOT RUN**.
+- Actual Windows 11 / WebView2 click, keyboard, hover, resize, scroll and screenshots: **NOT RUN**. Do not run/request Playwright visual QA; current MCC user override reserves screenshot review for user-supplied images.
+- Version remains **0.5.165 - Under construction ⚠️**.
+
 ## MCC v0.5.131 - Design system audit fixes (2026-11-17)
 
 - Fonts: Inter and JetBrains Mono load from the embedded `@font-face`; no system-font fallback in normal use.
