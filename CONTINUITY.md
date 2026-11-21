@@ -1,6 +1,6 @@
 ## Checkpoint 2026-11-21 - MCC v0.5.165 - Under construction ⚠️
 
-**Current source:** `Music Collection Cleaner v0.05.165.pyw` on `main` (version `0.5.165`). Base: v0.5.164 commit `2bfc89383b411b6592327a2007edb60cd190a150`. Feature commit `6898158036dad978fbdb8c807839bb98e5051352`; regression tests commit `db8edd3ce89b835dfa8bbcf7166fc1baea618b7e`.
+**Current source:** `Music Collection Cleaner v0.05.165.pyw` on `main` (version `0.5.165`). Base: v0.5.164 commit `2bfc89383b411b6592327a2007edb60cd190a150`. Feature commit `6898158036dad978fbdb8c807839bb98e5051352`; regression test creation `db8edd3ce89b835dfa8bbcf7166fc1baea618b7e`; test quoting fix `7e7321f8f222aa895413188d90ba9036c72a84bb`. Current `main` head at this checkpoint: `7e7321f8f222aa895413188d90ba9036c72a84bb`.
 
 ### Per-release integrity / tracklist review
 
