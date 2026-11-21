@@ -2,6 +2,13 @@
 
 Historical release notes and testing status retained from the original README.
 
+## v0.5.163 - Main window options always visible; Review next to Copy (Under construction ⚠️)
+
+- Changed: Audio I/O workers, UI size and Logging are always visible; the Advanced toggle is removed.
+- Changed: the Activity log is always visible; its Activity checkbox is removed. Its header is now live level bars that move while a scan runs.
+- Changed: `Remixes` / `Live recordings` are now `Keep Remixes` / `Keep Live recordings`, centred with Keeps and Skips.
+- Changed: Release Map Review moved from Step 4 to Step 5, before Copy, and reads `Review 2 warnings`; its list opens above Step 5.
+
 ## v0.5.162 - Save Remixes / Save Live OFF ignores them completely (Under construction ⚠️)
 
 - Fixed: with Save Remixes OFF every remix is ignored. The featured-vocalist and main-artist remix exceptions are removed, so `Always (Funkagenda Mix)`, `Suddenly (Ferry Corsten Mix)` and the rest of `These Re-Imagined Machines` no longer count as reasons to keep a release. Only your own Keeps bring a track back.

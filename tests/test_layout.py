@@ -259,8 +259,6 @@ class LayoutTests(unittest.TestCase):
                     page.evaluate("s=>renderState(s)", MAIN_STATE)
                     page.wait_for_timeout(300)
                     self._check(page, errors, "main", size)
-                    page.click("#advanced summary")
-                    self._check(page, errors, "main-advanced", size)
                     page, errors = self._open(browser, size, self.map_html, map_init)
                     page.wait_for_selector(".releaseRow")
                     self._check(page, errors, "map-changes", size)
@@ -283,10 +281,15 @@ class LayoutTests(unittest.TestCase):
             page.click("#reanalyzeBtn")
             self.assertEqual(page.evaluate("window.__calls"), ["scan"])
             page, errors = self._open(browser, VIEWPORTS[0], self.main_html)
-            page.evaluate("s=>renderState(s)", dict(MAIN_STATE, mapOpen=True, showActivity=False))
+            page.evaluate("s=>renderState(s)", dict(MAIN_STATE, mapOpen=True))
             self.assertEqual(page.eval_on_selector_all(".roleLabel", "e=>e.map(x=>x.textContent)")[1:], ["Folder 2", "Folder 3"])
             self.assertFalse(page.is_disabled("#openLogs"))
-            self.assertFalse(page.is_visible("#activity"))
+            self.assertTrue(page.is_visible("#activity") and page.is_visible("#ioWorkers"))
+            self.assertEqual(page.eval_on_selector_all("#keepOptions .check", "e=>e.map(x=>x.textContent)"),
+                             ["Keep Remixes", "Keep Live recordings"])
+            keep = page.eval_on_selector("#keepOptions", "e=>{const r=e.getBoundingClientRect();return r.left+r.width/2}")
+            row = page.eval_on_selector("#folderOptions", "e=>{const r=e.getBoundingClientRect();return r.left+r.width/2}")
+            self.assertAlmostEqual(keep, row, delta=1)
             browser.close()
 
 
