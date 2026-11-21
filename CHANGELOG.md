@@ -1,3 +1,10 @@
+## v0.5.165 - Per-release integrity review (Under construction ⚠️)
+
+- Added: audited release details now end with **Approve** and **Ignore** actions. Approve explicitly pins the complete release in the retained plan; Ignore excludes the complete release.
+- Changed: an audit warning blocks Copy/Move only while its release is unresolved. Every other unresolved warning continues to block export.
+- Changed: decisions reuse persistent source-path Keep/Ignore state and require Re-Analyze before Copy/Move. The original warning and source integrity evidence remain visible; no source file is modified or silently repaired.
+- Added: regression tests for decision exclusivity, reversibility, independent release blockers and the Release Map action wiring. Execution and Windows runtime acceptance are pending.
+
 # Music Collection Cleaner - Version History
 
 Historical release notes and testing status retained from the original README.
