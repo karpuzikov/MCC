@@ -1,3 +1,10 @@
+## v0.5.167 - Copy and Move audit fixes (Under construction ⚠️)
+
+- Protect Move exports from Undo before recycling any originals. Report the first recycle failure and the number of source folders already recycled.
+- Preserve empty source folders and the previous Copy journals when a Move skips every release.
+- Report artwork outcomes and errors separately from release export counts. Process covers only for newly created outputs.
+- Correct the README download and archive earlier builds.
+
 ## v0.5.166 - Preserve bracketed CD source metadata (Under construction ⚠️)
 
 - Fixed: Copy/Move now parses source folder names in the form `[1997] BT - ESCM [9 46799-2] CD`, retaining the source year and catalog number even when MusicBrainz is unavailable.

@@ -1,3 +1,7 @@
+## v0.5.167 - Export results
+
+The existing completion dialog identifies the requested operation, reports recycled folders for Move and separates artwork outcomes from release counts. Undo Copy appears only for a Copy that created output. Existing output-folder, Release Map, Close and keyboard behavior are retained. No new controls. Native Windows WebView2 acceptance NOT RUN. The Linux layout suite encountered the environment’s Chromium launch error.
+
 ## MCC v0.5.166 - Bracketed CD source-name metadata (2026-11-21)
 
 **Scope:** Copy/Move metadata parsing and destination folder naming only. No UI controls or visual layout changed.

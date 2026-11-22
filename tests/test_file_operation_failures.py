@@ -31,7 +31,7 @@ class FileOperationFailures(unittest.TestCase):
             patcher.start()
             self.addCleanup(patcher.stop)
 
-    def run_plan(self, move):
+    def run_plan(self, move, recycle=None):
         def fake_export(engine, folder, output, fmt, ff, ffprobe, source_files=None):
             for file in (source_files or list(Path(folder).glob('*.flac'))):
                 (output / Path(file).name).write_bytes(Path(file).read_bytes())
@@ -45,7 +45,7 @@ class FileOperationFailures(unittest.TestCase):
             patch.object(mcc, 'ensure_ffmpeg', lambda: ('ff', 'ffprobe')),
             patch.object(mcc, '_update_copied_track_tags', lambda *a, **k: None),
             patch.object(mcc, 'collection_credit_consensus', lambda *a, **k: {}),
-            patch.object(mcc, '_send_folders_to_recycle_bin', lambda folders: [__import__('shutil').rmtree(f) for f in folders]),
+            patch.object(mcc, '_send_folders_to_recycle_bin', recycle or (lambda folders: [__import__('shutil').rmtree(f) for f in folders])),
         )
         for item in patches:
             item.start()
@@ -70,6 +70,48 @@ class FileOperationFailures(unittest.TestCase):
         self.assertEqual(result['source_folders_recycled'], 2 - result['counts']['partial'] - result['counts']['skipped'])
         self.assertEqual(any(folder.exists() for folder in self.sources),
                          result['source_folders_recycled'] < 2)
+
+    def test_interrupted_move_protects_all_committed_exports(self):
+        import shutil
+        def recycle(folders):
+            self.assertFalse(self.sources[0].exists() and folders == [self.sources[1]])
+            if folders == [self.sources[1]]:
+                raise OSError("Recycle Bin unavailable")
+            shutil.rmtree(folders[0])
+        with patch.object(mcc, "completion_reasons", return_value=[]):
+            result = self.run_plan(True, recycle)
+        self.assertEqual(result["source_folders_recycled"], 1)
+        self.assertIn("Recycle Bin unavailable", result["problems"][0])
+        self.assertTrue(self.sources[1].exists())
+        with self.assertRaisesRegex(RuntimeError, "Move outputs are protected"):
+            mcc.undo_last_run()
+        self.assertEqual(len(list(self.destination.rglob("*.flac"))), 2)
+
+    def test_skipped_move_preserves_previous_copy_undo_and_empty_source_directories(self):
+        self.run_plan(False)
+        journals = {p: p.read_bytes() for p in (mcc.UNDO, mcc.ARTWORK_UNDO)}
+        empty = self.old_root / "Reserved"
+        empty.mkdir()
+        result = self.run_plan(True)
+        self.assertEqual(result["counts"]["skipped"], 2)
+        self.assertFalse(result["source_folders_modified"])
+        self.assertFalse(result["undo_available"])
+        self.assertTrue(empty.is_dir())
+        self.assertTrue(all(p.read_bytes() == saved for p, saved in journals.items()))
+
+    def test_artwork_failures_are_reported_independently_of_release_counts(self):
+        with patch.object(mcc, "_cover_release_barcode", side_effect=ValueError("unreadable barcode")):
+            result = self.run_plan(False)
+        self.assertEqual(result["counts"]["failed"], 0)
+        self.assertEqual(result["artwork_counts"]["failed"], 2)
+        self.assertEqual(sum("unreadable barcode" in p for p in result["problems"]), 2)
+
+    def test_artwork_batch_error_reaches_export_summary(self):
+        def fail(organizer, root, releases):
+            organizer.error = "Cannot write artwork journal"
+        with patch.object(mcc.Organizer, "_download_artwork", fail):
+            result = self.run_plan(False)
+        self.assertIn("Artwork: Cannot write artwork journal", result["problems"])
 
     def test_no_retained_release_is_an_error(self):
         self.decisions = [mcc.ReleaseDecision(d.release_id, 'DELETE', 'Dropped') for d in self.decisions]

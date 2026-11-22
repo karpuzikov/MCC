@@ -1,3 +1,11 @@
+## Checkpoint 2026-11-22 - MCC v0.5.167 - Under construction ⚠️
+
+Current entry point on main: `Music Collection Cleaner v0.05.167.pyw`. The README links to this file. Versions 164 through 166 are in version-history/.
+
+New Move journals record the operation kind before the destination rename. Undo refuses a Move journal even after interruption. Recycling stops at the first error and reports completed source folders. Move no longer traverses source roots to remove empty directories. A fully skipped export preserves the previous journals. Artwork uses the current run’s committed release paths and returns separate counts and problems.
+
+Validation: 289 passed, one skipped, two layout tests blocked at Chromium startup in the Linux sandbox. The four new integration regressions passed with temporary directories and simulated recycle/artwork outcomes. The README target matches the compiled entry point. Native Windows Recycle Bin and WebView2 acceptance NOT RUN. The next acceptance check is to run Copy and Move on disposable Windows folders, verify cover failure feedback, and exercise interruption and Undo. Older unfinished Move journals have no operation kind and cannot be distinguished from old Copy journals. Do not use Undo on an interrupted pre-167 Move without inspecting its exports.
+
 ## Checkpoint 2026-11-21 - MCC v0.5.166 - Under construction ⚠️
 
 **Current source:** `Music Collection Cleaner v0.05.166.pyw` on `main`, created from v0.5.165. This checkpoint addresses the reported Copy naming defect for source folders such as `[1997] BT - ESCM [9 46799-2] CD`.
