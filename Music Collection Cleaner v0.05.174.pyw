@@ -14136,6 +14136,7 @@ class Organizer:
             self._artist_root = artist_main
             self._credit_consensus = credit_consensus
             for index, (source_name, members, source) in enumerate(groups, 1):
+                source = Path(source).resolve(strict=True)
                 if self.stop.is_set():
                     self.status = "Cancelled. Completed output can be undone."
                     break
@@ -14373,6 +14374,10 @@ class Organizer:
 
     def _export_release(self, source, dest, fmt, ff, ffprobe,
                         source_files=None, disc_folders=()):
+        # Windows 8.3 aliases (RUNNER~1) and canonical long paths must be
+        # compared in the same namespace before any CUE traversal checks.
+        source = Path(source).resolve(strict=True)
+        disc_folders = tuple(Path(disc).resolve(strict=True) for disc in disc_folders)
         files = list(source_files) if source_files is not None else collect_files(source)
         def output_subdir(parent):
             for position, disc in enumerate(disc_folders, 1):
@@ -14400,7 +14405,7 @@ class Organizer:
                 if rec["file"]:
                     linked = (cp.parent / rec["file"].replace("\\", os.sep)).resolve()
                     if source != linked and source not in linked.parents:
-                        raise RuntimeError("CUE audio escapes release folder: " + rec["file"] + f" [source={source!r}; linked={linked!r}; source_resolved={Path(source).resolve()!r}; parents={linked.parents!r}]")
+                        raise RuntimeError("CUE audio escapes release folder: " + rec["file"])
             try:
                 found = cue_image_plan(cp, parsed)
             except ValueError as exc:
