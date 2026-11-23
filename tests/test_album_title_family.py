@@ -168,6 +168,8 @@ class EditionNamesAndKeepButton(unittest.TestCase):
 
     def test_skipped_release_offers_keep_not_ignore(self):
         source = (Path(mcc.__file__)).read_text(encoding="utf-8-sig")
-        code = source[source.index("const releaseAction="):].split(";", 1)[0]
-        self.assertIn('n.kind==="retained"?"Ignore":"Keep"', code)
-        self.assertIn('"toggleKeepRelease"', source)
+        code = source[source.index('  let ignoreRelease="";'):source.index('  let auditActions="";')]
+        self.assertIn('const keep=n.releaseBlocked||(!n.forceKeep&&n.kind!=="retained")', code)
+        self.assertIn(' Keep', code)
+        self.assertIn(' Skip', code)
+        self.assertIn('toggleKeepRelease', source)

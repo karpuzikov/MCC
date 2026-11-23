@@ -67,7 +67,7 @@ class HoverActions(unittest.TestCase):
             ({'unique':True,'coveredBy':['Retained Deluxe']},'Also on: Retained Deluxe'),
             ({'unique':False,'excluded':True,'isLive':True},'Excluded: Live'),
             ({'unique':True,'excluded':True,'isLive':True},'Excluded: Live'),
-            ({'unique':True,'manualSkip':True,'groupId':5},'Ignored recording everywhere'),
+            ({'unique':True,'manualSkip':True,'groupId':5},'Skipped recording everywhere'),
         ]
         statuses=self.run_js(r'''
 const input=JSON.parse(require('fs').readFileSync(0,'utf8'));
@@ -361,15 +361,15 @@ process.stdout.write(JSON.stringify(results));
         start = html.index('    let action="";')
         code = html[start:html.index('    const statusText=trackStatus(t,n);', start)]
         cases = [
-            ('normal', {}, True, ['remix', 'live'], 'Ignore'),
-            ('saved remix', {'patternKind': 'remix'}, True, ['live'], 'Ignore'),
-            ('saved live', {'patternKind': 'live'}, True, ['remix'], 'Ignore'),
+            ('normal', {}, True, ['remix', 'live'], 'Skip'),
+            ('saved remix', {'patternKind': 'remix'}, True, ['clear', 'live'], 'Skip'),
+            ('saved live', {'patternKind': 'live'}, True, ['remix', 'clear'], 'Skip'),
             ('saved skip', {'patternKind': 'skip', 'excluded': True}, True, ['remix', 'live'], None),
-            ('ignored', {'manualSkip': True, 'excluded': True}, True, ['remix', 'live'], 'Restore'),
-            ('pending ignore', {'manualSkip': True, 'pendingIgnore': True}, True, ['remix', 'live'], 'Restore'),
-            ('pending restore', {'excluded': True, 'pendingRestore': True}, True, ['remix', 'live'], 'Ignore'),
+            ('ignored', {'manualSkip': True, 'excluded': True}, True, ['remix', 'live'], 'Keep'),
+            ('pending ignore', {'manualSkip': True, 'pendingIgnore': True}, True, ['remix', 'live'], 'Keep'),
+            ('pending restore', {'excluded': True, 'pendingRestore': True}, True, ['remix', 'live'], 'Skip'),
             ('option excluded', {'excluded': True}, True, ['remix', 'live'], None),
-            ('ungrouped', {'groupId': -1}, True, ['remix', 'live'], 'Ignore'),
+            ('ungrouped', {'groupId': -1}, True, ['remix', 'live'], 'Skip'),
             ('read only', {'patternKind': 'skip'}, False, [], None),
         ]
         inputs = [{'track': {'index': 7, 'groupId': 42, **track_patch}, 'editable': editable}

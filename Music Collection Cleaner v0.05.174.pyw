@@ -15384,6 +15384,9 @@ select { appearance:none; padding-right:calc(var(--space-3) + var(--space-2)); b
 .sectionLabel { font:var(--type-table-header); letter-spacing:var(--section-tracking); text-transform:uppercase; color:var(--body); }
 
 /* Main window */
+#mapPanel:not([hidden]) { display:block; flex:1; min-height:0; width:100%; }
+#mapFrame { display:block; border:0; width:100%; height:100%; background:var(--canvas); }
+#homeBtn[hidden],#mapPanel[hidden],#mainContent[hidden] { display:none!important; }
 #mainContent { flex:1; min-height:0; display:flex; flex-direction:column; gap:var(--space-2); padding:var(--space-2); }
 .step { flex:none; display:flex; flex-direction:column; gap:var(--space-2); }
 #sourceRows { display:grid; grid-template-columns:auto auto minmax(0,1fr) auto auto auto; gap:var(--space-2); }
@@ -16844,10 +16847,10 @@ function openDetails(n) {
   if((n.auditIssues||[]).length)notices+='<div class="notice"><span class="warnMark">⚠︎</span> '+esc(n.auditIssues.join("\n"))+'</div>';
   inner.innerHTML='<div id="detailsHead"><div id="releaseNameRow"><div id="releaseName">'+esc(n.name)+'</div>'
     +'<button class="iconBtn clearBtn" id="closeDetailsBtn" title="Close details" aria-label="Close details">{{icon:close}}</button></div>'
-    +'<div id="factsRow"><div id="releaseFacts">'+releaseFactsHtml(n,true)+'</div>'+ignoreRelease+auditActions+albumGroupActions+'</div>'
+    +'<div id="factsRow"><div id="releaseFacts">'+releaseFactsHtml(n,true)+'</div>'+ignoreRelease+albumGroupActions+'</div>'
     +'<div id="pathRow"><div id="releasePath" role="textbox" aria-readonly="true" tabindex="0" aria-label="Release folder path">'+esc(n.path)+'</div>'
     +'<button class="iconBtn" id="openFolderBtn" title="Show in Explorer" aria-label="Show in Explorer">{{icon:explorer}}</button></div>'+notices+'</div>'
-    +'<div id="tracks">'+tracks+'</div>';
+    +'<div id="tracks">'+tracks+'</div>'+(hasAuditIssues?'<div id="auditActions">'+auditActions+'</div>':"");
   aside.classList.add("open");
   if(opening) requestAnimationFrame(scheduleConnections);
   document.getElementById("closeDetailsBtn").onclick=closeDetails;
@@ -18955,11 +18958,6 @@ def _webview_main_html() -> str:
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Music Collection Cleaner</title>
 <style>/*APP_THEME*/</style>
-<style>
-#mapPanel:not([hidden]){display:block;height:calc(100vh - 56px);min-height:0;width:100%}
-#mapFrame{display:block;border:0;width:100%;height:100%;background:var(--canvas)}
-#homeBtn[hidden],#mapPanel[hidden],#mainContent[hidden]{display:none!important}
-</style>
 </head>
 <body>
 <header class="topBar sep">
