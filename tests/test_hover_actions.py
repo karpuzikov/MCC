@@ -14,7 +14,10 @@ from test_audio_safety import mcc
 
 
 ROOT = Path(__file__).resolve().parents[1]
-SOURCE = Path(os.environ.get('MCC_TEST_SOURCE', str(max(ROOT.glob('Music Collection Cleaner v*.pyw')))))
+SOURCE = Path(os.environ.get("MCC_TEST_SOURCE") or str(max(
+    [*ROOT.glob("Music Collection Cleaner v*.pyw"), *ROOT.glob("Music.Collection.Cleaner.v*.pyw")],
+    key=lambda p: tuple(int(x) for x in __import__("re").findall(r"\d+", p.stem)[-3:]),
+)))
 NODE = shutil.which('node')
 
 
