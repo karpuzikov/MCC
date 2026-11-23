@@ -5696,6 +5696,133 @@ def _candidate_semantic_conflict(
     return bool(va and vb and va.isdisjoint(vb))
 
 
+
+# The grouping cache is keyed by all input features read by the acoustic
+# matcher, including decoded fingerprint content, file identity and user
+# classification. Never cache manual-review cases or detailed-comparison logs.
+ACOUSTIC_GROUP_CACHE_SCHEMA = 1
+_ACOUSTIC_GROUP_MUTATIONS = (
+    "group_id", "coverage_group_id", "comparison_index",
+    "identity_duration_seconds", "exclude_from_coverage",
+    "base_excluded_from_coverage", "acoustic_policy_reconciled",
+    "excluded_by_pattern",
+)
+
+
+def _acoustic_group_cache_path() -> Path:
+    return _cache_dir() / "acoustic-groups-v1.json.z"
+
+
+def _acoustic_group_cache_key(tracks: Sequence[Track]) -> str:
+    digest = hashlib.sha256(
+        f"MCC-acoustic-v4|{APP_VERSION}|{ACOUSTIC_GROUP_CACHE_SCHEMA}".encode()
+    )
+    for track in tracks:
+        values = dict(vars(track))
+        values["fingerprint"] = hashlib.sha256(
+            _pack_fingerprint(track.fingerprint)
+        ).hexdigest() if track.fingerprint else ""
+        for name in _ACOUSTIC_GROUP_MUTATIONS:
+            values.pop(name, None)
+        values["media_signature"] = _media_cache_signature(track.path)
+        if track.cue_path:
+            values["cue_signature"] = _media_cache_signature(track.cue_path)
+        digest.update(json.dumps(
+            values, ensure_ascii=False, sort_keys=True, default=str,
+            separators=(",", ":"),
+        ).encode("utf-8", errors="replace"))
+        digest.update(b"\0")
+    return digest.hexdigest()
+
+
+def _read_acoustic_group_cache(key: str, tracks: List[Track]):
+    try:
+        path = _acoustic_group_cache_path()
+        if path.stat().st_size > 32 * 1024 * 1024:
+            return None
+        document = json.loads(zlib.decompress(path.read_bytes()).decode("utf-8"))
+        if (document.get("schema") != ACOUSTIC_GROUP_CACHE_SCHEMA
+                or document.get("key") != key):
+            return None
+        rows = document["tracks"]
+        if len(rows) != len(tracks):
+            return None
+        groups = {int(gid): list(map(int, members))
+                  for gid, members in document["groups"].items()}
+        if any(i < 0 or i >= len(tracks) for members in groups.values() for i in members):
+            return None
+        if any(set(row) != set(_ACOUSTIC_GROUP_MUTATIONS) for row in rows):
+            return None
+        # Validate everything before modifying any track object.
+        for row in rows:
+            if not isinstance(row["group_id"], int) or row["group_id"] < -1:
+                return None
+            if not math.isfinite(float(row["identity_duration_seconds"])):
+                return None
+        for track, row in zip(tracks, rows):
+            for name in _ACOUSTIC_GROUP_MUTATIONS:
+                setattr(track, name, row[name])
+        return groups, list(document["notes"]), list(document["reviews"])
+    except (OSError, ValueError, TypeError, KeyError, IndexError,
+            zlib.error, OverflowError, AttributeError):
+        return None
+
+
+def _write_acoustic_group_cache(key: str, tracks: List[Track],
+                                groups: Dict[int, List[int]],
+                                notes: List[str], reviews: List[Dict[str, object]]) -> None:
+    if reviews:
+        return
+    temp = None
+    try:
+        destination = _acoustic_group_cache_path()
+        destination.parent.mkdir(parents=True, exist_ok=True)
+        document = {
+            "schema": ACOUSTIC_GROUP_CACHE_SCHEMA,
+            "key": key,
+            "tracks": [
+                {name: getattr(track, name) for name in _ACOUSTIC_GROUP_MUTATIONS}
+                for track in tracks
+            ],
+            "groups": {str(gid): ids for gid, ids in groups.items()},
+            "notes": [str(note) for note in notes],
+            "reviews": [],
+        }
+        payload = zlib.compress(json.dumps(
+            document, ensure_ascii=False, separators=(",", ":"),
+        ).encode("utf-8"), 2)
+        temp = destination.with_name(destination.name + "." + uuid.uuid4().hex + ".tmp")
+        temp.write_bytes(payload)
+        os.replace(temp, destination)
+    except (OSError, ValueError, TypeError):
+        pass  # This is an optional acceleration, not an export prerequisite.
+    finally:
+        if temp is not None:
+            try:
+                temp.unlink(missing_ok=True)
+            except OSError:
+                pass
+
+
+def merge_equivalent_tracks_cached(tracks: List[Track], progress_cb=None,
+                                   comparison_log_path: Optional[Path] = None):
+    """Skip unchanged acoustic pairs without weakening fingerprint authority."""
+    if comparison_log_path is not None:
+        # Detailed diagnostics must describe actual comparisons.
+        return merge_equivalent_tracks(tracks, progress_cb, comparison_log_path)
+    key = _acoustic_group_cache_key(tracks)
+    cached = _read_acoustic_group_cache(key, tracks)
+    if cached is not None:
+        if progress_cb:
+            progress_cb("Matching recordings (cached)...", 1, 1)
+        return cached
+    groups, notes, reviews = merge_equivalent_tracks(
+        tracks, progress_cb, comparison_log_path,
+    )
+    _write_acoustic_group_cache(key, tracks, groups, notes, reviews)
+    return groups, notes, reviews
+
+
 def _fingerprint_identity_candidates(tracks: List[Track]) -> List[Track]:
     """Readable files, except remixes / live tracks excluded by Save Remixes / Save Live OFF.
 
@@ -9023,7 +9150,7 @@ def analyze_prepared(
             if database is not None:
                 database.close()
 
-    groups, merge_notes, reviews = merge_equivalent_tracks(
+    groups, merge_notes, reviews = merge_equivalent_tracks_cached(
         tracks,
         progress_cb,
         comparison_log_path,
