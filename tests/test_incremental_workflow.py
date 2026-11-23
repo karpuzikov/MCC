@@ -92,6 +92,52 @@ class IncrementalWorkflow(unittest.TestCase):
         self.assertIn('window.__deaStateChanged', html)
         self.assertIn('window.__deaEventRaised', html)
 
+    def test_repeated_full_scan_reuses_exact_acoustic_group_results(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            with patch.object(mcc, "_cache_dir", return_value=Path(tmp)):
+                first = mcc.Track(1, Path(tmp) / "song.flac", 1, title="Song",
+                                  duration=180.0, fingerprint=(12, 34, 56))
+                second = mcc.Track(1, first.path, 1, title="Song",
+                                   duration=180.0, fingerprint=(12, 34, 56))
+                def compare(tracks, *_args):
+                    tracks[0].group_id = 7
+                    tracks[0].comparison_index = 0
+                    return {7: [0]}, [], []
+                with patch.object(mcc, "merge_equivalent_tracks", side_effect=compare) as expensive:
+                    self.assertEqual(mcc.merge_equivalent_tracks_cached([first])[0], {7: [0]})
+                    self.assertEqual(mcc.merge_equivalent_tracks_cached([second])[0], {7: [0]})
+                    self.assertEqual(expensive.call_count, 1)
+                    self.assertEqual(second.group_id, 7)
+                    third = mcc.Track(1, first.path, 1, title="Different title",
+                                      duration=180.0, fingerprint=(12, 34, 56))
+                    mcc.merge_equivalent_tracks_cached([third])
+                    self.assertEqual(expensive.call_count, 2)
+
+    def test_diagnostic_logging_bypasses_acoustic_group_cache(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            with patch.object(mcc, "_cache_dir", return_value=Path(tmp)):
+                track = mcc.Track(1, Path(tmp) / "song.flac", 1, title="Song",
+                                  duration=180.0, fingerprint=(12, 34, 56))
+                with patch.object(mcc, "merge_equivalent_tracks",
+                                  return_value=({0: [0]}, [], [])) as expensive:
+                    mcc.merge_equivalent_tracks_cached([track])
+                    mcc.merge_equivalent_tracks_cached([track], comparison_log_path=Path(tmp) / "log.jsonl")
+                    self.assertEqual(expensive.call_count, 2)
+
+    def test_acoustic_cache_changes_with_audio_and_metadata(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            song = Path(tmp) / "song.flac"
+            song.write_bytes(b"audio one")
+            track = mcc.Track(1, song, 1, title="Song", duration=100.0,
+                              fingerprint=(10, 11, 12))
+            baseline = mcc._acoustic_group_cache_key([track])
+            track.fingerprint = (10, 11, 13)
+            changed_fingerprint = mcc._acoustic_group_cache_key([track])
+            self.assertNotEqual(baseline, changed_fingerprint)
+            track.fingerprint = (10, 11, 12)
+            song.write_bytes(b"changed longer audio")
+            self.assertNotEqual(baseline, mcc._acoustic_group_cache_key([track]))
+
     def test_process_scenes_are_non_generic_for_safety_stages(self):
         html = mcc._webview_main_html()
         self.assertIn('[/verifying audio file integrity|checking audio files/i,"integrity"]', html)
