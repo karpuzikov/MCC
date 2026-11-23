@@ -74,8 +74,10 @@ class FileOperationFailures(unittest.TestCase):
     def test_interrupted_move_protects_all_committed_exports(self):
         import shutil
         def recycle(folders):
-            self.assertFalse(self.sources[0].exists() and folders == [self.sources[1]])
-            if folders == [self.sources[1]]:
+            expected = [self.sources[1].resolve(strict=False)]
+            normalized = [Path(folder).resolve(strict=False) for folder in folders]
+            self.assertFalse(self.sources[0].exists() and normalized == expected)
+            if normalized == expected:
                 raise OSError("Recycle Bin unavailable")
             shutil.rmtree(folders[0])
         with patch.object(mcc, "completion_reasons", return_value=[]):
