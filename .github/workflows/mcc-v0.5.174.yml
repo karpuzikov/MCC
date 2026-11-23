@@ -17,6 +17,14 @@ jobs:
         run: python -m py_compile "Music Collection Cleaner v0.05.174.pyw"
       - name: Run regression suite
         run: python -m unittest discover -s tests -p "test_*.py"
+      - name: Retain source and tests for validation
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: mcc-v0.5.174-validation-source
+          path: |
+            Music Collection Cleaner v0.05.174.pyw
+            tests/
 
   browser-visual-qa:
     runs-on: windows-latest
