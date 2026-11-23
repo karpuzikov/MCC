@@ -1,3 +1,27 @@
+## Checkpoint 2026-11-23 - MCC v0.5.174 - Under construction ⚠️
+
+**Source candidate:** `Music.Collection.Cleaner.v0.05.174.pyw` on branch `fix/v0.5.174-incremental-review`. Base: tagged v0.5.173 (`34b5959de63f59679abca797cd438233e6a8962b`). User feedback is canonical in [issue #2](https://github.com/karpuzikov/MCC/issues/2). Earlier root versions 170-173 moved into `version-history/`; no stable v174 release or tag has been published.
+
+### Completed changes
+- Resolve explicitly named EPs before compilation/anthology heuristics and preserve EP column when acoustically related to other long-form releases. Example: `[2000] BT - Extended Movement (EP) [0 6700 39957 2 6] CD`.
+- Track action menu now exposes both Remix and Live as checked/reversible items. A second click removes the saved category; it does **not** promote to Personal Picks. Internal neutral override `standard` prevents automatic title heuristics from reapplying removed labels. User-facing Keep/Skip consistency replaces Ignore/Restore, without breaking saved-rule keys.
+- Cached classification-only Re-scan recalculates policy and solver from existing, verified identity groups. Does not call integrity decode, Chromaprint generation or acoustic pair comparisons on that path. Files that changed since Scan are rejected using path/size/mtime_ns/ctime_ns; unverified newly included content is refused pending full Scan. Cached file identity is captured at initial Scan completion and checked before Re-scan and Copy.
+- Stage-specific audio decode and silent-boundary waveforms, improved stage mapping and reduced activity-log redundancy.
+- Same native window: Release Map iframe driven by whitelisted bridge, Folders navigation, Copy/Move no longer destroys map, live destination path and Open destination control, preserved output journals. Legacy standalone map host retained for compatibility but not used by main flow.
+
+### Verification
+- GitHub Actions Linux Python 3.12: v174 py_compile PASS.
+- Python regression and existing organizer suites: PASS (see latest Actions summary).
+- Node JavaScript syntax, real menu interaction tests: PASS.
+- Headless Chromium embedded map, parent bridge, persistent destination smoke tests: PASS.
+- **NOT RUN**: native Windows 11/WebView2 actual screenshots, DPI resizing/focus/navigation, real Copy/Move/Undo and the user's full 3,402 tracks. Therefore **Under construction ⚠️**; never claim stable until these run.
+- No GitHub release/tag or final merge to main as of this checkpoint. Version is a branch candidate.
+
+### Exact next action
+Check the latest Actions run for `fix/v0.5.174-incremental-review`; fix any failures. Validate the actual Windows executable and a disposable release collection, especially classification-only Re-scan, source changes, EP column, map/Copy persistence and real output paths. Then merge and publish a new versioned release only if all mandatory QA gates pass. Read `SOFTWARE_RULES.md`, `RULES.md`, `UI_UX_RULES.md`, `docs/v0.5.174-control-contract.md` before edits.
+
+---
+
 ## Checkpoint 2026-11-22 - MCC v0.5.167 - Under construction ⚠️
 
 Current entry point on main: `Music Collection Cleaner v0.05.167.pyw`. The README links to this file. Versions 164 through 166 are in version-history/.
