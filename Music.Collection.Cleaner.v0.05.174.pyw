@@ -17491,8 +17491,12 @@ def _assign_release_map_display_groups(nodes: List[Dict[str, object]], releases:
             continue
         source_row["displayGroupKey"] = target_row.get("displayGroupKey", "")
         source_row["displayGroupTitle"] = target_row.get("displayGroupTitle", "")
-        # A manual family link must not turn an EP into an Anthology.
-        source_row["displayGroupKind"] = source_kind or "album"
+        # Explicit EPs retain their category; other manual assignments
+        # may deliberately place Singles in an Album family.
+        source_row["displayGroupKind"] = (
+            "ep" if source_kind == "ep"
+            else str(target_row.get("displayGroupKind") or target_kind or "album")
+        )
 
 
 def _release_map_group_id(row: Dict[str, object]) -> int:
@@ -18833,14 +18837,13 @@ def _webview_main_html() -> str:
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Music Collection Cleaner</title>
-<style>/*APP_THEME*/</style>
-<style>
+<style>/*APP_THEME*/
 #mapShell{position:fixed;inset:0;z-index:8;background:var(--canvas,#111);overflow:hidden}
 #mapShell[hidden],#mapCopyBar[hidden]{display:none}
 #mapFrame{width:100%;height:100%;border:0;display:block}
 #mapShell.copyActive #mapFrame{height:calc(100% - 45px)}
 #mapCopyBar{position:absolute;bottom:0;left:0;right:0;height:45px;
- display:flex;align-items:center;gap:10px;padding:0 14px;
+ display:flex;align-items:center;gap:var(--space-2);padding:0 var(--space-2);
  background:var(--surface,#202225);border-top:1px solid var(--hairline,#444)}
 #copyPath{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;
  font:12px 'JetBrains Mono',monospace}
