@@ -112,7 +112,7 @@ def run(app, output, browser_kind):
         raise SystemExit("Install test dependency: py -m pip install playwright")
     if not app.is_file():
         raise SystemExit("Missing source: "+str(app))
-    html=runpy.run_path(str(app),run_name="mcc_visual_qa")["_webview_release_map_html"]()
+    html=runpy.run_path(str(app),run_name="mcc_visual_qa")["_webview_release_map_html"](inline=True)
     if html.count("</script>")!=1:
         raise RuntimeError("MCC Release Map must contain exactly one module script")
     html=html.replace("</script>",
@@ -146,8 +146,9 @@ def run(app, output, browser_kind):
                         "console: "+m.text) if m.type=="error" else None)
                     init="window.__qaFixture="+json.dumps(data,ensure_ascii=False)+";"+r"""
 window.__qaEvents=[];window.pywebview={api:{
- getState:()=>JSON.stringify(window.__qaFixture),
- markTrackPattern:(index,kind)=>{
+ map_getState:()=>JSON.stringify(window.__qaFixture),
+ map_getOrganizer:()=>JSON.stringify({format:'FLAC',enable_encoding:false,enable_checker:false,enable_splitting:false}),
+ map_markTrackPattern:(index,kind)=>{
    window.__qaEvents.push({index,kind});
    return JSON.stringify({kind:'patternToggle',tracks:[],requiresFreshScan:true});
  }
@@ -204,8 +205,8 @@ window.__qaEvents=[];window.pywebview={api:{
                         problems.append("Duplicate Copy path button")
                     if not page.locator(".trackActionGroup").first.is_visible():
                         problems.append("Hover actions inaccessible")
-                    if page.locator('.track').first.locator('.patternMark[data-kind="remix"]').count():
-                        problems.append("Saved Remix duplicated in actions")
+                    if not page.locator('.track').first.locator('.patternMark[data-kind="remix"]').count():
+                        problems.append("Saved Remix cannot be toggled off")
                     group=page.locator(".albumGroupActions")
                     if group.count():
                         if group.evaluate("(x)=>x.open"):
