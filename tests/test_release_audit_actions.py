@@ -7,9 +7,9 @@ from test_audio_safety import mcc
 class ReleaseAuditActions(unittest.TestCase):
     def setUp(self):
         self.snapshots = [
-            {"release_id": 7, "name": "Damaged candidate", "audit_issues": ["Corrupt/unreadable 07.flac: invalid sync code"]},
-            {"release_id": 8, "name": "Tracklist issue", "audit_issues": ["missing track number(s): 2"]},
-            {"release_id": 9, "name": "Clean release", "audit_issues": []},
+            {"release_id": 7, "action": "ADD", "name": "Damaged candidate", "audit_issues": ["Corrupt/unreadable 07.flac: invalid sync code"]},
+            {"release_id": 8, "action": "REPLACE", "name": "Tracklist issue", "audit_issues": ["missing track number(s): 2"]},
+            {"release_id": 9, "action": "KEEP", "name": "Clean release", "audit_issues": []},
         ]
         self.blocked = set()
         self.pinned = set()
