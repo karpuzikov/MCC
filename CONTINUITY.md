@@ -1,3 +1,13 @@
+## Checkpoint 2026-11-23 - MCC v0.5.174 - Under construction ⚠️
+
+**Development branch:** fix/mcc-v0.5.174-workflow, based on tag v0.5.173 (not the stale main v0.05.170). Current intended app root: Music Collection Cleaner v0.05.174.pyw. GitHub issue #2 tracks the user's complete feedback.
+
+**Changes:** Conservative cache of successful FFmpeg integrity checks keyed by file+decoder metadata; compressed SQLite Chromaprint cache keyed by file+CUE+fpcalc metadata; in-memory reapplication of Remix/Live/Skip patterns with existing acoustic groups reused for classification-only Re-scan. Explicit EP precedence and map EP column protection. One WebView2 host window (Scan and Map views via load_html), map remains loaded during Copy/Move with current target paths and Open destination. Keep/Skip vocabulary, reversible Remix/Live menu actions, reduced Activity verbosity, process-specific animations.
+
+**Validation:** Python compilation, unit tests, native Windows WebView2 visual/keyboard QA, staged Copy/Move/Undo, and 3,402-track profiling have NOT RUN as of this checkpoint. Code must remain Under construction ⚠️ until these are completed. In particular confirm pywebview's dynamic prefixed bridge exposure and in-window reloading on Windows. Only test Copy/Move with disposable music folders; never Move the source music collection. Check persistent cached fingerprints for changed CUE files and corruption, stale-cache handling and repeated runs.
+
+**Required next action:** Run CI Python compilation and tests on the branch; fix every failure. Then perform real Windows WebView2 inspection (Scan → Release Map → mark/clear Remix → Re-scan → Copy/Move) with screenshots, 100% interaction coverage and disposable output. Benchmark that a two-track Remix change performs zero whole-library FFmpeg/fpcalc runs and zero acoustic pair recomparisons. If CI and Windows QA pass, update this checkpoint with concrete results, fast-forward main, and publish a versioned GitHub release. Do not label stable or merge on static inspection alone.
+
 ## Checkpoint 2026-11-22 - MCC v0.5.167 - Under construction ⚠️
 
 Current entry point on main: `Music Collection Cleaner v0.05.167.pyw`. The README links to this file. Versions 164 through 166 are in version-history/.

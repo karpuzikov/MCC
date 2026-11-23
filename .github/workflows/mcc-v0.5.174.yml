@@ -1,0 +1,19 @@
+name: MCC validation
+
+on:
+  push:
+    branches: [fix/mcc-v0.5.174-workflow]
+  pull_request:
+
+jobs:
+  windows-regression:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Compile current MCC source
+        run: python -m py_compile "Music Collection Cleaner v0.05.174.pyw"
+      - name: Run regression suite
+        run: python -m unittest discover -s tests -p "test_*.py"

@@ -14244,7 +14244,7 @@ class Organizer:
                         self._export_warnings = []
                         self._export_notices = []
                         try:
-                            self.status = f"Organizing {index}/{len(groups)}: {out_name}"
+                            self.status = f"Organizing {index}/{len(groups)}: {target}"
                             export_started = time.monotonic()
                             if grouped:
                                 self._export_release(
@@ -14259,7 +14259,7 @@ class Organizer:
                             if not info["physical"] and self.enable_checker:
                                 checker_started = time.monotonic()
                                 try:
-                                    self.status = f"AudioChecker {index}/{len(groups)}: {out_name}"
+                                    self.status = f"AudioChecker {index}/{len(groups)}: {target}"
                                     result["checker"] = native_check_web_release(
                                         tmp, fmt, ff, self.stop, self.checker_workers,
                                         release_name=target.name)
@@ -15925,7 +15925,11 @@ def _webview_release_map_html(inline: bool = False) -> str:
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Music Collection Cleaner - Release Map</title>
-<style>/*APP_THEME*/</style>
+<style>/*APP_THEME*/
+#copyLive[hidden]{display:none}
+#copyLive{font-size:12px;padding:6px 12px;gap:10px}
+#copyLiveStatus{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+</style>
 </head>
 <body>
 <header class="topBar sep" id="toolbar">
@@ -16470,7 +16474,7 @@ function changeReason(n,kind) {
   if(kind==="added"){
     const unique=uniqueAddedTitles(n);
     if(unique.length)return "Retained for: "+unique.slice(0,3).join("; ")+(unique.length>3?"; +"+(unique.length-3)+" more":"");
-    if((n.tracks||[]).some(function(t){return t.pendingIgnore||t.pendingRestore;}))return "Ignore changes pending - Re-scan required.";
+    if((n.tracks||[]).some(function(t){return t.pendingIgnore||t.pendingRestore;}))return "Skip changes pending - Re-scan required.";
     return String(n.reason||"New addition from the NEW / update folder.");
   }
   if(kind==="upgraded"){
@@ -16486,9 +16490,9 @@ function changeReason(n,kind) {
   }
   if(kind==="removed") return String(n.reason||"OLD release is not retained in the improved discography.");
   if(kind==="ignored"){
-    if(n.pendingReleaseIgnore) return "Pending Ignore - Re-scan required.";
-    if(n.pendingReleaseRestore) return "Pending Restore - Re-scan required.";
-    return "Ignored by you.";
+    if(n.pendingReleaseIgnore) return "Pending Skip - Re-scan required.";
+    if(n.pendingReleaseRestore) return "Pending Keep - Re-scan required.";
+    return "Skipped by you.";
   }
   return "Unchanged retained release.";
 }
@@ -16504,7 +16508,7 @@ function renderChangeSummary() {
     ["changesAddedBtn","added","+ Added",counts.added],
     ["changesUpgradedBtn","upgraded","↑ Upgraded",counts.upgraded],
     ["changesRemovedBtn","removed","Removed",counts.removed],
-    ["changesIgnoredBtn","ignored","⊘ Ignored",counts.ignored]
+    ["changesIgnoredBtn","ignored","⊘ Skipped",counts.ignored]
   ];
   specs.forEach(function(spec){
     const el=document.getElementById(spec[0]);
@@ -16552,7 +16556,7 @@ function releaseFactsHtml(n,boxed) {
 }
 function rowMarker(n) {
   const kind=changeKind(n);
-  if(kind==="ignored") return {cls:"ignored",symbol:"&nbsp;",label:n.pendingReleaseIgnore?"Pending ignore":(n.pendingReleaseRestore?"Pending restore":"Ignored")};
+  if(kind==="ignored") return {cls:"ignored",symbol:"&nbsp;",label:n.pendingReleaseIgnore?"Pending skip":(n.pendingReleaseRestore?"Pending keep":"Skipped")};
   if(kind==="added") return {cls:"add",symbol:"+",label:"Add"};
   if(kind==="upgraded") return {cls:"upgrade",symbol:"↑",label:"Upgrade"};
   if(kind==="replacementSource"||kind==="removed"||n.kind==="duplicate") return {cls:"skip",symbol:"",label:"Skip"};
@@ -16603,7 +16607,7 @@ function renderChangesBoard(nodes) {
     changeSection(list,"Search",searchMatchesFor(q));
   } else {
     let shown=0;
-    [["added","Added"],["upgraded","Upgraded"],["removed","Removed"],["ignored","Ignored"]].forEach(function(spec){
+    [["added","Added"],["upgraded","Upgraded"],["removed","Removed"],["ignored","Skipped"]].forEach(function(spec){
       if(changeFilter!=="all"&&changeFilter!==spec[0])return;
       const items=nodes.filter(function(n){return changeKind(n)===spec[0];});
       if(!items.length)return;
@@ -16724,17 +16728,17 @@ function highlightAlternativeVersion(v) {
 }
 function exclusionStatus(t) {
   const reason=String(t.exclusionReason||"").trim();
-  if(reason==="Explicit>Clean") return "Explicit > Clean - excluded from selection";
-  if(reason) return "Excluded: "+reason;
+  if(reason==="Explicit>Clean") return "Explicit > Clean - skipped";
+  if(reason) return "Skipped: "+reason;
   if(t.isRemix&&t.isLive) return "Excluded: Remix / Live";
   if(t.isRemix) return "Excluded: Remix";
   if(t.isLive) return "Excluded: Live";
-  return "Excluded from scan (reason not recorded)";
+  return "Skipped (reason not recorded)";
 }
 function trackStatus(t,n) {
-  if(t.pendingIgnore) return (Number(t.groupId)>=0?"Ignore recording everywhere":"Ignore this track")+" - Re-scan required";
-  if(t.pendingRestore) return (Number(t.groupId)>=0?"Restore recording everywhere":"Restore this track")+" - Re-scan required";
-  if(t.manualSkip) return Number(t.groupId)>=0?"Ignored recording everywhere":"Ignored this track";
+  if(t.pendingIgnore) return (Number(t.groupId)>=0?"Skip recording everywhere":"Skip this track")+" - Re-scan required";
+  if(t.pendingRestore) return (Number(t.groupId)>=0?"Keep recording everywhere":"Keep this track")+" - Re-scan required";
+  if(t.manualSkip) return Number(t.groupId)>=0?"Skipped recording everywhere":"Skipped this track";
   if(n && n.manualRemoved){
     if(t.excluded) return exclusionStatus(t);
     if(t.orphaned || !t.replacementSource) return "NO REPLACEMENT - exact recording is not retained elsewhere";
@@ -16815,7 +16819,7 @@ function openDetails(n) {
     if(remixes.length) tags+='<button class="btn small tagBtn remixesTrack" data-track="'+t.index+'" aria-expanded="false">Remixes '+remixes.length+'</button>';
     if(live.length) tags+='<button class="btn small tagBtn liveTrack" data-track="'+t.index+'" aria-expanded="false">Live '+live.length+'</button>';
     if(nearestDelta!==null) tags+='<span class="lengthDelta" title="Length differs from another edition">'+lengthDeltaText(nearestDelta)+'</span>';
-    const names={remix:"Remix",live:"Live",skip:"Ignored"};
+    const names={remix:"Remix",live:"Live",skip:"Skip"};
     const badge=t.patternKind?
       '<button class="patternBadge" data-track="'+t.index+'" title="Move to Personal Picks" aria-label="Move '+esc(names[t.patternKind]||"pattern")+' to Personal Picks">To Personal Picks</button>':"";
     const actions=state.editable?
@@ -16829,7 +16833,7 @@ function openDetails(n) {
     const advisoryName=indicator?(indicator==="E"?"Explicit":"Clean"):"";
     const advisoryBadge=indicator?'<span class="advisoryBadge" title="'+advisoryName+'">'+indicator+'</span>':"";
     const flagged=!!(t.excluded||t.manualSkip||t.pendingIgnore||t.pendingRestore||t.orphaned||(n&&n.manualRemoved));
-    const note=flagged?statusText.replace(/^Excluded: /,"").replace(/ - Re-scan required$/,""):(t.isRemix?"Remix":(t.isLive?"Live":""));
+    const note=flagged?statusText.replace(/^Skipped: /,"").replace(/ - Re-scan required$/,""):(t.isRemix?"Remix":(t.isLive?"Live":""));
     tracks+='<div class="'+cls.join(" ")+'" role="button" tabindex="0" aria-label="Inspect track '+esc(t.title)+'" data-group="'+t.groupId+'" data-index="'+t.index+'" title="'+esc(statusText)+'">'
       +'<span class="num">'+esc(shownNumber(t))+'</span><span class="titleText">'+esc(t.title)+advisoryBadge+'</span>'+tags
       +(note?'<span class="note">'+esc(note)+'</span>':"")
@@ -16840,7 +16844,7 @@ function openDetails(n) {
       if(!items.length) return "";
       let rows="";
       items.forEach(function(v){
-        const stateText=v.retained?"Retained":(v.available?"Available":"Ignored");
+        const stateText=v.retained?"Retained":(v.available?"Available":"Skipped");
         const stateClass=v.retained?"retained":(v.available?"available":"");
         const releaseText=(v.retainedReleaseNames&&v.retainedReleaseNames.length?v.retainedReleaseNames:v.releaseNames||[]).join("; ");
         const delta=versionLengthDelta(t,v);
@@ -16875,7 +16879,7 @@ function openDetails(n) {
   }
   let albumGroupActions="";
   if(state.editable){
-    const kindLabels={album:"Albums",ep:"Albums",single:"Singles",compilation:"Compilations",anthology:"Anthologies"};
+    const kindLabels={album:"Albums",ep:"EPs",single:"Singles",compilation:"Compilations",anthology:"Anthologies"};
     const groupChoices=new Map();
     (state.nodes||[]).forEach(function(other){
       if(Number(other.id)===Number(n.id))return;
@@ -17109,7 +17113,7 @@ function receiveTrackToggle(raw) {
     const status=trackStatus(t,current);
     el.title=status;
     const flagged=!!(t.excluded||t.manualSkip||t.pendingIgnore||t.pendingRestore||t.orphaned||current.manualRemoved);
-    const noteText=flagged?status.replace(/^Excluded: /,"").replace(/ - Re-scan required$/,""):(t.isRemix?"Remix":(t.isLive?"Live":""));
+    const noteText=flagged?status.replace(/^Skipped: /,"").replace(/ - Re-scan required$/,""):(t.isRemix?"Remix":(t.isLive?"Live":""));
     let note=el.querySelector(".note");
     if(!note&&noteText){(el.querySelector(".trackGem")||el.querySelector(".dur")).insertAdjacentHTML("beforebegin",'<span class="note"></span>');note=el.querySelector(".note");}
     if(note){if(noteText)note.textContent=noteText;else note.remove();}
@@ -19069,8 +19073,8 @@ def _webview_main_html() -> str:
       <button class="btn primary" id="addFolder" title="Add another source folder">+ Add folder</button>
       <div class="gap"></div>
       <div class="row" id="keepOptions">
-        <label class="check" title="Checked: remixes participate normally. Unchecked: remixes are ignored."><input type="checkbox" id="saveRemixes">Keep Remixes</label>
-        <label class="check" title="Checked: live recordings participate normally. Unchecked: live recordings are ignored."><input type="checkbox" id="saveLive">Keep Live recordings</label>
+        <label class="check" title="Checked: remixes participate normally. Unchecked: remixes are skipped."><input type="checkbox" id="saveRemixes">Keep Remixes</label>
+        <label class="check" title="Checked: live recordings participate normally. Unchecked: live recordings are skipped."><input type="checkbox" id="saveLive">Keep Live recordings</label>
         <button class="btn" id="personalPicks">Keeps and Skips</button>
       </div>
     </div>
@@ -20053,9 +20057,24 @@ def _webview_main_app() -> int:
             stage_key = stage.split(" | ", 1)[0]
             with self._lock:
                 self._last_progress_stage = stage_key
-                self.status = stage
+                descriptions = (
+                    ("Verifying audio file integrity", "Checking audio files"),
+                    ("Measuring silent boundary padding", "Measuring silence"),
+                    ("Classifying wanted audio", "Sorting tracks"),
+                    ("Generating Chromaprint fingerprints", "Fingerprinting audio"),
+                    ("Indexing fingerprints", "Matching recordings"),
+                    ("Finding audio candidates", "Matching recordings"),
+                    ("Comparing audio", "Matching recordings"),
+                    ("Optimizing release set", "Choosing releases"),
+                    ("Building automatic action plan", "Preparing results"),
+                )
+                self.status = next(
+                    (title for prefix, title in descriptions if stage.startswith(prefix)), stage
+                )
                 self.progress_pct = pct
-                self.progress_count = f"{current:,} / {total:,} ({pct:.0f}%)" if total > 0 else ""
+                # Progress percentage already has its own UI field. Avoid
+                # 0 / 3,402 and 59,620 candidate-pair counters.
+                self.progress_count = ""
             self._emit_state(force=(current >= total or current == 0))
 
         def getState(self):

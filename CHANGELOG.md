@@ -1,3 +1,13 @@
+## v0.5.174 - Incremental workflow, unified actions and single-window map (Under construction ⚠️)
+
+- Pattern-only Re-scan updates the loaded release plan without re-decoding source audio or recalculating unchanged acoustic comparisons. Newly wanted audio without a verified fingerprint still requires an analysis.
+- Cache successful full integrity decodes and Chromaprint results for unchanged physical inputs; invalidate by file and tool identity, and do not cache verification failures.
+- Explicit EP titles take precedence over anthology heuristics. Mixed Album/EP display families no longer move EPs out of their column.
+- Use Keep/Skip consistently in track and map UI; saved Remix/Live categories can be cleared from the same menu.
+- Replace generic progress blocks with distinct integrity, silence-boundary, fingerprint and audio-match scenes. Remove redundant stage-by-stage Activity entries and display concise stage descriptions.
+- Render Release Map within the primary WebView2 window. Keep the map, actual output path, and Open destination control visible during Copy/Move.
+- Added regression coverage. Native Windows/WebView2 real UI and disposable-folder Copy/Move/Undo acceptance remain NOT RUN; do not call stable.
+
 ## v0.5.167 - Copy and Move audit fixes (Under construction ⚠️)
 
 - Protect Move exports from Undo before recycling any originals. Report the first recycle failure and the number of source folders already recycled.

@@ -1,3 +1,18 @@
+## MCC v0.5.174 - Scan/Map/Copy single-window control contract (2026-11-23)
+
+| Control | Behavior | Input / states |
+|---|---|---|
+| Scan | Opens a new scan only when source material/settings change; disabled when scanning | Click/Enter/Space; busy/ready/error |
+| Release Map / Scan tab | Navigate between Scan and editable Release Map in the same native WebView2 window | Click/Enter/Space; focus and scroll retained where feasible |
+| Re-scan | Recompute Keep/Skip selection from existing verified identities and updated track patterns; full Scan only for missing audio verification | Click/Enter/Space; dirty/ready/error |
+| Track Remix / Live | Toggle saved classification, checked when selected; second click clears it without promoting to Personal Picks | Click/Enter/Space; checked, unchecked, pending |
+| Track Keep / Skip | Reversible recording-wide retention choice | Click/Enter/Space; pending/committed |
+| Copy / Move | Execute once using current plan; no duplicate export | Click/Enter/Space; ready/busy/complete/error |
+| Output path / Open destination | Display actual destination throughout export; open in Explorer while map remains shown | Read-only path; Click/Enter/Space; missing-path error |
+| Activity and progress | Concise status and percentage; detailed warnings/errors and completed outcomes | Live text; reduced motion honored |
+
+Control layout: compact main header, no separate Release Map native window, output path and its open control in the existing map footer, single progress line. Background tasks do not destroy the map view. Native Windows screenshots, hover, keyboard, resize, scaling, focus, Copy/Move/Undo and UI accessibility acceptance: **NOT RUN**. Do not claim visually accepted.
+
 ## v0.5.167 - Export results
 
 The existing completion dialog identifies the requested operation, reports recycled folders for Move and separates artwork outcomes from release counts. Undo Copy appears only for a Copy that created output. Existing output-folder, Release Map, Close and keyboard behavior are retained. No new controls. Native Windows WebView2 acceptance NOT RUN. The Linux layout suite encountered the environment’s Chromium launch error.
