@@ -246,6 +246,8 @@ window.__qaEvents=[];window.pywebview={api:{
         print("Browser Visual QA: "+("FAIL" if report["errors"] else "PASS")+" | "+str(location))
         for error in report["errors"]:
             print("FAIL: "+error)
+        if report.get("traceback"):
+            print(report["traceback"])
         print("Native Windows WebView2: NOT RUN")
     return int(bool(report["errors"]))
 
