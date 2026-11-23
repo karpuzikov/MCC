@@ -18228,6 +18228,8 @@ def launch_webview_release_map(session: Dict[str, object], host_window=None,
             self.apply_enabled = bool(self.editable) and not self.integrity_blockers
             self.requires_fresh_scan = False
             self.pending_pattern_changes = False
+            self.initial_pattern_categories = _load_pattern_categories()
+            self.initial_pattern_keep_rules = _load_personal_keep_rules(_load_app_settings())
             self.initial_manual_album_group_links = _manual_album_group_links()
             supplied_initial = session.get("initial_plan_counts")
             if isinstance(supplied_initial, dict):
@@ -18540,7 +18542,10 @@ def launch_webview_release_map(session: Dict[str, object], host_window=None,
             # Re-scan reuses verified groups for exclusion-only changes.
             # If a newly included track lacks acoustic data it is detected
             # during reclassification, rather than rescanning every file now.
-            self.pending_pattern_changes = True
+            self.pending_pattern_changes = bool(
+                _normalize_pattern_categories(categories) != self.initial_pattern_categories
+                or _load_personal_keep_rules(_load_app_settings()) != self.initial_pattern_keep_rules
+            )
             self._mark_dirty(f'Pattern "{label}": {"Keep" if promote else ("Clear" if clear_category else kind)}')
             self._refresh_pending_state()
             patches = []
@@ -18554,9 +18559,7 @@ def launch_webview_release_map(session: Dict[str, object], host_window=None,
                     status = categories[cat_key]["kind"]
                 else:
                     cat_key = key
-                    status = "" if promote else kind
-                    if not promote:
-                        status = kind
+                    status = "" if (promote or clear_category) else kind
                 patches.append({"index": i, "patternKey": cat_key, "patternKind": status})
                 for node in self._ui_state.get("nodes", []):
                     for row in node.get("tracks", []):
@@ -18565,7 +18568,7 @@ def launch_webview_release_map(session: Dict[str, object], host_window=None,
                             row["patternKind"] = status
             return _json_ui_dumps({
                 "kind": "patternToggle", "tracks": patches,
-                "requiresFreshScan": False, **self._toggle_delta_base(),
+                "requiresFreshScan": bool(self.requires_fresh_scan), **self._toggle_delta_base(),
             })
 
         def reviewRelease(self, release_id: int, decision: str):
@@ -18710,10 +18713,11 @@ def launch_webview_release_map(session: Dict[str, object], host_window=None,
             if self.pending_pattern_changes:
                 self._refresh_loaded_patterns()
             if self.requires_fresh_scan:
-                raise RuntimeError(
-                    "A newly included recording has no verified fingerprint. "
-                    "Run Scan to analyze new audio before applying this change."
-                )
+                # Update the map's state instead of trapping the user in a
+                # repeatedly failing Re-scan button. The next click runs Scan
+                # for the newly wanted audio; cached unchanged files are reused.
+                self._refresh_pending_state()
+                return self._state()
             apply_persistent_track_skips(self.tracks)
             # Reuse verified acoustic groups; no FFmpeg, Chromaprint,
             # silent-padding verification or pair comparisons are repeated.
@@ -18825,6 +18829,8 @@ def launch_webview_release_map(session: Dict[str, object], host_window=None,
             self.pending_track_indices.clear()
             self.pending_release_ids.clear()
             self.pending_pattern_changes = False
+            self.initial_pattern_categories = _load_pattern_categories()
+            self.initial_pattern_keep_rules = _load_personal_keep_rules(_load_app_settings())
             self.dirty = False
             self.apply_enabled = bool(self.editable) and not bool(self.integrity_blockers)
             self.apply_highlighted = bool(added or removed)
