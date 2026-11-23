@@ -20451,8 +20451,6 @@ def _webview_main_app() -> int:
             self.review_pending = False
             self.progress_pct = 100.0
             self.progress_count = "100%"
-            self._append_activity("Scan complete")
-
             comparison_log = next(
                 (
                     n.split("COMPARISON LOG:", 1)[1].strip()
@@ -20461,9 +20459,6 @@ def _webview_main_app() -> int:
                 ),
                 "",
             )
-            if comparison_log:
-                self._append_activity(f"Comparison log: {comparison_log}")
-
             stored_ignored_paths = _load_manual_ignored_release_paths()
             blocked_release_ids: Set[int] = {
                 rel.rid for rel in releases
@@ -20471,10 +20466,6 @@ def _webview_main_app() -> int:
             }
             if selected & blocked_release_ids:
                 raise RuntimeError("Fresh analysis selected a persistently ignored release.")
-            if blocked_release_ids:
-                self._append_activity(
-                    f"Applied {len(blocked_release_ids)} saved ignored release(s) during optimization"
-                )
             decisions = build_release_decisions(
                 releases,
                 tracks,
@@ -20838,7 +20829,6 @@ def _webview_main_app() -> int:
             self.progress_count = ""
             self.status = "Moving retained OLD + NEW releases" if is_move else "Copying final discography"
             self._last_progress_stage = ""
-            self._append_activity(self.status)
             self._set_running(True)
 
             try:
@@ -20891,7 +20881,6 @@ def _webview_main_app() -> int:
             self.status = "Undoing last run"
             self.progress_pct = 0.0
             self.progress_count = ""
-            self._append_activity("Undo last run")
             self._set_running(True)
             threading.Thread(target=self._undo_worker, daemon=True).start()
 
