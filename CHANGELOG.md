@@ -1,3 +1,9 @@
+## v0.5.177 - Reuse unchanged scan analysis
+
+- Scan checks release folders by path and reuses valid tag, integrity, fingerprint, and comparison evidence. Changes to a member file invalidate the logical release. Full rescan rebuilds eligible audio evidence.
+- Saved exclusions and the Remix and Live settings apply before acoustic work. Unfamiliar-pattern review opens after acoustic matching. Review choices update the plan using the evidence from the same scan.
+- A reference-only set of folders can be scanned. Reference and update folders use the same discovery and audio checks.
+
 ## v0.5.176 - Release choices and shared navigation
 
 - Auto, Keep and Skip are always visible in release details. Auto clears the override and shows the automatic result.

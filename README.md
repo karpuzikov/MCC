@@ -1,6 +1,6 @@
 # Music Collection Cleaner (MCC)
 
-**Version: 0.5.176 - Under construction ⚠️**
+**Version: 0.5.177 - Under construction ⚠️**
 
 ## Download and run
 
@@ -10,7 +10,7 @@
 winget install -e --id Python.Python.3.12 && winget install -e --id Microsoft.EdgeWebView2Runtime
 ```
 
-2. Download [Music Collection Cleaner v0.5.176.pyw](https://raw.githubusercontent.com/karpuzikov/MCC/fix/mcc-174-incremental-ui/Music%20Collection%20Cleaner%20v0.5.176.pyw).
+2. Download [Music Collection Cleaner v0.5.177.pyw](https://raw.githubusercontent.com/karpuzikov/MCC/fix/mcc-174-incremental-ui/Music%20Collection%20Cleaner%20v0.5.177.pyw).
 3. Double-click it.
 
 This build is under construction. Automated regression checks and actual Windows/WebView2 acceptance must pass before stable publication.
@@ -39,3 +39,5 @@ When the same songs exist in several versions, MCC prefers the better source, be
 Scanning never changes your files. Copy and Move run only when you click them. Use **Copy** first. Move sends originals to the Recycle Bin.
 
 [Changelog](CHANGELOG.md) · [Previous versions](version-history/) · [Development notes](CONTINUITY.md)
+
+[UI and workflows](UI_AND_WORKFLOWS.md) · [Release selection rules](RELEASE_SELECTION_RULES.md)
