@@ -12,7 +12,7 @@ from test_audio_safety import mcc as app
 class ScanCacheTests(unittest.TestCase):
     def setUp(self):
         tmp = self.enterContext(tempfile.TemporaryDirectory())
-        self.library = Path(tmp) / 'music'
+        self.library = Path(tmp).resolve() / 'music'
         self.cache_path = Path(tmp) / 'cache' / 'scan.json'
         self.one = self.library / 'One'
         self.two = self.library / 'Two'
