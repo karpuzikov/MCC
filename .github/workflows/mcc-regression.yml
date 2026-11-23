@@ -3,6 +3,8 @@ on:
   push:
     branches: [ "fix/v0.5.174-incremental-review" ]
   pull_request:
+env:
+  MCC_TEST_SOURCE: Music.Collection.Cleaner.v0.05.174.pyw
 jobs:
   test:
     runs-on: ubuntu-latest
