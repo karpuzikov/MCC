@@ -5,6 +5,9 @@ from __future__ import annotations
 
 import atexit
 import base64
+import sqlite3
+import zlib
+from array import array
 import concurrent.futures
 import difflib
 import io
@@ -3915,6 +3918,105 @@ def _short_integrity_reason(raw: str) -> str:
     return "unreadable"
 
 
+# A full audio decode is safety-critical, but it need not be repeated for
+# unchanged physical media on each Scan. A versioned identity includes file
+# metadata and the decoder identity. Failed verifications are not cached.
+INTEGRITY_CACHE_SCHEMA = 1
+FINGERPRINT_CACHE_SCHEMA = 1
+
+
+def _media_cache_signature(path: Path) -> Optional[str]:
+    try:
+        absolute = Path(path).resolve(strict=True)
+        stat = absolute.stat()
+    except OSError:
+        return None
+    return "|".join((
+        os.path.normcase(str(absolute)),
+        str(int(stat.st_size)),
+        str(int(stat.st_mtime_ns)),
+        str(int(getattr(stat, "st_ctime_ns", 0))),
+        str(int(getattr(stat, "st_dev", 0))),
+        str(int(getattr(stat, "st_ino", 0))),
+    ))
+
+
+def _integrity_cache_path() -> Path:
+    return _cache_dir() / "audio-integrity-v1.json"
+
+
+def _load_integrity_cache() -> Dict[str, bool]:
+    try:
+        data = json.loads(_integrity_cache_path().read_text(encoding="utf-8"))
+        if data.get("schema") == INTEGRITY_CACHE_SCHEMA and isinstance(data.get("verified"), dict):
+            return {str(key): True for key, ok in data["verified"].items() if ok is True}
+    except (OSError, ValueError, AttributeError, TypeError):
+        pass
+    return {}
+
+
+def _integrity_cache_key(ffmpeg: str, path: Path) -> Optional[str]:
+    media = _media_cache_signature(path)
+    if media is None:
+        return None
+    exe = shutil.which(ffmpeg) or ffmpeg
+    decoder = _media_cache_signature(Path(exe)) or str(exe)
+    return hashlib.sha256((
+        f"{INTEGRITY_CACHE_SCHEMA}|{FFMPEG_DIRECT_URL}|{decoder}|{media}"
+    ).encode("utf-8", errors="replace")).hexdigest()
+
+
+def _fingerprint_cache_key(track: Track, fpcalc: str) -> Optional[str]:
+    media = _media_cache_signature(track.path)
+    if media is None:
+        return None
+    cue = _media_cache_signature(track.cue_path) if track.cue_path else ""
+    program = shutil.which(fpcalc) or fpcalc
+    executable = _media_cache_signature(Path(program)) or str(program)
+    payload = "|".join((
+        str(FINGERPRINT_CACHE_SCHEMA), CHROMAPRINT_VERSION, executable, media,
+        str(cue), str(bool(track.virtual_from_cue)),
+        f"{float(track.cue_start_seconds):.6f}",
+        f"{float(track.cue_end_seconds):.6f}",
+        f"{float(track.duration):.6f}",
+        str(int(track.cue_track_number or 0)),
+    ))
+    return hashlib.sha256(payload.encode("utf-8", errors="replace")).hexdigest()
+
+
+def _open_fingerprint_cache():
+    """One connection on the analysis thread; workers never write SQLite."""
+    try:
+        _cache_dir().mkdir(parents=True, exist_ok=True)
+        database = sqlite3.connect(str(_cache_dir() / "chromaprint-v1.sqlite"), timeout=30)
+        database.execute(
+            "CREATE TABLE IF NOT EXISTS fingerprints ("
+            "key TEXT PRIMARY KEY, duration REAL NOT NULL, frames BLOB NOT NULL,"
+            " repaired INTEGER NOT NULL)"
+        )
+        return database
+    except (sqlite3.Error, OSError):
+        return None
+
+
+def _pack_fingerprint(values: Tuple[int, ...]) -> bytes:
+    data = array("I", (int(value) & 0xFFFFFFFF for value in values))
+    if sys.byteorder != "little":
+        data.byteswap()
+    return zlib.compress(data.tobytes(), 1)
+
+
+def _unpack_fingerprint(blob: bytes) -> Tuple[int, ...]:
+    raw = zlib.decompress(blob)
+    if not raw or len(raw) % 4:
+        raise ValueError("Invalid cached fingerprint")
+    data = array("I")
+    data.frombytes(raw)
+    if sys.byteorder != "little":
+        data.byteswap()
+    return tuple(data)
+
+
 def verify_audio_integrity(
     ffmpeg: str,
     tracks: List[Track],
@@ -3928,13 +4030,25 @@ def verify_audio_integrity(
         track.integrity_error = ""
         by_file[os.path.normcase(str(track.path.resolve()))].append(track)
     paths = list(by_file)
-    workers = min(len(paths) or 1, _probe_workers(io_workers))
+    cached = _load_integrity_cache()
+    pending = []
+    identities = {}
     errors: List[str] = []
-    label = f"Verifying audio file integrity ({workers} workers)..."
-    progress_cb(label, 0, max(1, len(paths)))
-    if paths:
+    for name in paths:
+        cache_key = _integrity_cache_key(ffmpeg, Path(name))
+        identities[name] = cache_key
+        if cache_key is not None and cached.get(cache_key):
+            for track in by_file[name]:
+                track.integrity_checked = True
+        else:
+            pending.append(name)
+    if pending:
+        workers = min(len(pending), _probe_workers(io_workers))
+        label = "Verifying audio file integrity..."
+        progress_cb(label, 0, len(pending))
+        changed = False
         with ThreadPoolExecutor(max_workers=workers) as pool:
-            futures = {pool.submit(_verify_audio_file, ffmpeg, Path(name)): name for name in paths}
+            futures = {pool.submit(_verify_audio_file, ffmpeg, Path(name)): name for name in pending}
             for completed, future in enumerate(as_completed(futures), 1):
                 name = futures[future]
                 try:
@@ -3946,7 +4060,18 @@ def verify_audio_integrity(
                     track.integrity_error = issue
                 if issue:
                     errors.append(f"CORRUPT / unreadable audio: {name}: {issue}")
-                progress_cb(label, completed, len(paths))
+                elif identities[name] is not None:
+                    cached[identities[name]] = True
+                    changed = True
+                progress_cb(label, completed, len(pending))
+        if changed:
+            # A bounded cache also limits stale entries from renamed libraries.
+            try:
+                kept = dict(list(cached.items())[-100000:])
+                _atomic_write_json(_integrity_cache_path(),
+                                   {"schema": INTEGRITY_CACHE_SCHEMA, "verified": kept})
+            except OSError:
+                pass  # Cache failure must never prevent safe analysis.
     if paths and len(errors) == len(paths):
         # No recording identity can be inferred if EVERY physical input fails.
         # Never proceed to an optimizer/map where missing fingerprints look like
@@ -8837,27 +8962,66 @@ def analyze_prepared(
     fpcalc = ensure_fpcalc() if use_fingerprint else None
     if use_fingerprint and fpcalc:
         fingerprint_tracks = _fingerprint_identity_candidates(tracks)
-        fp_workers = min(len(fingerprint_tracks) or 1, _fingerprint_workers(io_workers))
-        label = f"Generating Chromaprint fingerprints ({fp_workers} workers)..."
-        progress_cb(label, 0, max(1, len(fingerprint_tracks)))
-        if fingerprint_tracks:
-            with ThreadPoolExecutor(max_workers=fp_workers) as ex:
-                futures = {ex.submit(chromaprint_fingerprint, fpcalc, t): t for t in fingerprint_tracks}
-                done = 0
-                for fut in as_completed(futures):
-                    t = futures[fut]
+        database = _open_fingerprint_cache()
+        new_tracks = []
+        keys: Dict[int, Optional[str]] = {}
+        try:
+            for track in fingerprint_tracks:
+                key = _fingerprint_cache_key(track, fpcalc)
+                keys[id(track)] = key
+                if database is not None and key is not None:
                     try:
-                        t.fingerprint, t.fingerprint_duration = fut.result()
-                        if t.fingerprint_repaired:
-                            errors.append(
-                                f"Recovered incomplete fingerprint via FFmpeg PCM: {t.path}"
-                            )
-                    except Exception as e:
-                        errors.append(f"Fingerprint error: {t.path}: {e}")
-                    done += 1
-                    progress_cb(label, done, len(fingerprint_tracks))
-        else:
-            progress_cb(label, 1, 1)
+                        row = database.execute(
+                            "SELECT duration, frames, repaired FROM fingerprints WHERE key = ?", (key,)
+                        ).fetchone()
+                        if row:
+                            fingerprint = _unpack_fingerprint(row[1])
+                            if _chromaprint_fingerprint_incomplete(
+                                len(fingerprint), max(float(track.duration or 0), float(row[0]))
+                            ):
+                                raise ValueError("Cached fingerprint is incomplete")
+                            track.fingerprint = fingerprint
+                            track.fingerprint_duration = float(row[0])
+                            track.fingerprint_repaired = bool(row[2])
+                            continue
+                    except (sqlite3.Error, ValueError, zlib.error, OverflowError):
+                        pass
+                new_tracks.append(track)
+            if new_tracks:
+                fp_workers = min(len(new_tracks), _fingerprint_workers(io_workers))
+                label = "Generating Chromaprint fingerprints..."
+                progress_cb(label, 0, len(new_tracks))
+                inserts = []
+                with ThreadPoolExecutor(max_workers=fp_workers) as ex:
+                    futures = {ex.submit(chromaprint_fingerprint, fpcalc, t): t for t in new_tracks}
+                    for done, fut in enumerate(as_completed(futures), 1):
+                        t = futures[fut]
+                        try:
+                            t.fingerprint, t.fingerprint_duration = fut.result()
+                            if t.fingerprint_repaired:
+                                errors.append(
+                                    f"Recovered incomplete fingerprint via FFmpeg PCM: {t.path}"
+                                )
+                            key = keys.get(id(t))
+                            if key and t.fingerprint:
+                                inserts.append((key, float(t.fingerprint_duration),
+                                                _pack_fingerprint(t.fingerprint),
+                                                int(bool(t.fingerprint_repaired))))
+                        except Exception as e:
+                            errors.append(f"Fingerprint error: {t.path}: {e}")
+                        progress_cb(label, done, len(new_tracks))
+                if database is not None and inserts:
+                    try:
+                        database.executemany(
+                            "INSERT OR REPLACE INTO fingerprints "
+                            "(key, duration, frames, repaired) VALUES (?, ?, ?, ?)", inserts
+                        )
+                        database.commit()
+                    except sqlite3.Error:
+                        database.rollback()
+        finally:
+            if database is not None:
+                database.close()
 
     groups, merge_notes, reviews = merge_equivalent_tracks(
         tracks,
