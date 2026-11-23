@@ -14400,7 +14400,7 @@ class Organizer:
                 if rec["file"]:
                     linked = (cp.parent / rec["file"].replace("\\", os.sep)).resolve()
                     if source != linked and source not in linked.parents:
-                        raise RuntimeError("CUE audio escapes release folder: " + rec["file"])
+                        raise RuntimeError("CUE audio escapes release folder: " + rec["file"] + f" [source={source!r}; linked={linked!r}; source_resolved={Path(source).resolve()!r}; parents={linked.parents!r}]")
             try:
                 found = cue_image_plan(cp, parsed)
             except ValueError as exc:
