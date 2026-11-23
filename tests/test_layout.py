@@ -21,7 +21,7 @@ except ImportError:  # pragma: no cover
 
 
 def _app():
-    path = next(HERE.parent.glob("Music Collection Cleaner v*.pyw"))
+    path = next(HERE.parent.glob("Music.Collection.Cleaner.v*.pyw"))
     return runpy.run_path(str(path), run_name="layout_test")
 
 
