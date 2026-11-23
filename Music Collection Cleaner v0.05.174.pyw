@@ -8797,8 +8797,11 @@ def _reclassify_without_acoustic_work(
     """
     if file_signatures is None:
         return False
-    if any(_audio_file_signature(t.path) != file_signatures.get(str(t.path)) for t in tracks):
-        return False
+    for track in tracks:
+        current = _audio_file_signature(track.path)
+        recorded = file_signatures.get(str(track.path))
+        if current is None or recorded is None or current != recorded:
+            return False
 
     saved_fields = (
         "group_id", "is_remix", "is_live", "exclude_from_coverage",
@@ -14070,6 +14073,7 @@ class Organizer:
             self._credit_consensus = credit_consensus
             for index, (source_name, members, source) in enumerate(groups, 1):
                 self._active_target = ""
+                source = Path(source).resolve(strict=True)
                 if self.stop.is_set():
                     self.status = "Cancelled. Completed output can be undone."
                     break
@@ -14309,6 +14313,11 @@ class Organizer:
 
     def _export_release(self, source, dest, fmt, ff, ffprobe,
                         source_files=None, disc_folders=()):
+        # Windows final-path spellings can differ from the user-supplied
+        # temporary/release path. Compare canonical paths on both sides.
+        source = Path(source).resolve(strict=True)
+        dest = Path(dest)
+        disc_folders = tuple(Path(disc).resolve(strict=True) for disc in disc_folders)
         files = list(source_files) if source_files is not None else collect_files(source)
         def output_subdir(parent):
             for position, disc in enumerate(disc_folders, 1):
@@ -19049,7 +19058,10 @@ window.mccMapCopyUpdate=function(payload){
   if(target&&typeof target.mccReceiveCopyUpdate==="function")target.mccReceiveCopyUpdate(payload);
 };
 document.getElementById("homeBtn").onclick=function(){
-  bridge.closeEmbeddedMap(function(){window.mccShowHome(false);});
+  bridge.closeEmbeddedMap(function(raw){
+    const next=JSON.parse(raw);
+    if(!next.mapOpen)window.mccShowHome(false);
+  });
 };
 
 function esc(v){
@@ -20774,7 +20786,9 @@ def _webview_main_app() -> int:
             return getattr(self._embedded_map_bridge, method)(*list(args or []))
 
         def closeEmbeddedMap(self):
-            if self.running:
+            if self.running or (
+                self._embedded_map_bridge is not None and self._embedded_map_bridge.copying
+            ):
                 return self._state_json()
             self.map_open = False
             self._emit_state()

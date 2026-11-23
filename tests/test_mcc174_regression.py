@@ -76,6 +76,16 @@ class MCC174Regression(unittest.TestCase):
                 {key: {"kind": "remix", "label": label}}, sigs))
             self.assertEqual(groups, {0: [0]})
 
+    def test_missing_audio_blocks_cached_replanning(self):
+        with tempfile.TemporaryDirectory() as folder:
+            path, track, release, key, label, sigs = self._fixture(folder)
+            path.unlink()
+            groups = {0: [0]}
+            self.assertFalse(mcc._reclassify_without_acoustic_work(
+                [release], [track], groups, False, False, [],
+                {key: {"kind": "remix", "label": label}}, sigs))
+            self.assertEqual(groups, {0: [0]})
+
     def test_no_fingerprint_blocks_newly_wanted_track(self):
         with tempfile.TemporaryDirectory() as folder:
             path, track, release, key, label, sigs = self._fixture(folder, fingerprint=())
