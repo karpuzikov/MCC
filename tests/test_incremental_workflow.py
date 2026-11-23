@@ -1,4 +1,6 @@
 """Regressions for MCC v0.5.174 incremental scan and unified map."""
+import ast
+import json
 import tempfile
 import unittest
 from pathlib import Path
@@ -137,6 +139,72 @@ class IncrementalWorkflow(unittest.TestCase):
             track.fingerprint = (10, 11, 12)
             song.write_bytes(b"changed longer audio")
             self.assertNotEqual(baseline, mcc._acoustic_group_cache_key([track]))
+
+    def test_two_remix_choices_replan_3402_tracks_without_audio_work(self):
+        source = Path(mcc.__file__).read_text(encoding="utf-8-sig")
+        tree = ast.parse(source)
+        launcher = next(node for node in tree.body
+                        if isinstance(node, ast.FunctionDef)
+                        and node.name == "launch_webview_release_map")
+        bridge_class = next(node for node in launcher.body
+                            if isinstance(node, ast.ClassDef)
+                            and node.name == "ReleaseMapBridge")
+        tracks = [
+            mcc.Track(1, Path("library") / f"{i:04d}.flac", i + 1,
+                      title=f"Recording {i}", artist="BT", duration=180.0,
+                      fingerprint=(10, 20, 30), group_id=i)
+            for i in range(3402)
+        ]
+        release = mcc.Release(1, "recycle", Path("library"), "Test",
+                              release_type="album", tracks=tracks)
+        snapshots = [{"release_id": 1, "name": "Test", "action": "ADD",
+                      "audit_issues": [], "tracklist": []}]
+        session = dict(
+            snapshots=snapshots, releases=[release], tracks=tracks,
+            groups={i: [i] for i in range(len(tracks))}, selected={1},
+            reviews=[], decisions=[mcc.ReleaseDecision(1, "ADD", "Test")],
+            allow_apply=True, initial_plan_counts=dict(releases=1, tracks=3402),
+        )
+        categories = {}
+        def save_categories(updated):
+            categories.clear()
+            categories.update(updated)
+        namespace = dict(vars(mcc), session=session)
+        exec(compile(ast.Module(body=[bridge_class], type_ignores=[]),
+                     str(mcc.__file__), "exec"), namespace)
+        with tempfile.TemporaryDirectory() as td, \
+             patch.object(mcc, "_load_app_settings", return_value={}), \
+             patch.object(mcc, "_load_personal_keep_rules", return_value=[]), \
+             patch.object(mcc, "_load_pattern_categories", side_effect=lambda: dict(categories)), \
+             patch.object(mcc, "_save_pattern_categories", side_effect=save_categories), \
+             patch.object(mcc, "_release_map_state_for_ui", return_value={"nodes": []}), \
+             patch.object(mcc, "_load_manual_kept_release_paths", return_value=set()), \
+             patch.object(mcc, "_load_manual_ignored_release_paths", return_value=set()), \
+             patch.object(mcc, "verify_audio_integrity", side_effect=AssertionError("Integrity must not run")), \
+             patch.object(mcc, "chromaprint_fingerprint", side_effect=AssertionError("Fingerprint must not run")), \
+             patch.object(mcc, "merge_equivalent_tracks", side_effect=AssertionError("Pair comparison must not run")), \
+             patch.object(mcc, "optimize_collection", return_value={1}) as optimization, \
+             patch.object(mcc, "build_release_decisions", return_value=session["decisions"]), \
+             patch.object(mcc, "build_decision_snapshot", return_value=snapshots), \
+             patch.object(mcc, "_save_manual_ignored_release_paths"), \
+             patch.object(mcc, "_save_manual_kept_release_paths"), \
+             patch.object(mcc, "_save_decision_snapshot"), \
+             patch.object(mcc, "_write_reanalysis_audit", return_value=Path(td) / "audit.json"):
+            bridge = namespace["ReleaseMapBridge"]()
+            for index in (4, 9):
+                event = json.loads(bridge.markTrackPattern(index, "remix"))
+                self.assertEqual(event["kind"], "patternToggle")
+            self.assertTrue(bridge.dirty)
+            bridge.reanalyze()
+            self.assertEqual(optimization.call_count, 1)
+            self.assertEqual(sum(track.exclude_from_coverage for track in tracks), 2)
+            self.assertFalse(bridge.dirty)
+            # Both saved classifications must be reversible in the same menu.
+            for index in (4, 9):
+                bridge.markTrackPattern(index, "remix")
+            bridge.reanalyze()
+            self.assertEqual(optimization.call_count, 2)
+            self.assertEqual(sum(track.exclude_from_coverage for track in tracks), 0)
 
     def test_process_scenes_are_non_generic_for_safety_stages(self):
         html = mcc._webview_main_html()
