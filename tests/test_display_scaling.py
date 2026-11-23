@@ -2,7 +2,7 @@ import runpy
 import unittest
 from pathlib import Path
 
-app = runpy.run_path(str(next(Path(__file__).resolve().parent.parent.glob("Music Collection Cleaner v*.pyw"))),
+app = runpy.run_path(str(next(Path(__file__).resolve().parent.parent.glob("Music.Collection.Cleaner.v*.pyw"))),
                      run_name="display_scaling_test")
 zoom_factor = app["_css_zoom_factor"]
 
