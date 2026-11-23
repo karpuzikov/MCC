@@ -190,6 +190,20 @@ class IncrementalWorkflow(unittest.TestCase):
              patch.object(mcc, "_save_manual_kept_release_paths"), \
              patch.object(mcc, "_save_decision_snapshot"), \
              patch.object(mcc, "_write_reanalysis_audit", return_value=Path(td) / "audit.json"):
+            # The nested bridge class was extracted with its own module globals.
+            # Bind patched dependencies into those globals, too.
+            for name in (
+                "_load_app_settings", "_load_personal_keep_rules",
+                "_load_pattern_categories", "_save_pattern_categories",
+                "_release_map_state_for_ui", "_load_manual_kept_release_paths",
+                "_load_manual_ignored_release_paths", "verify_audio_integrity",
+                "chromaprint_fingerprint", "merge_equivalent_tracks",
+                "optimize_collection", "build_release_decisions",
+                "build_decision_snapshot", "_save_manual_ignored_release_paths",
+                "_save_manual_kept_release_paths", "_save_decision_snapshot",
+                "_write_reanalysis_audit",
+            ):
+                namespace[name] = getattr(mcc, name)
             bridge = namespace["ReleaseMapBridge"]()
             for index in (4, 9):
                 event = json.loads(bridge.markTrackPattern(index, "remix"))
