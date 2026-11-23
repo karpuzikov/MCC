@@ -15,7 +15,9 @@ jobs:
         with:
           python-version: '3.12'
       - name: Install test dependencies
-        run: python -m pip install pytest mutagen
+        run: python -m pip install pytest mutagen playwright
+      - name: Install Chromium for embedded browser smoke check
+        run: python -m playwright install --with-deps chromium
       - name: Compile latest Python GUI
         run: python -m py_compile "Music.Collection.Cleaner.v0.05.174.pyw"
       - name: Run regression suite (layout requires browser)
