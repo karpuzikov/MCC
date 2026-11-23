@@ -1,3 +1,11 @@
+## v0.5.174 - Single-window map and incremental review (2026-11-23)
+
+Status: **Under construction ⚠️**. Control contract: [docs/v0.5.174-control-contract.md](docs/v0.5.174-control-contract.md).
+
+Controls affected: Remix, Live, Keep, Skip, Re-scan, Release Map/Folders, Copy/Move, Open destination. The original two-window Release Map is now embedded in the main WebView. The map should persist while Copy runs with an explicit output folder and explorer button.
+
+Automated verification: Python compiler, full headless non-layout regression, Node execution of real track actions and JS syntax, Chromium embedding, parent bridge and copy-destination smoke tests PASS on CI. Native Windows 11/WebView2 screenshots, hover/focus, keyboard, layout at multiple DPI and physical Copy/Move/Undo tests: **NOT RUN**. User's 3,402 track set: **NOT RUN**.
+
 ## v0.5.167 - Export results
 
 The existing completion dialog identifies the requested operation, reports recycled folders for Move and separates artwork outcomes from release counts. Undo Copy appears only for a Copy that created output. Existing output-folder, Release Map, Close and keyboard behavior are retained. No new controls. Native Windows WebView2 acceptance NOT RUN. The Linux layout suite encountered the environment’s Chromium launch error.
