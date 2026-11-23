@@ -8900,6 +8900,41 @@ def analyze_prepared(
     return releases, tracks, groups, selected, reviews, errors
 
 
+def _verified_media_signatures(tracks: Sequence[Track]) -> Dict[str, Tuple[int, int, int]]:
+    """Cheap safety check that the cached decoder verdict still covers the same files.
+
+    A full scan must precede cached acoustic reuse when source bytes may have
+    changed. This reads metadata only, not audio samples or fingerprints.
+    """
+    result: Dict[str, Tuple[int, int, int]] = {}
+    for track in tracks:
+        # Tests and snapshot-only maps can contain synthetic rows with no
+        # verified file evidence. Never trust those as cache candidates.
+        if not track.integrity_checked:
+            continue
+        paths = [track.path]
+        if track.virtual_from_cue and track.cue_path is not None:
+            paths.append(track.cue_path)
+        for path in paths:
+            name = os.path.normcase(str(Path(path).resolve(strict=False)))
+            try:
+                st = Path(path).stat()
+            except OSError as exc:
+                raise RuntimeError(f"Source file inaccessible: {path}. Run Scan.") from exc
+            result[name] = (st.st_size, st.st_mtime_ns, st.st_ctime_ns)
+    return result
+
+
+def _assert_unchanged_verified_media(
+    baseline: Dict[str, Tuple[int, int, int]], tracks: Sequence[Track],
+) -> None:
+    if _verified_media_signatures(tracks) != baseline:
+        raise RuntimeError(
+            "Source audio or CUE files changed after Scan. "
+            "Run Scan again before Copy or Move."
+        )
+
+
 def replan_cached_classification(
     releases: List[Release],
     tracks: List[Track],
@@ -18088,6 +18123,7 @@ def _create_release_map_bridge(session: Dict[str, object]):
                 index: bool(track.manual_skip_rule)
                 for index, track in enumerate(self.tracks or [])
             }
+            self._verified_media_baseline = _verified_media_signatures(self.tracks or [])
             self.initial_blocked_release_ids = set(self.blocked_release_ids)
             stored_kept = _load_manual_kept_release_paths()
             self.pinned_release_ids = {rel.rid for rel in (self.releases or [])
@@ -18520,6 +18556,11 @@ def _create_release_map_bridge(session: Dict[str, object]):
         def reanalyze(self):
             if not self.editable or not self.dirty:
                 return self._state()
+            # Classification-only Re-scan never reads full audio, but never
+            # trusts acoustic evidence if a verified file was changed.
+            _assert_unchanged_verified_media(
+                self._verified_media_baseline, self.tracks,
+            )
             old_selected = set(self.selected)
             apply_persistent_track_skips(self.tracks)
             # Re-scan is a plan update. Category changes do not alter audio.
