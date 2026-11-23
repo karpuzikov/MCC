@@ -69,8 +69,11 @@ GEOMETRY = r"""() => {
  const p=rect(panel);
  if(p.left<-1||p.right>innerWidth+1)faults.push('Details outside viewport');
  for(const [i,row] of [...document.querySelectorAll('#tracks .track')].entries()){
-   const cols=['.num','.titleCell','.dur','.versionsCell','.status','.trackActionGroup']
-     .map(x=>row.querySelector(x)).filter(Boolean);
+   const cols=[...row.children].filter(e=>{
+     const style=getComputedStyle(e),bounds=rect(e);
+     return style.display!=='none' && style.position!=='fixed' &&
+       bounds.width>0 && bounds.height>0;
+   });
    for(let j=1;j<cols.length;j++){
      if(rect(cols[j-1]).right>rect(cols[j]).left+1.5)
        faults.push('Row '+i+': overlapping columns');
@@ -80,6 +83,8 @@ GEOMETRY = r"""() => {
    const status=row.querySelector('.status');
    for(const btn of row.querySelectorAll('button')){
      const style=getComputedStyle(btn);
+     // The menu is a deliberate floating popover, outside its track row.
+     if(btn.closest('.trackActionGroup'))continue;
      if(style.visibility==='hidden'||style.display==='none')continue;
      const b=rect(btn);
      if(b.width<20||b.height<20)faults.push('Row '+i+': tiny button');
@@ -202,8 +207,8 @@ window.__qaEvents=[];window.pywebview={api:{
                     problems=page.evaluate(GEOMETRY)
                     if page.locator("#copyPathBtn").count():
                         problems.append("Duplicate Copy path button")
-                    if not page.locator(".trackActionGroup").first.is_visible():
-                        problems.append("Hover actions inaccessible")
+                    if not page.locator(".rowMenuBtn").first.is_visible():
+                        problems.append("Track action menu inaccessible")
                     if not page.locator('.track').first.locator('.patternMark[data-kind="remix"]').count():
                         problems.append("Saved Remix cannot be toggled off")
                     group=page.locator(".albumGroupActions")
