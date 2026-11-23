@@ -15918,7 +15918,7 @@ def _apply_css_zoom_to_open_windows() -> None:
                 pass
 
 
-def _webview_release_map_html() -> str:
+def _webview_release_map_html(inline: bool = False) -> str:
     html = r"""<!doctype html>
 <html>
 <head>
@@ -15930,6 +15930,7 @@ def _webview_release_map_html() -> str:
 <body>
 <header class="topBar sep" id="toolbar">
   <span class="appLogo">{{icon:music}}</span>
+  <button class="btn" id="backToScan" hidden>Scan</button>
   <div class="appName" id="title">Release Map</div>
   <span class="versionTag">v{{app:version}}</span>
   <span class="buildState">Under construction</span>
@@ -15977,6 +15978,9 @@ def _webview_release_map_html() -> str:
     <button class="btn" id="reviewBtn" aria-expanded="false" hidden></button>
     <button class="btn primary fill" id="exportBtn" disabled></button>
   </div>
+  <div class="row" id="copyLive" aria-live="polite" hidden>
+    <span id="copyLiveStatus"></span><span id="copyLiveCount"></span>
+  </div>
   <div class="row" id="organizerBar">
     <label class="check"><input type="checkbox" id="orgEncode">Encode to</label>
     <select id="orgFormat" aria-label="Format"><option value="ALAC">ALAC</option><option value="FLAC">FLAC</option></select>
@@ -15999,6 +16003,8 @@ let changeFilter="all";
 let showAllConnections=false;
 let exportDestination="";
 let exportMode="all";
+let copyRunning=false,copyComplete=false;
+const MAP_API_PREFIX="__MCC_MAP_PREFIX__";
 const REANALYZE_HIGHLIGHT_MS=15000;
 let lastReanalyzeToken="";
 let reanalyzeHighlightTimer=null;
@@ -16097,7 +16103,7 @@ function actionDisplay(n) {
 }
 function updateExportControls(){
   const enabled=!!(state&&state.editable);
-  document.getElementById("stepSave").hidden=!enabled;
+  document.getElementById("stepSave").hidden=!enabled&&!copyRunning&&!copyComplete;
   const move=exportMode==="new", path=selectedExportPath();
   const modeBtn=document.getElementById("exportModeBtn");
   modeBtn.innerHTML='{{icon:swap}}'+(move?"Move into":"Copy into");
@@ -16108,7 +16114,9 @@ function updateExportControls(){
   document.getElementById("openDestination").disabled=!path;
   const run=document.getElementById("exportBtn");
   run.textContent=move?"Move":"Copy";run.title=modeBtn.title;
-  run.disabled=!enabled||!path||!!state.dirty||!state.applyEnabled;
+  run.disabled=!enabled||!path||!!state.dirty||!state.applyEnabled||copyRunning||copyComplete;
+  modeBtn.disabled=copyRunning||copyComplete;
+  document.getElementById("chooseDestination").disabled=copyRunning||copyComplete;
 }
 
 function esc(v) {
@@ -17170,7 +17178,7 @@ function chooseDestination(){
   });
 }
 function copyPlan(){
-  if(!state||!state.applyEnabled||state.dirty)return;
+  if(!state||!state.applyEnabled||state.dirty||copyRunning||copyComplete)return;
   const mode=exportMode, path=selectedExportPath();
   if(!path){chooseDestination();return;}
   const nodes=(state.nodes||[]).filter(function(n){
@@ -17186,12 +17194,56 @@ function copyPlan(){
     : "MOVE retained OLD + NEW releases into:\n\n"+path+"\n\n"+summary+"\n\n"
       +"Releases are written to the destination like Copy; originals of finished releases then go to the Recycle Bin. "
       +"Partial or failed releases stay where they are.";
-  if(window.confirm(message))bridge.copyPlan(mode,path);
+  if(window.confirm(message)){
+    copyRunning=true;
+    const bar=document.getElementById("copyLive");
+    bar.hidden=false;
+    document.getElementById("copyLiveStatus").textContent=mode==="all"?"Copying":"Moving";
+    document.getElementById("copyLiveCount").textContent="";
+    document.getElementById("exportPath").textContent=path;
+    document.getElementById("exportPath").title=path;
+    document.getElementById("backToScan").disabled=true;
+    updateExportControls();
+    bridge.copyPlan(mode,path).catch(function(err){
+      copyRunning=false;
+      document.getElementById("copyLiveStatus").textContent="Copy could not start";
+      document.getElementById("copyLiveCount").textContent=String(err&&err.message||err);
+      document.getElementById("backToScan").disabled=false;
+      updateExportControls();
+    });
+  }
 }
 document.getElementById("exportModeBtn").onclick=function(){exportMode=exportMode==="all"?"new":"all";updateExportControls();};
 document.getElementById("chooseDestination").onclick=chooseDestination;
 document.getElementById("openDestination").onclick=function(){const path=selectedExportPath();if(path)bridge.openFolder(path);};
 document.getElementById("exportBtn").onclick=copyPlan;
+document.getElementById("backToScan").hidden=MAP_API_PREFIX!=="map_";
+document.getElementById("backToScan").onclick=function(){if(!copyRunning)bridge.closeMap();};
+if(MAP_API_PREFIX==="map_"){
+  window.__deaStateChanged=function(raw){
+    if(!copyRunning)return;
+    const info=typeof raw==="string"?JSON.parse(raw):raw;
+    document.getElementById("copyLiveStatus").textContent=String(info.status||"Copying");
+    document.getElementById("copyLiveCount").textContent=String(info.progressCount||"");
+  };
+  window.__deaEventRaised=function(raw){
+    const event=typeof raw==="string"?JSON.parse(raw):raw;
+    if(event.type==="copyDone"){
+      copyRunning=false;copyComplete=true;
+      const totals=(event.result&&event.result.counts)||{};
+      document.getElementById("copyLiveStatus").textContent="Finished";
+      document.getElementById("copyLiveCount").textContent=String(totals.done||0)+" releases · "+String(totals.failed||0)+" failed";
+      document.getElementById("backToScan").disabled=false;
+      updateExportControls();
+    }else if(event.type==="error"){
+      copyRunning=false;
+      document.getElementById("copyLiveStatus").textContent="Failed";
+      document.getElementById("copyLiveCount").textContent=String(event.message||"Copy failed");
+      document.getElementById("backToScan").disabled=false;
+      updateExportControls();
+    }
+  };
+}
 function renderOrganizer(raw){
   const o=JSON.parse(raw);
   document.getElementById("orgEncode").checked=!!o.enable_encoding;
@@ -17258,7 +17310,7 @@ function waitForPywebviewMethod(name,timeoutMs){
   });
 }
 function bridgeCall(name,args,callback){
-  return waitForPywebviewMethod(name,30000).then(function(entry){
+  return waitForPywebviewMethod(MAP_API_PREFIX+name,30000).then(function(entry){
     return entry.fn.apply(entry.api,args);
   }).then(function(result){
     if(callback)callback(typeof result==="string"?result:JSON.stringify(result));
@@ -17290,7 +17342,7 @@ window.addEventListener("pywebviewready",function(){
 </script>
 </body>
 </html>"""
-    return _apply_app_theme(html)
+    return _apply_app_theme(html.replace("__MCC_MAP_PREFIX__", "map_" if inline else ""))
 
 
 def _release_date_sort_key_for_map(name: str) -> Tuple[int, int, int, str]:
@@ -18116,8 +18168,9 @@ def _focus_release_map_window() -> None:
             pass
 
 
-def launch_webview_release_map(session: Dict[str, object]) -> Dict[str, object]:
-    """Open the full regular Release Map in a lightweight WebView2 host."""
+def launch_webview_release_map(session: Dict[str, object], host_window=None,
+                               result_callback=None):
+    """Display the map inside the existing WebView2 window when available."""
     webview = ensure_light_ui_dependencies()
     _ensure_webview2_runtime()
 
@@ -18125,6 +18178,9 @@ def launch_webview_release_map(session: Dict[str, object]) -> Dict[str, object]:
 
         def __init__(self):
             self.window = None
+            self.inline = False
+            self.result_callback = None
+            self.export_busy = False
             self.done_event = threading.Event()
             self.result_payload: Optional[Dict[str, object]] = None
             self.snapshots = list(session.get("snapshots", []) or [])
@@ -18809,7 +18865,35 @@ def launch_webview_release_map(session: Dict[str, object]) -> Dict[str, object]:
             )
             return chosen_items[0] if chosen_items else ""
 
+        def _deliver_inline(self, payload: Dict[str, object], close: bool) -> bool:
+            if not self.inline:
+                return False
+            if not callable(self.result_callback):
+                raise RuntimeError("Embedded Release Map is missing its host callback.")
+            threading.Thread(
+                target=self.result_callback, args=(payload, close),
+                name="MCC map action", daemon=True,
+            ).start()
+            return True
+
+        def closeMap(self):
+            if self.export_busy:
+                return
+            payload = {
+                "action": "close", "snapshots": self.snapshots,
+                "selected": self.selected, "decisions": self.decisions,
+                "blocked_release_ids": self.blocked_release_ids,
+                "initial_plan_counts": self.initial_plan_counts,
+                "requires_fresh_scan": bool(self.requires_fresh_scan),
+                "pending_plan": bool(self.dirty),
+            }
+            self._deliver_inline(payload, True)
+
         def requestScan(self):
+            if self.export_busy:
+                return
+            if self._deliver_inline({"action": "scan"}, True):
+                return
             self.result_payload = {"action": "scan"}
             self.done_event.set()
             if self.window is not None:
@@ -18820,6 +18904,7 @@ def launch_webview_release_map(session: Dict[str, object]) -> Dict[str, object]:
             destination = str(destination or "").strip()
             if (
                 not self.editable
+                or self.export_busy
                 or self.dirty
                 or not self.apply_enabled
                 or self.integrity_blockers
@@ -18840,6 +18925,11 @@ def launch_webview_release_map(session: Dict[str, object]) -> Dict[str, object]:
                 "blocked_release_ids": self.blocked_release_ids,
                 "initial_plan_counts": self.initial_plan_counts,
             }
+            if self.inline:
+                self.export_busy = True
+                self._deliver_inline(self.result_payload, False)
+                return
+
             self.done_event.set()
             if self.window is not None:
                 self.window.destroy()
@@ -18847,6 +18937,27 @@ def launch_webview_release_map(session: Dict[str, object]) -> Dict[str, object]:
 
 
     bridge = ReleaseMapBridge()
+    if host_window is not None:
+        # Prefix map bridge methods so the main getState and settings API
+        # remains available when the same WebView2 loads the map.
+        bridge.inline = True
+        bridge.window = host_window
+        bridge.result_callback = result_callback
+        names = (
+            "getState", "getOrganizer", "setOrganizerOption", "toggleTrack",
+            "toggleRelease", "toggleKeepRelease", "reviewRelease",
+            "markTrackPattern", "setAlbumGroup", "reanalyze", "requestScan",
+            "closeMap", "openFolder", "copyPath", "chooseDestination", "copyPlan",
+        )
+        def route(name: str):
+            def exposed(*args):
+                return getattr(bridge, name)(*args)
+            exposed.__name__ = "map_" + name
+            return exposed
+        host_window.expose(*(route(name) for name in names))
+        host_window.load_html(_webview_release_map_html(inline=True))
+        return bridge
+
     window = webview.create_window(
         f"{APP_NAME} {APP_VERSION} - Under construction ⚠️ - Release Map",
         html=_webview_release_map_html(),
@@ -19515,14 +19626,18 @@ document.getElementById("mapBtn").onclick=function(){bridge.openReleaseMap();};
 // Scan stage animation: one small scene per stage, chosen from the status text.
 const scanStageScenes=[
   [/dependenc/i,"tools"],[/scanning release folders/i,"folders"],[/reading tags/i,"tags"],
-  [/cd rip logs/i,"disc"],[/classifying/i,"sort"],[/generating chromaprint/i,"fingerprint"],
-  [/indexing fingerprints|finding audio candidates|comparing audio|alternate masterings/i,"compare"],
-  [/saved track skips|optimizing release set/i,"choose"],[/action plan|organizing|undo/i,"copy"],
+  [/verifying audio file integrity|checking audio files/i,"integrity"],
+  [/measuring silent boundary padding|measuring silence/i,"silence"],
+  [/cd rip logs/i,"disc"],[/classifying|sorting tracks/i,"sort"],
+  [/generating chromaprint|fingerprinting/i,"fingerprint"],
+  [/indexing fingerprints|finding audio candidates|comparing audio|matching recordings|alternate masterings/i,"compare"],
+  [/saved track skips|optimizing release set|choosing releases/i,"choose"],
+  [/action plan|organizing|copying|moving retained|undo/i,"copy"],
   [/looking up release/i,"lookup"],[/audiochecker/i,"spectrum"],[/artwork/i,"artwork"]];
 const scanStage={canvas:null,scene:"idle",progress:0,running:false,frame:0,colors:{}};
 function scanStageSceneFor(status){
   for(const [pattern,scene] of scanStageScenes) if(pattern.test(status||"")) return scene;
-  return "idle";
+  return "process";
 }
 function scanStageBits(column,row){ // stable pseudo-random fingerprint bits
   let x=(column*374761393+row*668265263)|0; x=(x^(x>>>13))*1274126177|0; return ((x^(x>>>16))&7)<3;
@@ -19564,6 +19679,42 @@ function drawScanStage(t){
     });
     return;
   }
+  if(scene==="integrity"){ // File waveform is decoded and verified through the tail.
+    const left=68,right=W-18,span=Math.max(20,right-left),head=left+(t*86)%span;
+    box(8,mid-19,43,38,c.body,false);box(17,mid-13,22,27,c.primary,false);
+    g.fillStyle=c.primary;g.fillText("AUDIO",12,mid+25);
+    line(left,mid,right,mid,c.hairline);
+    for(let x=left;x<right;x+=3){
+      const u=(x-left)/span,amplitude=5+11*Math.abs(Math.sin(u*11));
+      const h=amplitude*Math.sin(u*170)*Math.cos(u*38);
+      line(x,mid-h,x,mid+h,x<=head?c["status-added"]:c.body);
+    }
+    line(head,4,head,H-4,c.ink);
+    g.fillStyle=c["status-added"];g.fillText("✓",Math.min(right-14,head+5),mid-20);
+    return;
+  }
+  if(scene==="silence"){ // Quiet head and tail contrasted with the audible waveform.
+    const left=12,right=W-12,span=right-left,a=left+span*.18,b=left+span*.82;
+    g.fillStyle=c["canvas-soft"];g.fillRect(left,4,a-left,H-8);g.fillRect(b,4,right-b,H-8);
+    line(left,mid,right,mid,c.hairline);
+    for(let x=left;x<right;x+=3){
+      const u=(x-left)/span,quiet=u<.18||u>.82,env=quiet?2:8+7*Math.abs(Math.sin(u*17));
+      const h=env*Math.sin(u*91);
+      line(x,mid-h,x,mid+h,quiet?c.mute:c.primary);
+    }
+    const shift=Math.sin(t*1.7)*5;
+    line(a+shift,2,a+shift,H-2,c["status-warning"]);
+    line(b-shift,2,b-shift,H-2,c["status-warning"]);
+    return;
+  }
+  if(scene==="process"){ // Default work with an actual progress gauge.
+    box(12,mid-16,26,30,c.body,false);line(28,mid-16,38,mid-5,c.primary);
+    line(19,mid-5,31,mid-5,c.primary);line(19,mid+2,31,mid+2,c.primary);
+    const start=52,span=Math.max(20,W-66);
+    line(start,mid,start+span,mid,c.hairline);
+    g.fillStyle=c.primary;g.fillRect(start,mid-3,span*p,6);
+    return;
+  }
   if(scene==="folders"){ // folders found one after another, a scan line sweeping across
     const n=Math.floor(W/28), found=(Math.floor(t*6)%(n+8));
     for(let i=0;i<n;i++){
@@ -19598,47 +19749,62 @@ function drawScanStage(t){
     }
     return;
   }
-  if(scene==="sort"){ // tracks split into kept (up, teal) and ignored remixes/live (down, grey)
-    const split=W*0.45;
-    line(0,mid,split,mid,c.hairline); line(split,mid,W,8,c.hairline); line(split,mid,W,H-8,c.hairline);
-    for(let i=0;i<28;i++){
-      const u=((t*0.35+i/28)%1), x=u*W, keep=(i*7)%5!==0;
-      let y=mid; if(x>split){const f=(x-split)/(W-split); y=keep?mid-(mid-8)*f:mid+(H-8-mid)*f;}
-      g.fillStyle=x<split?c.body:(keep?c.primary:c.mute); g.beginPath(); g.arc(x,y,3,0,Math.PI*2); g.fill();
+  if(scene==="sort"){ // Distinct track rows with Keep / Skip decisions.
+    const count=Math.max(3,Math.floor(H/16)),step=Math.floor(t*3);
+    for(let i=0;i<count;i++){
+      const y=8+i*16,decided=((i+step)%count)<Math.max(1,Math.round(count*p));
+      const keep=i%4!==2,x=12;
+      box(x,y-6,12,12,decided?(keep?c["status-added"]:c.mute):c.hairline,false);
+      line(x+24,y,x+80+(i%3)*24,y,c.body);
+      if(decided){g.fillStyle=keep?c["status-added"]:c.mute;g.fillText(keep?"Keep":"Skip",Math.max(108,W-58),y);}
     }
     return;
   }
-  if(scene==="fingerprint"){ // waveform written into a scrolling Chromaprint bit grid
-    const cell=6, rows=Math.floor((H-4)/cell), cols=Math.ceil(W/cell)+1, shift=t*40, head=Math.floor(shift/cell);
-    for(let col=0;col<cols;col++){
-      const id=head+col, x=col*cell-(shift%cell);
-      for(let row=0;row<rows;row++) if(scanStageBits(id,row)) g.fillStyle=col>cols-8?c.ink:c.primary, g.fillRect(x,2+row*cell,cell-1,cell-1);
+  if(scene==="fingerprint"){ // A waveform produces Chromaprint cells below.
+    const cell=7,rows=Math.floor((H/2-3)/cell),cols=Math.ceil(W/cell),shift=Math.floor(t*7);
+    line(0,H*.28,W,H*.28,c.hairline);
+    for(let x=3;x<W;x+=3){const u=x/W,h=9*Math.sin(u*91+shift)*Math.cos(u*24);
+      line(x,H*.28-h,x,H*.28+h,c.body);}
+    for(let col=0;col<cols;col++)for(let row=0;row<rows;row++){
+      if(scanStageBits(col+shift,row)){g.fillStyle=c.primary;g.fillRect(col*cell,H/2+row*cell,cell-1,cell-1);}
+    }
+    const head=shift*cell%Math.max(1,W);
+    line(head,2,head,H-2,c.ink);
+    return;
+  }
+  if(scene==="compare"){ // Two recordings align; shared waveform lights up.
+    const offset=Math.sin(t*1.5)*7,amp=Math.max(4,H*.19),top=H*.27,bottom=H*.73;
+    g.fillStyle=c.body;g.fillText("A",5,top);g.fillText("B",5,bottom);
+    for(let x=24;x<W-4;x+=3){
+      const u=(x-24)/(W-28),v=Math.sin(u*86)*Math.cos(u*22);
+      line(x,top-v*amp,x,top+v*amp,c.body);
+      const shifted=Math.sin((u+offset/W)*86)*Math.cos((u+offset/W)*22);
+      line(x,bottom-shifted*amp,x,bottom+shifted*amp,Math.abs(offset)<1.5?c["status-added"]:c.primary);
+    }
+    if(Math.abs(offset)<1.5){g.fillStyle=c["status-added"];g.fillText("✓ MATCH",Math.max(8,W-76),mid);}
+    return;
+  }
+  if(scene==="choose"){ // Candidate albums / EPs show clear Keep / Skip.
+    const count=Math.max(1,Math.floor(W/100)),step=Math.floor(t*2);
+    for(let i=0;i<count;i++){
+      const x=6+i*100,keep=i%3!==1,decided=((i+step)%count)<Math.max(1,Math.round(count*p));
+      box(x,mid-17,91,34,decided?(keep?c.primary:c.mute):c.hairline,false);
+      g.fillStyle=c.body;g.fillText(i%3===0?"ALBUM":(i%3===1?"EP":"SINGLE"),x+8,mid-6);
+      if(decided){g.fillStyle=keep?c["status-added"]:c.mute;g.fillText(keep?"✓ Keep":"× Skip",x+8,mid+8);}
     }
     return;
   }
-  if(scene==="compare"){ // two fingerprints slide against each other; matching cells light up
-    const cell=6, cols=Math.ceil(W/cell), offset=Math.round(Math.sin(t*1.3)*6), half=Math.floor((H-6)/2/cell);
-    for(let col=0;col<cols;col++) for(let row=0;row<half;row++){
-      const a=scanStageBits(col,row), b=scanStageBits(col+offset,row), match=offset===0&&a;
-      if(a){g.fillStyle=match?c["status-added"]:c.body;g.fillRect(col*cell,2+row*cell,cell-1,cell-1);}
-      if(b){g.fillStyle=offset===0?c["status-added"]:c.primary;g.fillRect(col*cell,H-2-(half-row)*cell,cell-1,cell-1);}
+  if(scene==="copy"){ // Individual file sheets enter a named destination folder.
+    const fx=W-92;
+    box(fx,mid-13,75,31,c.primary,false);box(fx,mid-19,29,7,c.primary,false);
+    g.fillStyle=c.body;g.fillText("DEST",fx+13,mid+3);
+    for(let i=0;i<3;i++){
+      const x=12+(t*65+i*95)%Math.max(15,fx-20);
+      box(x,mid-13,21,27,c.body,false);line(x+4,mid-5,x+16,mid-5,c.primary);
+      line(x+4,mid+1,x+16,mid+1,c.primary);
     }
-    return;
-  }
-  if(scene==="choose"){ // releases weighed: each kept (teal) or struck (grey)
-    const n=Math.floor(W/64), step=Math.floor(t*3);
-    for(let i=0;i<n;i++){
-      const x=4+i*64, decided=i<(step%(n+4)), keep=(i*5)%3!==0;
-      box(x,mid-9,56,18,decided?(keep?c.primary:c.hairline):c.body,decided&&keep);
-      if(decided&&!keep) line(x+4,mid,x+52,mid,c.mute);
-    }
-    return;
-  }
-  if(scene==="copy"){ // files flowing into the output folder, filled by progress
-    const fx=W-70;
-    box(fx,mid-14,60,28,c.primary,false); box(fx,mid-18,22,6,c.primary,false);
-    g.fillStyle=c.primary; g.fillRect(fx+2,mid+12-24*p,56,24*p);
-    for(let i=0;i<9;i++){const x=((t*120+i*70)%(fx-10)); box(x,mid-5,14,10,c.body,true);}
+    line(fx,mid+21,fx+75,mid+21,c.hairline);
+    g.fillStyle=c.primary;g.fillRect(fx,mid+19,75*p,4);
     return;
   }
   if(scene==="lookup"){ // queries travelling to MusicBrainz and answers coming back
@@ -19786,6 +19952,7 @@ def _webview_main_app() -> int:
             self._lock = threading.RLock()
             self._decision_snapshot: List[Dict[str, object]] = _load_decision_snapshot()
             self._live_release_map_session: Optional[Dict[str, object]] = None
+            self._active_map_bridge = None
             self._pending_analysis: Optional[Dict[str, object]] = None
             self._pattern_review_mode = ""
             self._review_visible_rows: List[Dict[str, object]] = []
@@ -20694,11 +20861,55 @@ def _webview_main_app() -> int:
             self.map_open = True
             self.status = "Opening Release Map"
             self._emit_state()
-            threading.Thread(
-                target=self._release_map_worker,
-                args=(session, self._live_release_map_session is not None),
-                daemon=True,
-            ).start()
+            try:
+                self._active_map_bridge = launch_webview_release_map(
+                    dict(session),
+                    host_window=self.window,
+                    result_callback=lambda payload, close: self._handle_inline_map_result(
+                        session, self._live_release_map_session is not None,
+                        payload, close,
+                    ),
+                )
+            except Exception as exc:
+                self.map_open = False
+                self._error(f"Release Map failed:\n\n{exc}")
+
+        def _handle_inline_map_result(self, session: Dict[str, object],
+                                      live: bool, payload: Dict[str, object],
+                                      close: bool) -> None:
+            """All map actions run inside the main window, including Copy."""
+            action = str(payload.get("action", ""))
+            if not close and action in {"copy_all", "move_all"}:
+                try:
+                    if not live or self._live_release_map_session is None:
+                        raise RuntimeError("No live analysis is available for Copy/Move.")
+                    self._handle_live_map_result(session, payload)
+                except Exception as exc:
+                    self._error(str(exc))
+                finally:
+                    # The page stays open for inspecting the destination even
+                    # after the export finishes. A new Scan is required for
+                    # another export; never execute the old plan twice.
+                    self.map_open = True
+                    if self._active_map_bridge is not None:
+                        self._active_map_bridge.export_busy = False
+                        self._active_map_bridge.apply_enabled = False
+                return
+            if live and action != "scan" and self._live_release_map_session is not None:
+                self._update_live_release_map_session(session, payload)
+                if payload.get("requires_fresh_scan") or payload.get("pending_plan"):
+                    session["allow_apply"] = False
+            self.map_open = False
+            self._active_map_bridge = None
+            self.status = "Ready"
+            if self.window is not None:
+                self.window.load_html(_webview_main_html())
+            self._emit_state()
+            if action == "scan":
+                self.startAnalyze(
+                    self.folders, self.save_remixes, self.save_live,
+                    self.logging_enabled,
+                )
 
         def _release_map_worker(self, session: Dict[str, object], live: bool) -> None:
             try:
