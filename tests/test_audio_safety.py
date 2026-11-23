@@ -15,7 +15,10 @@ from unittest.mock import patch
 import wave
 
 ROOT = Path(__file__).resolve().parents[1]
-SOURCE = Path(os.environ.get('MCC_TEST_SOURCE', str(max(ROOT.glob('Music Collection Cleaner v*.pyw')))))
+SOURCE = Path(os.environ.get("MCC_TEST_SOURCE") or str(max(
+    [*ROOT.glob("Music Collection Cleaner v*.pyw"), *ROOT.glob("Music.Collection.Cleaner.v*.pyw")],
+    key=lambda p: tuple(int(x) for x in __import__("re").findall(r"\d+", p.stem)[-3:]),
+)))
 loader = importlib.machinery.SourceFileLoader('mcc_test_subject', str(SOURCE))
 spec = importlib.util.spec_from_loader(loader.name, loader)
 mcc = importlib.util.module_from_spec(spec)
