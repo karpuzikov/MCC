@@ -1,3 +1,13 @@
+## v0.5.174 - Under construction ⚠️ (2026-11-23)
+
+- Source and UI work tracked in [issue #2](https://github.com/karpuzikov/MCC/issues/2).
+- Cached classification-only Re-scan: use existing fingerprint/acoustic groups without repeating full audio decode, Chromaprint extraction, silence-padding measurement or pair comparisons. Block an unverified new inclusion; invalidate cached identity when previously verified audio/CUE size, mtime or ctime changes. Verify again before Copy/Move.
+- Explicit (EP) release names take precedence over misleading compilation/anthology metadata and mixed-family columns. Regression: BT - Extended Movement (EP).
+- Track actions: Keep/Skip vocabulary throughout, reversible Remix/Live menu checkboxes without a "Mark" prefix or unexpected Keep-rule promotion.
+- New signal-specific integrity and silence-padding animations and better animation routing. Activity log no longer echoes every scan stage or worker setting.
+- Release Map embedded in the same WebView2 application window; Copy retains map, exposes actual per-release output target, destination path and Open destination while active.
+- GitHub Actions Python, Node and Chromium tests added. Windows-native UI screenshots, focus, keyboard, scaling and real filesystem Copy/Move/Undo acceptance **NOT RUN**. Do not mark stable.
+
 ## v0.5.167 - Copy and Move audit fixes (Under construction ⚠️)
 
 - Protect Move exports from Undo before recycling any originals. Report the first recycle failure and the number of source folders already recycled.
