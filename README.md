@@ -1,39 +1,24 @@
 # Music Collection Cleaner (MCC)
 
-**Version: 0.5.167 - Under construction ⚠️**
+**Version: 0.5.174 - Under construction ⚠️**
 
 ## Download and run
 
-1. Run once in a terminal:
+Source: [Music.Collection.Cleaner.v0.05.174.pyw](Music.Collection.Cleaner.v0.05.174.pyw)
 
-```
-winget install -e --id Python.Python.3.12 && winget install -e --id Microsoft.EdgeWebView2Runtime
-```
+Install Python 3.12 and Microsoft Edge WebView2 Runtime, then double-click the `.pyw`.
 
-2. Download [Music Collection Cleaner v0.05.167.pyw](https://raw.githubusercontent.com/karpuzikov/MCC/main/Music%20Collection%20Cleaner%20v0.05.167.pyw).
-3. Double-click it.
+## Purpose
 
-## What it does
+Keep every wanted unique recording in the smallest practical retained release set, preferring better sources and preserving the originals until an explicit Copy or Move.
 
-**Main idea:** keep each unique song while keeping the total file count as low as possible.
+- A **single-window** scan and Release Map.
+- **Keep / Skip** for release and track decisions; **Remix / Live** can be checked and unchecked in the same track menu.
+- **Re-scan** of classification or planning decisions reuses already verified acoustic identities. Use full **Scan** if source media changed or newly included audio lacks a fingerprint.
+- During Copy or Move, the destination path and **Open destination** remain accessible.
+- Optional lossless encoding, CUE splitting, tagging, cover art, MusicBrainz enrichment, rip-log and AudioChecker integration retain existing rules.
+- Move recycles originals only after completed output; use Copy first.
 
-- Keeps the best edition of each album
-- Preserves unique songs
-- Keeps the total file count as low as possible
-- Preserving remixes and live versions is an option
-- You can manually pick which songs to keep
-- Star a folder (**Mark as main folder**) to keep it as the base; other folders are compared against it
-- Copy and Move also name folders by MusicBrainz, tag, encode to ALAC or FLAC, split CUE images and write AudioChecker logs (options: Encode, Format, AudioChecker, Split CUE are in the Release Map)
+**Status:** Python regression, Node interaction tests and Chromium embedded-map smoke checks pass in CI. Real Windows/WebView2 and full-library end-to-end acceptance are **NOT RUN**; this candidate is **not stable**.
 
-When the same songs exist in several versions, MCC prefers the better source, best first:
-
-1. CD: 100% - Log - Cue
-2. CD: 100% - Log
-3. CD: <100% - Log
-4. WEB/Digital
-
-## Safety
-
-Scanning never changes your files. Copy and Move run only when you click them. Use **Copy** first. Move sends originals to the Recycle Bin.
-
-[Changelog](CHANGELOG.md) · [Previous versions](version-history/) · [Development notes](CONTINUITY.md)
+[Changelog](CHANGELOG.md) · [Prior versions](version-history/) · [Control contract](docs/v0.5.174-control-contract.md) · [Development notes](CONTINUITY.md)
