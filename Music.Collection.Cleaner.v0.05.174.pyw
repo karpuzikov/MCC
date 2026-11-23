@@ -18123,7 +18123,9 @@ def _create_release_map_bridge(session: Dict[str, object]):
                 index: bool(track.manual_skip_rule)
                 for index, track in enumerate(self.tracks or [])
             }
-            self._verified_media_baseline = _verified_media_signatures(self.tracks or [])
+            self._verified_media_baseline = session.get("media_signatures")
+            if self._verified_media_baseline is None:
+                self._verified_media_baseline = _verified_media_signatures(self.tracks or [])
             self.initial_blocked_release_ids = set(self.blocked_release_ids)
             stored_kept = _load_manual_kept_release_paths()
             self.pinned_release_ids = {rel.rid for rel in (self.releases or [])
@@ -18758,6 +18760,9 @@ def _create_release_map_bridge(session: Dict[str, object]):
                 if not source:
                     return
                 destination = str(default_updated_destination(Path(source)))
+            _assert_unchanged_verified_media(
+                self._verified_media_baseline, self.tracks,
+            )
             self.result_payload = {
                 "action": "copy_all" if mode == "all" else "move_all",
                 "destination": destination,
@@ -20529,6 +20534,7 @@ def _webview_main_app() -> int:
                 "extra_roots": list(ctx.get("extra_roots", []) or []),
                 "releases": releases,
                 "tracks": tracks,
+                "media_signatures": _verified_media_signatures(tracks),
                 "groups": groups,
                 "selected": set(selected),
                 "reviews": list(reviews),
