@@ -18,18 +18,20 @@ jobs:
       - name: Run regression suite
         run: python -m unittest discover -s tests -p "test_*.py"
 
-  baseline-v173:
+  browser-visual-qa:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
-        with:
-          ref: v0.5.173
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - name: Compile v0.5.173 release source
-        run: python -m py_compile "Music.Collection.Cleaner.v0.05.173.pyw"
-      - name: Run baseline regression suite
-        env:
-          MCC_TEST_SOURCE: Music.Collection.Cleaner.v0.05.173.pyw
-        run: python -m unittest discover -s tests -p "test_*.py"
+      - name: Install Playwright
+        run: python -m pip install playwright
+      - name: Render and exercise the embedded Release Map in Edge
+        run: python tests/visual_qa.py --browser edge --output visual-qa
+      - name: Preserve QA screenshots and report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: mcc-v0.5.174-visual-qa
+          path: visual-qa/
