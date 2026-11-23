@@ -72,6 +72,36 @@ class IncrementalReview(unittest.TestCase):
         self.assertTrue(track.exclude_from_coverage)
         self.assertEqual(groups, {})
 
+    def test_cached_replan_rejects_changed_verified_media(self):
+        import tempfile
+        import time
+        with tempfile.TemporaryDirectory() as root:
+            media = Path(root) / "recording.flac"
+            media.write_bytes(b"first")
+            track = mcc.Track(
+                1, media, 0, title="Example", group_id=2,
+                fingerprint=(1, 2), integrity_checked=True,
+            )
+            baseline = mcc._verified_media_signatures([track])
+            mcc._assert_unchanged_verified_media(baseline, [track])
+            media.write_bytes(b"changed content")
+            with self.assertRaisesRegex(RuntimeError, "changed after Scan"):
+                mcc._assert_unchanged_verified_media(baseline, [track])
+
+    def test_missing_verified_media_never_reuses_cached_identity(self):
+        import tempfile
+        with tempfile.TemporaryDirectory() as root:
+            media = Path(root) / "recording.flac"
+            media.write_bytes(b"available")
+            track = mcc.Track(
+                1, media, 0, title="Example", group_id=2,
+                fingerprint=(1, 2), integrity_checked=True,
+            )
+            baseline = mcc._verified_media_signatures([track])
+            media.unlink()
+            with self.assertRaisesRegex(RuntimeError, "Source file inaccessible"):
+                mcc._assert_unchanged_verified_media(baseline, [track])
+
     def test_category_menu_is_reversible_without_mark_prefix(self):
         html = mcc._webview_release_map_html()
         self.assertIn('role="menuitemcheckbox"', html)
