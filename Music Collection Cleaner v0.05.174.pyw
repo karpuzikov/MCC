@@ -14319,6 +14319,7 @@ class Organizer:
         dest = Path(dest)
         disc_folders = tuple(Path(disc).resolve(strict=True) for disc in disc_folders)
         files = list(source_files) if source_files is not None else collect_files(source)
+        files = [Path(file).resolve(strict=True) for file in files]
         def output_subdir(parent):
             for position, disc in enumerate(disc_folders, 1):
                 if parent == disc or disc in parent.parents:
@@ -14659,6 +14660,7 @@ class Organizer:
                 raise RuntimeError("A CUE was lost during export.")
 
     def _download_artwork(self, root, releases):
+        root = Path(root).resolve(strict=True)
         manifest = {"root": str(root), "created": [],
                     "layout": "destination-root", "kind": "artwork",
                     "started": datetime.now().isoformat()}
@@ -14672,16 +14674,20 @@ class Organizer:
             # basename rather than arbitrarily assigning one cover.
             from collections import Counter
             title_counts = Counter(folder.name.casefold() for folder in releases)
-            for index, folder in enumerate(releases, 1):
+            for index, raw_folder in enumerate(releases, 1):
                 if self.stop.is_set():
                     self.status = "Artwork cancelled; created covers can be undone."
                     break
+                folder = Path(raw_folder)
                 row = {"name": folder.name, "source": str(folder),
                        "target": str(root), "status": "",
                        "message": "", "warnings": []}
                 try:
-                    if folder.is_symlink() or folder.resolve(strict=True) != folder:
+                    if folder.is_symlink():
                         raise ValueError("Release directory changed or is symlinked")
+                    folder = folder.resolve(strict=True)
+                    if not folder.is_dir() or (folder != root and root not in folder.parents):
+                        raise ValueError("Release directory escaped artwork destination")
                     if title_counts[folder.name.casefold()] > 1:
                         row["status"] = "partial"
                         row["message"] = ("Duplicate release folder names cannot share "
@@ -14764,16 +14770,17 @@ class Organizer:
                 raise RuntimeError("Unknown Artwork Undo journal layout")
             # Validate every filename and hash before unlinking anything.
             for entry in files:
-                image = Path(entry["path"])
-                resolved = image.resolve(strict=True) if image.is_file() else image
-                symlink_parent = any(p.is_symlink() for p in image.parents
-                                     if p == root or root in p.parents)
+                raw_image = Path(entry["path"])
+                image = raw_image.resolve(strict=True) if raw_image.is_file() else raw_image
+                resolved = image
+                symlink_parent = any(p.is_symlink() for p in raw_image.parents)
+                original_symlink = raw_image.is_symlink()
                 valid_location = (image.parent == root and
                                   image.name == entry.get("release_name", "") + ".jpg"
                                   if flat else
                                   root in image.parents and
                                   image.name == image.parent.name + ".jpg")
-                if (not image.is_file() or image.is_symlink() or symlink_parent or
+                if (not image.is_file() or image.is_symlink() or original_symlink or symlink_parent or
                         not valid_location or
                         not resolved.is_relative_to(root) or
                         sha(image) != entry["sha256"]):
