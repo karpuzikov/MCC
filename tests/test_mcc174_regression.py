@@ -1,4 +1,7 @@
 """MCC v0.5.174: incremental planning, release identity and single-window UX."""
+import re
+import shutil
+import subprocess
 import tempfile
 import unittest
 from pathlib import Path
@@ -107,12 +110,34 @@ class MCC174Regression(unittest.TestCase):
         self.assertIn('id="homeBtn"', main_html)
         self.assertIn('id="copyTarget"', map_html)
         self.assertIn('id="openCopyDestination"', map_html)
+        self.assertIn('id="copyMeter"', map_html)
+        self.assertIn('copyPercent', source)
         self.assertIn('selected?"clear":kind', map_html)
         self.assertNotIn('>Mark Remix<', map_html)
         self.assertNotIn('>Mark Live<', map_html)
         self.assertIn('scene==="integrity"', main_html)
         self.assertIn('scene==="silence"', main_html)
+        self.assertIn('scene==="fingerprint"', main_html)
+        self.assertIn('scene==="compare"', main_html)
+        self.assertIn('return "progress";', main_html)
         self.assertIn('on_copy=self._start_embedded_copy', source)
+
+    @unittest.skipUnless(shutil.which("node"), "Node required to verify embedded scripts")
+    def test_full_embedded_javascript_parses_without_syntax_errors(self):
+        for page_name, html in (("home", mcc._webview_main_html()),
+                                ("map", mcc._webview_release_map_html())):
+            scripts = re.findall(r"<script(?:\\s+[^>]*)?>(.*?)</script>",
+                                 html, flags=re.I | re.S)
+            self.assertTrue(scripts, "No embedded scripts found in " + page_name)
+            for index, script in enumerate(scripts):
+                with self.subTest(page=page_name, index=index):
+                    with tempfile.TemporaryDirectory() as folder:
+                        file = Path(folder) / "embedded.mjs"
+                        file.write_text(script, encoding="utf-8")
+                        checked = subprocess.run(
+                            [shutil.which("node"), "--check", str(file)],
+                            text=True, capture_output=True, timeout=20)
+                        self.assertEqual(checked.returncode, 0, checked.stderr[:1000])
 
 
 if __name__ == "__main__":

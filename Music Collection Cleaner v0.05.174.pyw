@@ -15421,6 +15421,11 @@ select { appearance:none; padding-right:calc(var(--space-3) + var(--space-2)); b
 #progressPercent { font:var(--type-mono-body); color:var(--primary); }
 #progressTrack { height:4px; background:var(--canvas-soft); border-radius:2px; overflow:hidden; }
 #progressFill { height:100%; width:0; background:var(--primary); transition:width .12s ease; }
+#copyProgress { display:flex; flex-wrap:wrap; }
+#copyStatus { flex:none; white-space:nowrap; font:var(--type-secondary); color:var(--body); }
+#copyTarget { flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+#copyMeter { width:100%; height:3px; background:var(--canvas-soft); overflow:hidden; }
+#copyMeterFill { height:100%; width:0; background:var(--primary); transition:width .12s ease; }
 #activitySection { flex:1; min-height:0; display:flex; flex-direction:column; gap:var(--space-2); }
 /* Scan stage scene: one small animation per scan stage, a flat line when idle. */
 #scanStage { flex:none; display:block; width:100%; height:48px; }
@@ -15936,6 +15941,7 @@ def _webview_release_map_html() -> str:
     <div id="copyStatus" role="status" aria-live="polite"></div>
     <div class="field path" id="copyTarget" title=""></div>
     <button class="iconBtn" id="openCopyDestination" title="Open destination" aria-label="Open destination">{{icon:explorer}}</button>
+    <div id="copyMeter" role="progressbar" aria-label="Copy progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><div id="copyMeterFill"></div></div>
   </div>
   <div class="row" id="organizerBar">
     <label class="check"><input type="checkbox" id="orgEncode">Encode to</label>
@@ -16038,6 +16044,9 @@ function renderCopyStatus(){
   const path=document.getElementById("copyTarget");
   path.textContent=target;path.title=target;
   document.getElementById("copyStatus").textContent=String(state.copyStatus||"");
+  const pct=Math.max(0,Math.min(100,Number(state.copyPercent||0)));
+  document.getElementById("copyMeterFill").style.width=pct+"%";
+  document.getElementById("copyMeter").setAttribute("aria-valuenow",String(pct));
   document.getElementById("openCopyDestination").disabled=!destination;
 }
 window.mccReceiveCopyUpdate=function(data){
@@ -17170,6 +17179,7 @@ function copyPlan(){
       copying:!!next.copying,
       copyDestination:String(next.copyDestination||path),
       copyActiveTarget:String(next.copyActiveTarget||""),
+      copyPercent:Number(next.copyPercent||0),
       copyStatus:String(next.copyStatus||"Preparing destination")
     });
   });
@@ -18137,6 +18147,7 @@ def launch_webview_release_map(
             self.copying = False
             self.copy_destination = ""
             self.copy_active_target = ""
+            self.copy_percent = 0
             self.copy_status = ""
             self._last_copy_emit = 0.0
             self.done_event = threading.Event()
@@ -18242,6 +18253,7 @@ def launch_webview_release_map(
             self._ui_state["copying"] = bool(self.copying)
             self._ui_state["copyDestination"] = str(self.copy_destination)
             self._ui_state["copyActiveTarget"] = str(self.copy_active_target)
+            self._ui_state["copyPercent"] = int(self.copy_percent)
             self._ui_state["copyStatus"] = str(self.copy_status)
 
         def _state(self) -> str:
@@ -18757,6 +18769,7 @@ def launch_webview_release_map(
             self.copy_status = label
             if separator:
                 self.copy_active_target = target.strip()
+            self.copy_percent = min(100, max(0, round(100 * current / total))) if total > 0 else 0
             self._sync_ui_root()
             now = time.monotonic()
             if current < total and now - self._last_copy_emit < 0.18:
@@ -18765,6 +18778,7 @@ def launch_webview_release_map(
             progress = (f"{current:,} / {total:,}" if total else "")
             self._emit_copy_ui({"copying": True, "copyDestination": self.copy_destination,
                                 "copyActiveTarget": self.copy_active_target,
+                                "copyPercent": self.copy_percent,
                                 "copyStatus": self.copy_status + (" · " + progress if progress else "")})
 
         def _emit_copy_ui(self, data: Dict[str, object]) -> None:
@@ -18777,6 +18791,7 @@ def launch_webview_release_map(
         def exportDone(self, destination: Path, result: Dict[str, object]) -> None:
             self.copying = False
             self.copy_active_target = ""
+            self.copy_percent = 100
             self.editable = False
             self.apply_enabled = False
             counts = result.get("counts", {})
@@ -18784,7 +18799,9 @@ def launch_webview_release_map(
                 f": {counts.get('done', 0)} done, {counts.get('failed', 0)} failed")
             self._sync_ui_root()
             self._emit_copy_ui({"copying": False, "copyDestination": str(destination),
-                                "copyActiveTarget": "", "copyStatus": self.copy_status, "copyFinished": True})
+                                "copyActiveTarget": "", "copyPercent": self.copy_percent,
+                                "applyEnabled": False, "editable": False,
+                                "copyStatus": self.copy_status, "copyFinished": True})
 
         def openFolder(self, value: str):
             try:
@@ -18863,6 +18880,7 @@ def launch_webview_release_map(
                     return self._state()
                 self.copy_destination = destination
                 self.copying = True
+                self.copy_percent = 0
                 self.copy_status = "Preparing destination"
                 self.apply_enabled = False
                 self._sync_ui_root()
@@ -19573,15 +19591,18 @@ document.getElementById("mapBtn").onclick=function(){bridge.openReleaseMap();};
 // Scan stage animation: one small scene per stage, chosen from the status text.
 const scanStageScenes=[
   [/dependenc/i,"tools"],[/scanning release folders/i,"folders"],[/reading tags/i,"tags"],
+  [/scanning track patterns|applying pattern/i,"sort"],
   [/verifying audio file integrity/i,"integrity"],[/measuring silent boundary padding/i,"silence"],
   [/cd rip logs/i,"disc"],[/classifying/i,"sort"],[/generating chromaprint/i,"fingerprint"],
   [/indexing fingerprints|finding audio candidates|comparing audio|alternate masterings|confirming alternate masterings/i,"compare"],
-  [/saved track skips|optimizing release set/i,"choose"],[/action plan|organizing|undo/i,"copy"],
+  [/saved track skips|optimizing release set|applying manual acoustic decisions/i,"choose"],
+  [/action plan|organizing|processing release|copying|undo/i,"copy"],
   [/looking up release/i,"lookup"],[/audiochecker/i,"spectrum"],[/artwork/i,"artwork"]];
 const scanStage={canvas:null,scene:"idle",progress:0,running:false,frame:0,colors:{}};
 function scanStageSceneFor(status){
   for(const [pattern,scene] of scanStageScenes) if(pattern.test(status||"")) return scene;
-  return "idle";
+  // Active but unnamed processes should never show a blank scene.
+  return "progress";
 }
 function scanStageBits(column,row){ // stable pseudo-random fingerprint bits
   let x=(column*374761393+row*668265263)|0; x=(x^(x>>>13))*1274126177|0; return ((x^(x>>>16))&7)<3;
@@ -19615,6 +19636,14 @@ function drawScanStage(t){
     g.strokeStyle=c.primary;g.lineWidth=3;g.beginPath();
     const x=W/2;
     g.moveTo(x-20,mid);g.lineTo(x-6,mid+12);g.lineTo(x+23,mid-16);g.stroke();
+    return;
+  }
+  if(scene==="progress"){
+    g.fillStyle=c.body;g.fillText("PROCESSING",8,mid-11);
+    const x=8, y=mid+6, span=W-16;
+    line(x,y,x+span,y,c.hairline);
+    line(x,y,x+span*p,y,c.primary);
+    line(x+span*p,y-5,x+span*p,y+5,c.ink);
     return;
   }
   if(scene==="integrity"){ // decoder sweeps the waveform as valid frames pass
@@ -19690,47 +19719,81 @@ function drawScanStage(t){
     }
     return;
   }
-  if(scene==="sort"){ // tracks split into kept (up, teal) and ignored remixes/live (down, grey)
-    const split=W*0.45;
-    line(0,mid,split,mid,c.hairline); line(split,mid,W,8,c.hairline); line(split,mid,W,H-8,c.hairline);
-    for(let i=0;i<28;i++){
-      const u=((t*0.35+i/28)%1), x=u*W, keep=(i*7)%5!==0;
-      let y=mid; if(x>split){const f=(x-split)/(W-split); y=keep?mid-(mid-8)*f:mid+(H-8-mid)*f;}
-      g.fillStyle=x<split?c.body:(keep?c.primary:c.mute); g.beginPath(); g.arc(x,y,3,0,Math.PI*2); g.fill();
+  if(scene==="sort"){ // track entries are sent to visibly named Keep / Skip lanes
+    const fork=W*.45, edge=W-78;
+    line(55,mid,fork,mid,c.hairline);
+    line(fork,mid,edge,mid-11,c.primary);
+    line(fork,mid,edge,mid+11,c.hairline);
+    g.fillStyle=c.mute;g.fillText("TRACKS",5,mid);
+    g.fillStyle=c.primary;g.fillText("KEEP ✓",W-67,mid-11);
+    g.fillStyle=c.mute;g.fillText("SKIP ×",W-67,mid+11);
+    for(let i=0;i<11;i++){
+      const u=(t*.32+i/11)%1, x=55+u*(edge-55), keep=(i%5)!==0;
+      const y=x<fork?mid:mid+(keep?-11:11)*((x-fork)/(edge-fork));
+      g.fillStyle=keep?c.primary:c.body;
+      g.fillText("♪",x,y);
     }
     return;
   }
-  if(scene==="fingerprint"){ // waveform written into a scrolling Chromaprint bit grid
-    const cell=6, rows=Math.floor((H-4)/cell), cols=Math.ceil(W/cell)+1, shift=t*40, head=Math.floor(shift/cell);
-    for(let col=0;col<cols;col++){
-      const id=head+col, x=col*cell-(shift%cell);
-      for(let row=0;row<rows;row++) if(scanStageBits(id,row)) g.fillStyle=col>cols-8?c.ink:c.primary, g.fillRect(x,2+row*cell,cell-1,cell-1);
+  if(scene==="fingerprint"){ // waveform is converted to a Chromaprint grid
+    const waveEnd=W*.37, gridStart=W*.47, cell=6, rows=Math.floor((H-8)/cell);
+    g.fillStyle=c.mute;g.fillText("PCM",8,9);
+    g.fillText("FINGERPRINT",gridStart,9);
+    g.strokeStyle=c.body;g.beginPath();
+    for(let x=8;x<waveEnd;x+=3){
+      const amp=(Math.sin((x+t*23)*.15)*Math.sin((x+t*23)*.047))*(mid-10);
+      if(x===8)g.moveTo(x,mid+amp);else g.lineTo(x,mid+amp);
+    }
+    g.stroke();line(waveEnd+7,mid,gridStart-10,mid,c.primary);
+    g.fillStyle=c.primary;g.fillText("›",gridStart-18,mid);
+    const cols=Math.ceil((W-gridStart)/cell),head=Math.floor(t*5);
+    for(let col=0;col<cols;col++)for(let row=0;row<rows;row++){
+      if(!scanStageBits(col+head,row))continue;
+      g.fillStyle=col===cols-1?c.ink:c.primary;
+      g.fillRect(gridStart+col*cell,4+row*cell,cell-1,cell-1);
     }
     return;
   }
-  if(scene==="compare"){ // two fingerprints slide against each other; matching cells light up
-    const cell=6, cols=Math.ceil(W/cell), offset=Math.round(Math.sin(t*1.3)*6), half=Math.floor((H-6)/2/cell);
-    for(let col=0;col<cols;col++) for(let row=0;row<half;row++){
-      const a=scanStageBits(col,row), b=scanStageBits(col+offset,row), match=offset===0&&a;
-      if(a){g.fillStyle=match?c["status-added"]:c.body;g.fillRect(col*cell,2+row*cell,cell-1,cell-1);}
-      if(b){g.fillStyle=offset===0?c["status-added"]:c.primary;g.fillRect(col*cell,H-2-(half-row)*cell,cell-1,cell-1);}
+  if(scene==="compare"){ // two audio fingerprints align; matching frames are highlighted
+    const left=52,right=W-80,offset=Math.round(Math.sin(t*1.25)*12),same=Math.abs(offset)<=2;
+    g.fillStyle=c.mute;g.fillText("A",10,mid-10);g.fillText("B",10,mid+10);
+    line(left,mid-10,right,mid-10,c.hairline);
+    line(left,mid+10,right,mid+10,c.hairline);
+    const step=5;
+    for(let x=left;x<right;x+=step){
+      const id=Math.floor((x-left)/step),ok=scanStageBits(id,2);
+      if(ok)line(x,mid-14,x,mid-6,same?c["status-added"]:c.body);
+      if(scanStageBits(id+offset,2))line(x,mid+6,x,mid+14,same?c["status-added"]:c.primary);
     }
+    const scan=left+((t*70)%Math.max(1,right-left));
+    line(scan,mid-18,scan,mid+18,c.ink);
+    g.fillStyle=same?c["status-added"]:c.mute;
+    g.fillText(same?"MATCH ✓":"ALIGNING",W-73,mid);
     return;
   }
-  if(scene==="choose"){ // releases weighed: each kept (teal) or struck (grey)
-    const n=Math.floor(W/64), step=Math.floor(t*3);
+  if(scene==="choose"){ // actual release discs receive Keep/Skip decisions
+    const n=Math.max(1,Math.floor(W/78)), step=Math.floor(t*2);
     for(let i=0;i<n;i++){
-      const x=4+i*64, decided=i<(step%(n+4)), keep=(i*5)%3!==0;
-      box(x,mid-9,56,18,decided?(keep?c.primary:c.hairline):c.body,decided&&keep);
-      if(decided&&!keep) line(x+4,mid,x+52,mid,c.mute);
+      const x=28+i*78, chosen=i<(step%(n+3)), keep=i%4!==0;
+      g.strokeStyle=chosen?(keep?c.primary:c.mute):c.hairline;
+      g.beginPath();g.arc(x,mid,13,0,Math.PI*2);g.stroke();
+      g.beginPath();g.arc(x,mid,3,0,Math.PI*2);g.stroke();
+      if(chosen){g.fillStyle=keep?c.primary:c.mute;g.fillText(keep?"✓":"×",x+18,mid);}
     }
     return;
   }
-  if(scene==="copy"){ // files flowing into the output folder, filled by progress
-    const fx=W-70;
-    box(fx,mid-14,60,28,c.primary,false); box(fx,mid-18,22,6,c.primary,false);
-    g.fillStyle=c.primary; g.fillRect(fx+2,mid+12-24*p,56,24*p);
-    for(let i=0;i<9;i++){const x=((t*120+i*70)%(fx-10)); box(x,mid-5,14,10,c.body,true);}
+  if(scene==="copy"){ // recognizable file sheets travel into a destination folder
+    const fx=W-95;
+    box(fx,mid-12,80,24,c.primary,false);box(fx,mid-18,28,7,c.primary,false);
+    g.fillStyle=c.primary;g.fillText("OUTPUT",fx+15,mid);
+    line(4,mid,fx-10,mid,c.hairline);
+    for(let i=0;i<5;i++){
+      const travel=(t*70+i*82)%Math.max(1,fx-26),x=6+travel;
+      box(x,mid-11,18,22,c.body,false);
+      line(x+4,mid-4,x+14,mid-4,c.body);
+      line(x+4,mid+1,x+14,mid+1,c.body);
+      line(x+4,mid+6,x+11,mid+6,c.body);
+    }
     return;
   }
   if(scene==="lookup"){ // queries travelling to MusicBrainz and answers coming back
