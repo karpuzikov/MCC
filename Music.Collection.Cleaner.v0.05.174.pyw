@@ -16049,7 +16049,7 @@ function actionDisplay(n) {
     return {label:"UPGRADE",cls:"upgrade"};
   }
   if(action==="ADD") return (state&&state.standaloneMode)
-    ? {label:"RETAIN",cls:"keep"} : {label:"+ ADD",cls:"add"};
+    ? {label:"KEEP",cls:"keep"} : {label:"+ ADD",cls:"add"};
   if(action==="KEEP") return {label:"KEEP",cls:"keep"};
   if(action==="REMOVE") return {label:"REMOVE",cls:"remove"};
   if(action==="SKIP") return {label:"SKIP",cls:"skip"};
@@ -16420,7 +16420,7 @@ function changeReason(n,kind) {
   if(kind==="added"){
     const unique=uniqueAddedTitles(n);
     if(unique.length)return "Retained for: "+unique.slice(0,3).join("; ")+(unique.length>3?"; +"+(unique.length-3)+" more":"");
-    if((n.tracks||[]).some(function(t){return t.pendingIgnore||t.pendingRestore;}))return "Skip changes pending - Re-scan required.";
+    if((n.tracks||[]).some(function(t){return t.pendingIgnore||t.pendingRestore;}))return "Changes pending - Re-scan required.";
     return String(n.reason||"New addition from the NEW / update folder.");
   }
   if(kind==="upgraded"){
@@ -16502,7 +16502,7 @@ function releaseFactsHtml(n,boxed) {
 }
 function rowMarker(n) {
   const kind=changeKind(n);
-  if(kind==="ignored") return {cls:"ignored",symbol:"&nbsp;",label:n.pendingReleaseIgnore?"Pending ignore":(n.pendingReleaseRestore?"Pending restore":"Skipped")};
+  if(kind==="ignored") return {cls:"ignored",symbol:"&nbsp;",label:n.pendingReleaseIgnore?"Pending Skip":(n.pendingReleaseRestore?"Pending Keep":"Skipped")};
   if(kind==="added") return {cls:"add",symbol:"+",label:"Add"};
   if(kind==="upgraded") return {cls:"upgrade",symbol:"↑",label:"Upgrade"};
   if(kind==="replacementSource"||kind==="removed"||n.kind==="duplicate") return {cls:"skip",symbol:"",label:"Skip"};
@@ -18911,8 +18911,8 @@ def _webview_main_html() -> str:
       <button class="btn primary" id="addFolder" title="Add another source folder">+ Add folder</button>
       <div class="gap"></div>
       <div class="row" id="keepOptions">
-        <label class="check" title="Checked: remixes participate normally. Unchecked: remixes are ignored."><input type="checkbox" id="saveRemixes">Keep Remixes</label>
-        <label class="check" title="Checked: live recordings participate normally. Unchecked: live recordings are ignored."><input type="checkbox" id="saveLive">Keep Live recordings</label>
+        <label class="check" title="Checked: remixes participate normally. Unchecked: remixes are skipped."><input type="checkbox" id="saveRemixes">Keep Remixes</label>
+        <label class="check" title="Checked: live recordings participate normally. Unchecked: live recordings are skipped."><input type="checkbox" id="saveLive">Keep Live recordings</label>
         <button class="btn" id="personalPicks">Keeps and Skips</button>
       </div>
     </div>
