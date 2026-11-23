@@ -283,7 +283,7 @@ process.stdout.write(JSON.stringify(evaluate(input.node,()=>({}))));
             [mcc.ReleaseDecision(1,'ADD','Plan'),mcc.ReleaseDecision(2,'SKIP','Duplicate')])
         session=dict(snapshots=snapshots,releases=releases,tracks=tracks,groups={0:[0,1],1:[2]},selected={1},allow_apply=True)
         tree=ast.parse(SOURCE.read_text(encoding='utf-8-sig'))
-        launch=next(n for n in tree.body if isinstance(n,ast.FunctionDef) and n.name=='launch_webview_release_map')
+        launch=next(n for n in tree.body if isinstance(n,ast.FunctionDef) and n.name=='_create_release_map_bridge')
         bridge_class=next(n for n in launch.body if isinstance(n,ast.ClassDef) and n.name=='ReleaseMapBridge')
         namespace=dict(vars(mcc),session=session)
         # Run the actual bridge, with persistence replaced by in-memory rules.
