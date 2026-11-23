@@ -67,7 +67,7 @@ class HoverActions(unittest.TestCase):
             ({'unique':True,'coveredBy':['Retained Deluxe']},'Also on: Retained Deluxe'),
             ({'unique':False,'excluded':True,'isLive':True},'Excluded: Live'),
             ({'unique':True,'excluded':True,'isLive':True},'Excluded: Live'),
-            ({'unique':True,'manualSkip':True,'groupId':5},'Skipped recording everywhere'),
+            ({'unique':True,'manualSkip':True,'groupId':5},'Skip this recording everywhere'),
         ]
         statuses=self.run_js(r'''
 const input=JSON.parse(require('fs').readFileSync(0,'utf8'));
@@ -215,7 +215,7 @@ const evaluate=new Function('n','replacementMap',input.code+'\nreturn {titles:un
 process.stdout.write(JSON.stringify(evaluate(input.node,()=>({}))));
 ''',{'code':code,'node':target})
         self.assertEqual(result['titles'],expected)
-        self.assertEqual(result['reason'],'Retained for: Ultralight Beam; Father Stretch My Hands Pt. 1; Pt. 2; +12 more')
+        self.assertEqual(result['reason'],'Keep for: Ultralight Beam; Father Stretch My Hands Pt. 1; Pt. 2; +12 more')
 
     def test_actual_bully_highlights_follow_logged_retention_reasons(self):
         fixture=json.loads((ROOT/'tests/fixtures/bully_song_presence.json').read_text())
@@ -352,8 +352,8 @@ process.stdout.write(JSON.stringify(results));
             self.assertEqual(result['gem'],gem)
             self.assertEqual([r['highlight'] for r in result['rows']],['Song' in titles,'Rare' in titles])
             self.assertEqual([r['gem'] for r in result['rows']],[False,gem])
-            if titles:self.assertEqual(result['reason'],'Retained for: '+'; '.join(titles))
-            else:self.assertIn('Re-scan',result['reason'])
+            if titles:self.assertEqual(result['reason'],'Keep for: '+'; '.join(titles))
+            else:self.assertEqual(result['reason'],'Updating Skip.')
 
     def test_one_ignore_action_preserves_saved_categories_and_restore(self):
         html = map_html()

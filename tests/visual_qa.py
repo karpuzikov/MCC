@@ -69,8 +69,8 @@ GEOMETRY = r"""() => {
  const p=rect(panel);
  if(p.left<-1||p.right>innerWidth+1)faults.push('Details outside viewport');
  for(const [i,row] of [...document.querySelectorAll('#tracks .track')].entries()){
-   const cols=['.num','.titleCell','.dur','.versionsCell','.status','.trackActionGroup']
-     .map(x=>row.querySelector(x)).filter(Boolean);
+   const cols=['.num','.titleText','.dur','.rowMenuBtn']
+     .map(x=>row.querySelector(x)).filter(e=>e && e.getClientRects().length);
    for(let j=1;j<cols.length;j++){
      if(rect(cols[j-1]).right>rect(cols[j]).left+1.5)
        faults.push('Row '+i+': overlapping columns');
@@ -82,6 +82,11 @@ GEOMETRY = r"""() => {
      const style=getComputedStyle(btn);
      if(style.visibility==='hidden'||style.display==='none')continue;
      const b=rect(btn);
+     if(!btn.getClientRects().length)continue;
+     if(btn.closest('.trackActionGroup')){
+       if(b.left<0||b.right>innerWidth+1||b.top<0||b.bottom>innerHeight+1)faults.push('Menu outside viewport');
+       continue;
+     }
      if(b.width<20||b.height<20)faults.push('Row '+i+': tiny button');
      if(b.left<r.left-1||b.right>r.right+1||b.top<r.top-1||b.bottom>r.bottom+1)
        faults.push('Row '+i+': button outside row');
@@ -93,7 +98,7 @@ GEOMETRY = r"""() => {
      }
    }
    const badge=row.querySelector('.patternBadge'),title=row.querySelector('.titleText');
-   if(badge&&title){
+   if(badge&&title&&!badge.closest('.trackActionGroup')){
      const a=rect(title),b=rect(badge);
      if(Math.min(a.right,b.right)-Math.max(a.left,b.left)>1.5&&
         Math.min(a.bottom,b.bottom)-Math.max(a.top,b.top)>1.5)
@@ -175,14 +180,13 @@ window.__qaEvents=[];window.pywebview={api:{
                         raise
                     if zoom!=1:
                         page.evaluate("(z)=>document.body.style.zoom=String(z)",zoom)
-                    # The app opens in Changes, whose rows are .changeRow,
-                    # not .releaseRow. Exercise both actual release views.
-                    if not page.locator('.changeRow[data-id="1"]').count():
+                    # Changes and Full map share release rows.
+                    if not page.locator('#changeList .releaseRow[data-id="1"]').count():
                         raise AssertionError("Changes view did not render the removed release")
                     screenshot=name+"-changes.png"
                     page.screenshot(path=str(output/screenshot))
                     report["screenshots"].append(screenshot)
-                    page.locator('.changeRow[data-id="1"]').click()
+                    page.locator('#changeList .releaseRow[data-id="1"]').click()
                     page.wait_for_function("document.querySelector('#details').classList.contains('open')")
                     screenshot=name+"-changes-details.png"
                     page.screenshot(path=str(output/screenshot))
@@ -195,7 +199,7 @@ window.__qaEvents=[];window.pywebview={api:{
                     report["screenshots"].append(screenshot)
                     page.locator('.releaseRow[data-id="1"]').click()
                     page.wait_for_function("document.querySelector('#details').classList.contains('open')")
-                    page.locator('#tracks .track').first.hover()
+                    page.locator('#tracks .track .rowMenuBtn').first.click()
                     screenshot=name+"-hover.png"
                     page.screenshot(path=str(output/screenshot))
                     report["screenshots"].append(screenshot)
@@ -203,7 +207,7 @@ window.__qaEvents=[];window.pywebview={api:{
                     if page.locator("#copyPathBtn").count():
                         problems.append("Duplicate Copy path button")
                     if not page.locator(".trackActionGroup").first.is_visible():
-                        problems.append("Hover actions inaccessible")
+                        problems.append("Track menu inaccessible")
                     if page.locator('.track').first.locator('.patternMark[data-kind="remix"]').count():
                         problems.append("Saved Remix duplicated in actions")
                     group=page.locator(".albumGroupActions")
@@ -222,6 +226,9 @@ window.__qaEvents=[];window.pywebview={api:{
                     if page.evaluate("window.getSelection().toString()")!=data["nodes"][0]["path"]:
                         problems.append("Ctrl+A path selection failed")
                     badge=page.locator(".track").first.locator(".patternBadge")
+                    page.locator('#tracks .track .rowMenuBtn').first.focus()
+                    if not badge.is_visible():
+                        page.keyboard.press("Enter")
                     badge.focus()
                     if not page.locator(".trackActionGroup").first.is_visible():
                         problems.append("Actions hidden from keyboard focus")

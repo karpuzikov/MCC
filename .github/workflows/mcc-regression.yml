@@ -22,7 +22,9 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
+      - name: Install audio metadata test dependency
+        run: python -m pip install "mutagen>=1.47,<2"
       - name: Compile MCC source
-        run: python -m py_compile "Music Collection Cleaner v0.05.174.pyw"
+        run: python -m py_compile "Music Collection Cleaner v0.05.175.pyw"
       - name: Run full regression suite
         run: python -m unittest discover -s tests -p "test_*.py"

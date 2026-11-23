@@ -1,3 +1,10 @@
+## v0.5.175 - Automatic updates after map edits (under construction)
+
+- Keep, Skip, Remix and Live update the export plan automatically. An already-selected release can be confirmed without running the optimizer. Other choices recalculate connected releases.
+- Scan defers full decoding until after inclusion choices. Re-enabling previously unexamined tracks checks their audio and compares them with cached recordings. Changes to source files still invalidate the cached plan.
+- Track-menu buttons work with Enter and Space and remain inside the viewport when zoomed. Optimization counters use the progress indicator.
+- Tested on Windows with an isolated Scan and Copy through the embedded map in headless Edge. The exported ALAC decoded to identical PCM. Full-library desktop acceptance remains pending.
+
 ## v0.5.174 - Incremental Re-scan and integrated Release Map (2026-11-23) - Under construction ⚠️
 
 - Classification-only Remix/Live changes now attempt a safe in-memory re-plan; unchanged verified acoustic groups and comparisons are reused, with source-file stat and missing-fingerprint invalidation.

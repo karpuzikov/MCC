@@ -155,7 +155,7 @@ class SilencePaddingVerification(unittest.TestCase):
         # Actual edition/censorship naming, controlled vectors and generated
         # media: this reaches the real router, comparison and native decoder.
         from test_audio_safety import fp
-        base = self.write_audio('13 Illest Motherf***** Alive.wav', seconds=12)
+        base = self.write_audio('13 Illest Motherf Alive.wav', seconds=12)
         padded = self.write_audio('13 Illest Motherfucker Alive.wav',
                                   prefix=180.059375, seconds=12)
         base.fingerprint = fp(count=76)
@@ -208,7 +208,7 @@ class SilencePaddingVerification(unittest.TestCase):
 
     def test_full_pipeline_illest_near_silent_prefix_retains_only_cd(self):
         from test_audio_safety import fp
-        base = self.write_audio('13 Illest Motherf***** Alive.wav', seconds=12, rate=44100)
+        base = self.write_audio('13 Illest Motherf Alive.wav', seconds=12, rate=44100)
         padded = self.write_audio('13 Illest Motherfucker Alive.wav', prefix=180.059375,
                                   seconds=12, rate=44100, prefix_noise_peak=5)
         base.fingerprint = fp(count=76)
