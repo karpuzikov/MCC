@@ -16812,10 +16812,10 @@ function openDetails(n) {
   if((n.auditIssues||[]).length)notices+='<div class="notice"><span class="warnMark">⚠︎</span> '+esc(n.auditIssues.join("\n"))+'</div>';
   inner.innerHTML='<div id="detailsHead"><div id="releaseNameRow"><div id="releaseName">'+esc(n.name)+'</div>'
     +'<button class="iconBtn clearBtn" id="closeDetailsBtn" title="Close details" aria-label="Close details">{{icon:close}}</button></div>'
-    +'<div id="factsRow"><div id="releaseFacts">'+releaseFactsHtml(n,true)+'</div>'+ignoreRelease+auditActions+albumGroupActions+'</div>'
+    +'<div id="factsRow"><div id="releaseFacts">'+releaseFactsHtml(n,true)+'</div>'+ignoreRelease+albumGroupActions+'</div>'
     +'<div id="pathRow"><div id="releasePath" role="textbox" aria-readonly="true" tabindex="0" aria-label="Release folder path">'+esc(n.path)+'</div>'
     +'<button class="iconBtn" id="openFolderBtn" title="Show in Explorer" aria-label="Show in Explorer">{{icon:explorer}}</button></div>'+notices+'</div>'
-    +'<div id="tracks">'+tracks+'</div>';
+    +'<div id="tracks">'+tracks+'</div>'+(auditActions?'<div id="auditActions">'+auditActions+'</div>':"");
   aside.classList.add("open");
   if(opening) requestAnimationFrame(scheduleConnections);
   document.getElementById("closeDetailsBtn").onclick=closeDetails;
