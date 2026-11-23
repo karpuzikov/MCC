@@ -126,7 +126,7 @@ class MCC174Regression(unittest.TestCase):
     def test_full_embedded_javascript_parses_without_syntax_errors(self):
         for page_name, html in (("home", mcc._webview_main_html()),
                                 ("map", mcc._webview_release_map_html())):
-            scripts = re.findall(r"<script(?:\\s+[^>]*)?>(.*?)</script>",
+            scripts = re.findall(r"<script(?:\s+[^>]*)?>(.*?)</script>",
                                  html, flags=re.I | re.S)
             self.assertTrue(scripts, "No embedded scripts found in " + page_name)
             for index, script in enumerate(scripts):

@@ -1,3 +1,7 @@
+## Checkpoint 2026-11-23 - Latest CI regression repair - NOT ACCEPTED
+
+Commit `87e9d295` failed workflow [#45122919718](https://github.com/karpuzikov/MCC/actions/runs/45122919718) on both Windows and Linux (300 tests, 2 failures, 38 skipped per job). The failures were: forbidden CSS path truncation (`text-overflow:ellipsis`) and incorrect test regex that did not match the map's `<script type="module">`. The development patch removes path truncation and fixes the regex. CI of the patch: **PENDING**. Native Windows WebView2 visual, keyboard, focus, viewport/DPI and disposable Copy/Move/Undo: **NOT RUN**. No screenshot acceptance or stable release.
+
 ## v0.5.174 - Single-window/map, reclassification and copy progress - NOT ACCEPTED
 
 **Controls:** Folders switches back to the scan view; Release Map opens in the *same* native WebView2 window. Keep/Skip (including audited releases) are mutually exclusive. Remix and Live are reversible one-click choices. Re-scan updates coverage without invalidating acoustic identity unless source changes or a previously unverified track becomes wanted. Copy writes to the destination without closing the map and displays full current target; Open destination opens the output root. Move still requires confirmation. Keyboard/pointer interaction and focus restoration are requirements, not assumptions.

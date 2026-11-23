@@ -1,3 +1,13 @@
+## Checkpoint 2026-11-23 - MCC v0.5.174 CI hotfix - Under construction ⚠️
+
+The current branch `fix/mcc-174-incremental-ui` advanced beyond the earlier passing run [#45122416760](https://github.com/karpuzikov/MCC/actions/runs/45122416760). Its new head `87e9d295` failed [#45122919718](https://github.com/karpuzikov/MCC/actions/runs/45122919718) on Windows and Linux: 300 tests ran, 2 failed and 38 skipped on each OS. Failure 1: `tests/test_design_system.py` rejected `text-overflow:ellipsis` in the Copy destination CSS; it also hid the full path. Failure 2: the embedded-JS syntax test searched for a literal backslash-s (`\\s`) rather than whitespace and therefore failed to find `<script type="module">` in the Release Map. This checkpoint makes the full path wrap normally and repairs the test regex. The branch README points to the development build rather than an absent `main` v0.05.174 file.
+
+**Validation:** CI of this repair is PENDING. No local Windows/WebView2 GUI, real media scanning, Copy/Move/Undo, screen/DPI/focus/hover, or user's 3,402-file collection was tested here. Preserve **Under construction ⚠️**. PR #3 points at `fix/v0.5.174-incremental-review`, not this branch; reconcile only after all acceptance gates. No merge or release.
+
+**Next:** verify CI on this exact commit, inspect embedded map and Copy/Undo on Windows using disposable media, record screenshots and results, then update acceptance documentation, reconcile PR, and release only after native acceptance.
+
+---
+
 ## Checkpoint 2026-11-23 - MCC v0.5.174 - Under construction ⚠️
 
 Source: `Music Collection Cleaner v0.05.174.pyw`, based on v0.5.173 tag. GitHub issue #2 documents user feedback and acceptance: https://github.com/karpuzikov/MCC/issues/2.

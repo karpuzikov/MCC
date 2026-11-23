@@ -15423,7 +15423,7 @@ select { appearance:none; padding-right:calc(var(--space-3) + var(--space-2)); b
 #progressFill { height:100%; width:0; background:var(--primary); transition:width .12s ease; }
 #copyProgress { display:flex; flex-wrap:wrap; }
 #copyStatus { flex:none; white-space:nowrap; font:var(--type-secondary); color:var(--body); }
-#copyTarget { flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+#copyTarget { flex:1; min-width:0; overflow-wrap:anywhere; white-space:normal; }
 #copyMeter { width:100%; height:3px; background:var(--canvas-soft); overflow:hidden; }
 #copyMeterFill { height:100%; width:0; background:var(--primary); transition:width .12s ease; }
 #activitySection { flex:1; min-height:0; display:flex; flex-direction:column; gap:var(--space-2); }
