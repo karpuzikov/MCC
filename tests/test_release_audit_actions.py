@@ -53,7 +53,7 @@ class ReleaseAuditActions(unittest.TestCase):
     def test_release_map_exposes_both_actions_at_bottom_of_details(self):
         html = mcc._webview_release_map_html()
         self.assertIn('id="auditApproveBtn" title="Retain this release despite its audit warning">Approve', html)
-        self.assertIn('id="auditIgnoreBtn" title="Exclude this release from the retained plan">Ignore', html)
+        self.assertIn('id="auditIgnoreBtn" title="Exclude this release from the retained plan">Skip', html)
         self.assertIn('bridge.reviewRelease(Number(n.id),"approve"', html)
         self.assertIn('bridge.reviewRelease(Number(n.id),"ignore"', html)
         self.assertIn("""+'<div id="tracks">'+tracks+'</div>'+auditActions;""", html)
