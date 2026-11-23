@@ -15774,17 +15774,17 @@ select { appearance:none; padding-right:calc(var(--space-3) + var(--space-2)); b
 .track .num { width:calc(var(--space-3) + var(--space-1)); flex:none; margin-right:calc(-1 * var(--space-1)); font:var(--type-mono-small); color:var(--mute); }
 .track .titleText { font:var(--type-row-title); flex:1; min-width:0; overflow-wrap:anywhere; }
 .track .advisoryBadge { margin-left:var(--space-1); font:var(--type-chip); color:var(--mute); }
-.track .btn.small.tagBtn { font:var(--type-chip); color:var(--body); }
+.track .btn.small.tagBtn { font:var(--type-chip); color:var(--body); min-height:24px; }
 .track .note { flex:none; font:var(--type-chip); color:var(--mute); }
 .track.unique .note { color:var(--primary); }
 .trackGem { flex:none; color:var(--primary); display:inline-flex; }
 .track .dur { width:36px; flex:none; text-align:right; font:var(--type-mono-body); color:var(--mute); }
 .track.unique .dur.differentLength,.track.unique .lengthDelta,.altDuration.changed { color:var(--status-length); }
 .lengthDelta { flex:none; font:var(--type-chip); }
-.rowMenuBtn { color:var(--body); }
+.rowMenuBtn { color:var(--body); width:24px; height:24px; }
 .trackActionGroup { position:fixed; z-index:50; display:none; flex-direction:column; padding:var(--space-1); background:var(--canvas-soft); border-radius:var(--radius); }
 .track.menuOpen .trackActionGroup { display:flex; }
-.trackActionGroup button { display:block; text-align:left; padding:var(--space-1); border-radius:4px; font:var(--type-button); color:var(--ink); white-space:nowrap; }
+.trackActionGroup button { display:block; text-align:left; min-height:28px; padding:var(--space-1); border-radius:4px; font:var(--type-button); color:var(--ink); white-space:nowrap; }
 .trackActionGroup button:hover { background:var(--hairline); }
 .trackPanel { display:none; flex-direction:column; margin:0 0 var(--space-1) calc(var(--space-3) + var(--space-2)); padding:var(--pad-tight); background:var(--canvas-soft); border-radius:var(--radius); }
 .trackPanel.open { display:flex; }
