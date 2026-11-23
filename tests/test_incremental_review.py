@@ -75,7 +75,7 @@ class IncrementalReview(unittest.TestCase):
     def test_category_menu_is_reversible_without_mark_prefix(self):
         html = mcc._webview_release_map_html()
         self.assertIn('role="menuitemcheckbox"', html)
-        self.assertNotIn('>Mark \\'+names[kind]', html)
+        self.assertNotIn('>Mark ', html)
         self.assertIn('const checked=t.patternKind===kind', html)
         self.assertFalse(mcc._promote_pattern_choice("remix", "remix"))
         self.assertTrue(mcc._promote_pattern_choice("keep", "remix"))
