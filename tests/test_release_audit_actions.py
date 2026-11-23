@@ -7,8 +7,8 @@ from test_audio_safety import mcc
 class ReleaseAuditActions(unittest.TestCase):
     def setUp(self):
         self.snapshots = [
-            {"release_id": 7, "name": "Damaged candidate", "audit_issues": ["Corrupt/unreadable 07.flac: invalid sync code"]},
-            {"release_id": 8, "name": "Tracklist issue", "audit_issues": ["missing track number(s): 2"]},
+            {"release_id": 7, "action": "KEEP", "name": "Damaged candidate", "audit_issues": ["Corrupt/unreadable 07.flac: invalid sync code"]},
+            {"release_id": 8, "action": "KEEP", "name": "Tracklist issue", "audit_issues": ["missing track number(s): 2"]},
             {"release_id": 9, "name": "Clean release", "audit_issues": []},
         ]
         self.blocked = set()
@@ -58,7 +58,7 @@ class ReleaseAuditActions(unittest.TestCase):
         self.assertIn('×</span> Skip</button>', html)
         self.assertIn('bridge.reviewRelease(Number(n.id),"approve"', html)
         self.assertIn('bridge.reviewRelease(Number(n.id),"ignore"', html)
-        self.assertIn("""+'<div id="tracks">'+tracks+'</div>'+auditActions;""", html)
+        self.assertIn("""+'<div id="tracks">'+tracks+'</div>'+(auditActions?'<div id="auditActions">'+auditActions+'</div>':"");""", html)
 
 
 if __name__ == "__main__":
