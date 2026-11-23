@@ -17089,7 +17089,11 @@ function openDetails(n) {
       };
       el.onclick=activateTrack;
       el.onkeydown=function(ev){
-        if(ev.key==="Enter"||ev.key===" "){ev.preventDefault();activateTrack(ev);}
+        // A row is keyboard-activatable only when it owns focus. Do not
+        // cancel Enter/Space on its nested real buttons (Remix/Live/Keep).
+        if(ev.target===el && (ev.key==="Enter"||ev.key===" ")){
+          ev.preventDefault();activateTrack(ev);
+        }
       };
     }
   });
