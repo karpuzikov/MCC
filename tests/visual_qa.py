@@ -221,12 +221,18 @@ window.__qaEvents=[];window.pywebview={api:{
                     page.keyboard.press("Control+A")
                     if page.evaluate("window.getSelection().toString()")!=data["nodes"][0]["path"]:
                         problems.append("Ctrl+A path selection failed")
-                    badge=page.locator(".track").first.locator(".patternBadge")
+                    row=page.locator("#details .track").first
+                    menu_button=row.locator(".rowMenuBtn")
+                    menu_button.focus()
+                    menu_button.press("Enter")
+                    if not row.evaluate("(x)=>x.classList.contains('menuOpen')"):
+                        problems.append("Keyboard Enter did not open track actions")
+                    badge=row.locator(".patternBadge")
                     badge.focus()
-                    if not page.locator(".trackActionGroup").first.is_visible():
+                    if not row.locator(".trackActionGroup").is_visible():
                         problems.append("Actions hidden from keyboard focus")
                     badge.press("Enter")
-                    page.wait_for_function("window.__qaEvents.some(x=>x.kind==='keep')")
+                    page.wait_for_function("window.__qaEvents.some(x=>x.kind==='keep')",timeout=4000)
                     page.keyboard.press("Escape")
                     if page.locator("#details").evaluate("(x)=>x.classList.contains('open')"):
                         problems.append("Escape did not close details")
