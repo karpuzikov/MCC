@@ -1,3 +1,11 @@
+## v0.5.174 - Single-window/map, reclassification and copy progress - NOT ACCEPTED
+
+**Controls:** Folders switches back to the scan view; Release Map opens in the *same* native WebView2 window. Keep/Skip (including audited releases) are mutually exclusive. Remix and Live are reversible one-click choices. Re-scan updates coverage without invalidating acoustic identity unless source changes or a previously unverified track becomes wanted. Copy writes to the destination without closing the map and displays full current target; Open destination opens the output root. Move still requires confirmation. Keyboard/pointer interaction and focus restoration are requirements, not assumptions.
+
+**Animation contract:** Full audio integrity validation shows decoding across a waveform; silence boundary padding shows flat head/tail with measured trim boundaries; fingerprints compare bit patterns; copying shows destination progress. Reduced motion must show a static meaningful frame.
+
+**Tests:** Python syntax, all regressions, Linux/Windows CI: not yet observed at time of checkpoint. Target Windows 11 WebView2 visual and interaction acceptance, screenshot side-by-side, source audio preservation, Copy/Move and Undo on disposable music folders: **NOT RUN**. Cannot mark stable until complete.
+
 ## v0.5.167 - Export results
 
 The existing completion dialog identifies the requested operation, reports recycled folders for Move and separates artwork outcomes from release counts. Undo Copy appears only for a Copy that created output. Existing output-folder, Release Map, Close and keyboard behavior are retained. No new controls. Native Windows WebView2 acceptance NOT RUN. The Linux layout suite encountered the environment’s Chromium launch error.

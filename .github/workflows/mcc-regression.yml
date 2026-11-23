@@ -1,0 +1,28 @@
+name: MCC regression
+on:
+  push:
+    branches: [fix/mcc-174-incremental-ui]
+  pull_request:
+    paths:
+      - '**.pyw'
+      - 'tests/**'
+      - '.github/workflows/mcc-regression.yml'
+permissions:
+  contents: read
+jobs:
+  unit:
+    name: Python 3.12 - ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Compile MCC source
+        run: python -m py_compile "Music Collection Cleaner v0.05.174.pyw"
+      - name: Run full regression suite
+        run: python -m unittest discover -s tests -p "test_*.py"

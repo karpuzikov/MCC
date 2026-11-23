@@ -1,3 +1,17 @@
+## Checkpoint 2026-11-23 - MCC v0.5.174 - Under construction ⚠️
+
+Source: `Music Collection Cleaner v0.05.174.pyw`, based on v0.5.173 tag. GitHub issue #2 documents user feedback and acceptance: https://github.com/karpuzikov/MCC/issues/2.
+
+Implementation: incremental Remix/Live reclassification and optimizer-only Re-scan from verified in-memory groups, with file size/mtime/ctime guards and full-scan fallback when media changes or missing fingerprints become wanted; explicit EP precedence and display category; unified Keep/Skip, reversible normal classification; activity log summary only; meaningful waveform integrity and silent-padding animations; single native WebView2 shell with embedded Release Map, current target during Copy, and persistent Open destination.
+
+Test plan: `py -m py_compile "Music Collection Cleaner v0.05.174.pyw"`, `py -m unittest discover -s tests -p "test_*.py"`. Added CI workflow for Python 3.12 Linux/Windows, plus `tests/test_mcc174_regression.py`. GitHub workflow result is pending/NOT RUN until observed. Real Windows WebView2 interaction, screenshot/hover/keyboard/resize, live media validation and disposable Copy/Move/Undo **NOT RUN**. Do not claim stable or publish a final release until all mandatory gates pass.
+
+Known risks requiring Windows QA: iframe-to-parent pywebview bridge and file-dialog callbacks; mixed-family EP display; pending edits when leaving the map; no persistent cross-session fingerprint cache yet (the fast path is in-session); full Scan still performs original integrity/fingerprint stages. No source file should be modified by Scan/Copy.
+
+Exact next action: run the workflow on the feature branch, fix any regressions, then perform the original Windows WebView2 manual acceptance including 3,402-file playback evidence and copying to a disposable destination. After acceptance, merge and create a versioned GitHub release. Keep prior versions archived.
+
+---
+
 ## Checkpoint 2026-11-22 - MCC v0.5.167 - Under construction ⚠️
 
 Current entry point on main: `Music Collection Cleaner v0.05.167.pyw`. The README links to this file. Versions 164 through 166 are in version-history/.

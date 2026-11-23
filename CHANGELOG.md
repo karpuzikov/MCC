@@ -1,3 +1,12 @@
+## v0.5.174 - Incremental Re-scan and integrated Release Map (2026-11-23) - Under construction ⚠️
+
+- Classification-only Remix/Live changes now attempt a safe in-memory re-plan; unchanged verified acoustic groups and comparisons are reused, with source-file stat and missing-fingerprint invalidation.
+- Explicit EP titles take precedence over anthology heuristics, including map family overrides.
+- Track action labels use Keep/Skip and reversible Remix/Live. Activity output is limited to warnings, failures and outcomes.
+- One native desktop window contains Folders and Release Map views. Copy/Move keeps the map open and displays the current destination folder and release target.
+- Integrity and silence-padding stages have specific waveform-based animations; the user can still use reduced-motion settings.
+- Safety and QA: original audio remains untouched during Scan/Copy. Native Windows/WebView2, real Copy/Move and hover/keyboard/scale acceptance **NOT RUN**. This release is **NOT STABLE**.
+
 ## v0.5.167 - Copy and Move audit fixes (Under construction ⚠️)
 
 - Protect Move exports from Undo before recycling any originals. Report the first recycle failure and the number of source folders already recycled.
