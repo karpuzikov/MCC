@@ -94,7 +94,7 @@ class DesignSystemTests(unittest.TestCase):
 
     def test_step_layout_and_scan_wording(self):
         main, release_map = PAGES
-        steps = ["Step 1: Select folders", "Step 2: Scan selected folders", "Step 3: Open the map"]
+        steps = ["Step 1: Select folders", "Step 2: Scan selected folders", "Step 3: Manage output"]
         self.assertEqual([main.index(x) for x in steps], sorted(main.index(x) for x in steps))
         self.assertLess(release_map.index("Step 4: Check the scan result"), release_map.index("Step 5: Save results"))
         for html in PAGES:

@@ -1,3 +1,9 @@
+## v0.5.176 - Release choices and shared navigation
+
+- Auto, Keep and Skip are always visible in release details. Auto clears the override and shows the automatic result.
+- Folders and Release Map share one header. Map choices apply without freezing release details, with a visible working indicator.
+- Track duration differences appear only in Versions, sorted by title and then duration.
+
 ## v0.5.175 - Automatic updates after map edits (under construction)
 
 - Keep, Skip, Remix and Live update the export plan automatically. An already-selected release can be confirmed without running the optimizer. Other choices recalculate connected releases.

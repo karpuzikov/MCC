@@ -24,6 +24,7 @@ class IncrementalMap(unittest.TestCase):
             selected = {0, 1, 2}
             groups = {i:[i] for i in selected}
             releases[-1].validation_issues = ["Check track numbers"]
+            releases[-1].track_totals_validated = True
             decisions = mcc.build_release_decisions(releases, tracks, selected, [])
             snapshots = mcc.build_decision_snapshot(releases, tracks, selected, decisions)
             session = dict(allow_apply=True, tracks=tracks, groups=groups, releases=releases, decisions=decisions,
@@ -36,7 +37,7 @@ class IncrementalMap(unittest.TestCase):
                  patch.object(mcc, "merge_equivalent_tracks", side_effect=AssertionError("matching")), \
                  patch.object(mcc, "optimize_collection", wraps=mcc.optimize_collection) as optimize:
                 bridge = mcc.launch_webview_release_map(session, embedded_window=object())
-                self.assertTrue(json.loads(bridge.reviewRelease(2, "approve"))["dirty"])
+                self.assertTrue(json.loads(bridge.setReleaseChoice(2, "Keep"))["dirty"])
                 self.assertTrue(json.loads(bridge.reanalyze())["applyEnabled"])
                 optimize.assert_not_called()
                 for classification, expected in (("remix",{1,2}), ("clear",{0,1,2}), ("live",{1,2})):
@@ -47,3 +48,12 @@ class IncrementalMap(unittest.TestCase):
                     self.assertEqual(bridge.selected,expected)
                     self.assertEqual([r.rid for r in optimize.call_args.args[0]],[0])
                     self.assertEqual([t.group_id for t in tracks],[0,1,2])
+                self.assertTrue(json.loads(bridge.setReleaseChoice(0, "Skip"))["dirty"])
+                bridge.reanalyze()
+                self.assertEqual(bridge.selected, {1,2})
+                self.assertTrue(json.loads(bridge.setReleaseChoice(0, "Auto"))["dirty"])
+                bridge.reanalyze()
+                self.assertEqual(bridge.selected, {1,2})  # Live is still excluded
+                self.assertNotIn(0, bridge.blocked_release_ids)
+                self.assertFalse(json.loads(bridge.setReleaseChoice(2, "Auto"))["forceKeep"])
+                self.assertFalse(json.loads(bridge.reanalyze())["applyEnabled"])

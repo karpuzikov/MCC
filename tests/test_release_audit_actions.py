@@ -50,13 +50,12 @@ class ReleaseAuditActions(unittest.TestCase):
         self.assertEqual(self.blocked, set())
         self.assertEqual(self.pinned, set())
 
-    def test_release_map_exposes_both_actions_at_bottom_of_details(self):
+    def test_release_map_exposes_one_choice_group(self):
         html = mcc._webview_release_map_html()
-        self.assertIn('id="auditApproveBtn"', html)
-        self.assertIn('id="auditIgnoreBtn"', html)
-        self.assertIn('bridge.reviewRelease(Number(n.id),"approve"', html)
-        self.assertIn('bridge.reviewRelease(Number(n.id),"ignore"', html)
-        self.assertIn("""+'<div id="tracks">'+tracks+'</div>'+(hasAuditIssues?'<div id="auditActions">'+auditActions+'</div>':"");""", html)
+        self.assertIn('id="releaseChoice"', html)
+        self.assertIn('["Auto","Keep","Skip"]', html)
+        self.assertIn('bridge.setReleaseChoice(Number(n.id)', html)
+        self.assertNotIn('id="auditActions"', html)
 
 
 if __name__ == "__main__":

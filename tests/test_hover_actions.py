@@ -169,7 +169,7 @@ process.stdout.write(JSON.stringify(input.tracks.map(t=>status(t,{kind:'retained
     def render_track_rows(self,nodes):
         html=map_html()
         code=(html[html.index('function discNumbering('):html.index('function openDetails(')]
-              +html[html.index('  const allTracks=n.tracks||[];'):html.index('  let ignoreRelease="";',html.index('function openDetails('))])
+              +html[html.index('  const allTracks=n.tracks||[];'):html.index('  const choice=n.releaseBlocked?',html.index('function openDetails('))])
         status=html[html.index('function exclusionStatus('):html.index('function closeDetails(')]
         return self.run_js(r'''
 const input=JSON.parse(require('fs').readFileSync(0,'utf8'));
