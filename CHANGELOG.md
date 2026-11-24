@@ -1,3 +1,11 @@
+## v0.5.178 - Skip, remix families and Release Map refinement (Under construction)
+
+- Apply saved Skip rules before integrity and acoustic work; restore newly eligible audio incrementally and replan affected releases.
+- Track retention highlighting follows the completed eligible-recording plan rather than title/duration resemblance. Saved Skip is an independent checked menu action.
+- Display alternate versions within the same named remix family, without merging acoustic recordings.
+- Align and compact Release Map columns, track metadata and action controls; replace overlapping connectors with relation markers and linked-release tooltips.
+- Embedded JavaScript syntax and synthetic remix-family/Skip display checks passed. Full Python regression and native Windows/real-library acceptance remain pending.
+
 ## v0.5.177 - Reuse unchanged scan analysis
 
 - Scan checks release folders by path and reuses valid tag, integrity, fingerprint, and comparison evidence. Changes to a member file invalidate the logical release. Full rescan rebuilds eligible audio evidence.

@@ -149,7 +149,7 @@ process.stdout.write(JSON.stringify(input.tracks.map(t=>status(t,{kind:'retained
         self.assertEqual(node['ripLogProblems'],['x.log: unrecognized'])
         self.assertEqual(node['ripLogResults'],['a.log: 98% (EAC)','x.log: not recognized - unrecognized'])
 
-    def test_same_song_and_album_tag_within_8_seconds_on_another_retained_release_is_not_highlighted(self):
+    def test_same_title_and_length_do_not_override_distinct_acoustic_groups(self):
         ep=[mcc.Track(1,Path('EP/a.flac'),1,title='Die In 1977',artist='Re-TROS',album='CUT OFF!',duration=294.4,group_id=0),
             mcc.Track(1,Path('EP/b.flac'),2,title='TV Show',artist='Re-TROS',album='CUT OFF!',duration=296.4,group_id=1)]
         album=[mcc.Track(2,Path('Album/a.flac'),1,title='Die In 1977',artist='Rebuilding The Rights of Statues',album='Cut Off!',duration=310.2,group_id=2),
@@ -158,7 +158,7 @@ process.stdout.write(JSON.stringify(input.tracks.map(t=>status(t,{kind:'retained
         snapshots=mcc.build_decision_snapshot(releases,ep+album,{1,2},
             [mcc.ReleaseDecision(r.rid,'ADD','Plan') for r in releases])
         for node in self.ui_state(snapshots)['nodes']:
-            self.assertEqual([t['title'] for t in node['tracks'] if t['unique']],['Die In 1977'])
+            self.assertEqual([t['title'] for t in node['tracks'] if t['unique']],['Die In 1977','TV Show'])
 
     def ui_state(self,snapshots):
         with patch.object(mcc,'_load_pattern_categories',return_value={}), \
@@ -173,10 +173,10 @@ process.stdout.write(JSON.stringify(input.tracks.map(t=>status(t,{kind:'retained
         status=html[html.index('function exclusionStatus('):html.index('function closeDetails(')]
         return self.run_js(r'''
 const input=JSON.parse(require('fs').readFileSync(0,'utf8'));
-const status=new Function(input.status+'\nreturn trackStatus;')();
-const render=new Function('n','state','activeTrack','esc','versionsForTrack','remixesForTrack','liveForTrack','trackStatus',input.code+'\nreturn tracks;');
+const {trackStatus:status,trackNote}=new Function(input.status+'\nreturn {trackStatus,trackNote};')();
+const render=new Function('n','state','activeTrack','esc','versionsForTrack','remixesForTrack','liveForTrack','trackStatus','trackNote',input.code+'\nreturn tracks;');
 const esc=value=>String(value).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;');
-process.stdout.write(JSON.stringify(input.nodes.map(n=>render(n,{editable:false},null,esc,()=>[],()=>[],()=>[],status))));
+process.stdout.write(JSON.stringify(input.nodes.map(n=>render(n,{editable:false},null,esc,()=>[],()=>[],()=>[],status,trackNote))));
 ''',{'code':code,'status':status,'nodes':nodes})
 
     def assert_highlighted_rows(self,node,rows,expected_titles):
@@ -328,14 +328,14 @@ const rows=current.tracks.map(t=>{
     classList:{toggle:(c,on)=>on?classes.add(c):classes.delete(c)},classes};
   row.querySelector=s=>s==='.ignoreTrack'?row.button:
     s==='.trackGem'?(row.hasGem?{remove:()=>row.hasGem=false}:null):
-    s==='.dur'?{insertAdjacentHTML:(where,html)=>{if(html.includes('trackGem'))row.hasGem=true;}}:null;
+    s==='.titleText'?{insertAdjacentHTML:(where,html)=>{if(html.includes('trackGem'))row.hasGem=true;}}:null;
   return row;
 });
 const document={getElementById:()=>null,querySelectorAll:()=>rows};
 const getNode=id=>state.nodes.find(n=>Number(n.id)===Number(id));
 const applyRootPatch=()=>{},receiveState=()=>{throw Error('Unexpected full-state fallback')};
 const changeKind=()=> 'added',replacementMap=()=>({}),paintReanalyzeHighlight=()=>{};
-const trackStatus=new Function(input.status+'\nreturn trackStatus;')();
+const {trackStatus,trackNote}=new Function(input.status+'\nreturn {trackStatus,trackNote};')();
 eval(input.policy+'\n'+input.toggle);
 const results=[];
 for(const p of input.payloads){

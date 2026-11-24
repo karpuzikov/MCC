@@ -1,6 +1,6 @@
 # Music Collection Cleaner (MCC)
 
-**Version: 0.5.177 - Under construction ⚠️**
+**Version: 0.5.178 - Under construction ⚠️**
 
 ## Download and run
 
@@ -10,7 +10,7 @@
 winget install -e --id Python.Python.3.12 && winget install -e --id Microsoft.EdgeWebView2Runtime
 ```
 
-2. Download [Music Collection Cleaner v0.5.177.pyw](https://raw.githubusercontent.com/karpuzikov/MCC/fix/mcc-174-incremental-ui/Music%20Collection%20Cleaner%20v0.5.177.pyw).
+2. Download [Music Collection Cleaner v0.5.178.pyw](https://raw.githubusercontent.com/karpuzikov/MCC/fix/mcc-174-incremental-ui/Music%20Collection%20Cleaner%20v0.5.178.pyw).
 3. Double-click it.
 
 This build is under construction. Automated regression checks and actual Windows/WebView2 acceptance must pass before stable publication.

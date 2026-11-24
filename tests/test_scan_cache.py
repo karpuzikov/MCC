@@ -110,5 +110,22 @@ class ScanCacheTests(unittest.TestCase):
         self.assertEqual([-1, -1], [group for path, _, group in tracks if path.parent == self.one])
 
 
+    def test_saved_instance_skip_excludes_audio_before_decode_and_fingerprint(self):
+        self.first.write_text("Never Gonna Come Back Down (Scott Humpries Radio Edit)", encoding="utf-8")
+        self.second.write_text("Never Gonna Come Back Down (Rock Edit)", encoding="utf-8")
+        cache = app.ScanCache(full_rescan=True, path=self.cache_path)
+        releases, tracks = app.prepare_analysis(None, self.library, lambda *_: None, 1, scan_cache=cache)
+        skipped = next(t for t in tracks if t.path == self.first)
+        rule = {"id": "fixture-skip", "instance_keys": [app._track_instance_key(skipped)], "fingerprint_evidence": []}
+        with patch.object(app, "_load_manual_track_skip_rules", return_value=[rule]):
+            app.analyze_prepared(releases, tracks, True, lambda *_: None, exclude_remixes=False,
+                                 exclude_live=False, io_workers=1, pattern_categories={}, scan_cache=cache)
+        self.assertTrue(skipped.exclude_from_coverage)
+        self.assertFalse(skipped.fingerprint)
+        self.assertLess(skipped.group_id, 0)
+        self.assertNotIn(self.first, {item.args[1] for item in self.decode.call_args_list})
+        self.assertNotIn(self.first, {item.args[1].path for item in self.fingerprint.call_args_list})
+
+
 if __name__ == '__main__':
     unittest.main()
