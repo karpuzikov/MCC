@@ -1,3 +1,7 @@
+## v0.5.182 - Trophy for perfect releases
+
+- A teal trophy before WEB/CD/CUE/LOG marks a perfect release (CD, CUE, LOG 100%) instead of the filled teal box.
+
 ## v0.5.181 - One header switch, MusicBrainz questions during Copy
 
 - The header shows Music Collection Cleaner and Release Map with a switch between them.
