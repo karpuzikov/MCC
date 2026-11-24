@@ -1,3 +1,8 @@
+## v0.5.186 - MusicBrainz finds newly added releases
+
+- A MusicBrainz search that found nothing is no longer remembered for 14 days; the next lookup asks again.
+- Retry and Use MBID always ask MusicBrainz directly instead of the saved answers.
+
 ## v0.5.185 - Scan results kept after updates
 
 - Integrity checks, fingerprints and other scan results are reused after an MCC update; only unchanged files are skipped, as before.

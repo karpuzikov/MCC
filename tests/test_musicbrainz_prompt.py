@@ -29,6 +29,25 @@ class MusicBrainzPrompt(unittest.TestCase):
         self.assertEqual(engine.lookup_musicbrainz_now(7), (True, ""))
         self.assertEqual(engine._musicbrainz_answers[7][0], "found")
 
+    def test_empty_search_is_not_cached_and_retry_skips_cache(self):
+        import io, json, tempfile
+        from pathlib import Path
+        from unittest import mock
+        answers = iter([{"releases": []}, {"releases": [{"id": "x"}]}, {"releases": [{"id": "y"}]}])
+        def respond(*args, **kwargs):
+            return io.BytesIO(json.dumps(next(answers)).encode())
+        with tempfile.TemporaryDirectory() as folder, \
+                mock.patch.object(mcc, "_MB_CACHE", Path(folder)), \
+                mock.patch.object(mcc.urllib.request, "urlopen", respond), \
+                mock.patch.object(mcc.time, "sleep", lambda s: None):
+            self.assertEqual(mcc.mb_json("release/?query=barcode:1"), {"releases": []})
+            self.assertEqual(mcc.mb_json("release/?query=barcode:1"), {"releases": [{"id": "x"}]})
+            mcc._MB_FRESH.active = True
+            try:
+                self.assertEqual(mcc.mb_json("release/?query=barcode:1"), {"releases": [{"id": "y"}]})
+            finally:
+                mcc._MB_FRESH.active = False
+
     def test_cancel_stops_waiting(self):
         engine = mcc.Organizer()
         engine.stop.set()
