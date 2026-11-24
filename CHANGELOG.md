@@ -1,3 +1,7 @@
+## v0.5.190 - Default Organize folder
+
+- Organize only defaults to the first folder's name + " - Organized" next to it (e.g. C:\!deemix Music\Wiley - Organized); Browse picks another.
+
 ## v0.5.189 - Organize button always available
 
 - Organize is enabled before an output folder is chosen; pressing it asks for the folder, then starts.
