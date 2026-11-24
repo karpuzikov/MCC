@@ -1,3 +1,7 @@
+## v0.5.183 - Quieter Activity log
+
+- Display size lines appear only when the monitor reports a usable size; otherwise Windows scaling applies without a message.
+
 ## v0.5.182 - Trophy for perfect releases
 
 - A teal trophy before WEB/CD/CUE/LOG marks a perfect release (CD, CUE, LOG 100%) instead of the filled teal box.
