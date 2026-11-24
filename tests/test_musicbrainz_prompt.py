@@ -21,6 +21,14 @@ class MusicBrainzPrompt(unittest.TestCase):
         self.assertEqual(engine._wait_for_musicbrainz_answer([5]), 5)
         self.assertEqual(engine._musicbrainz_answers, {5: ("skip", "")})
 
+    def test_retry_reports_right_away(self):
+        engine = mcc.Organizer()
+        results = iter([{"metadata_verified": False, "notes": ["No compatible edition"]}, {"metadata_verified": True, "notes": []}])
+        engine._musicbrainz_lookups[7] = lambda chosen_release="": next(results)
+        self.assertEqual(engine.lookup_musicbrainz_now(7), (False, "No compatible edition"))
+        self.assertEqual(engine.lookup_musicbrainz_now(7), (True, ""))
+        self.assertEqual(engine._musicbrainz_answers[7][0], "found")
+
     def test_cancel_stops_waiting(self):
         engine = mcc.Organizer()
         engine.stop.set()

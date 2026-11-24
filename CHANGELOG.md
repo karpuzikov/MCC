@@ -1,3 +1,7 @@
+## v0.5.184 - Retry answers right away
+
+- Retry and Use MBID look the release up immediately. The dialog says "Found on MusicBrainz" and moves on, or shows "Still not found" and stays on the same release.
+
 ## v0.5.183 - Quieter Activity log
 
 - Display size lines appear only when the monitor reports a usable size; otherwise Windows scaling applies without a message.
