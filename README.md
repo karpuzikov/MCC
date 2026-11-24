@@ -4,7 +4,7 @@
 
 ## Download and run
 
-Download [Music Collection Cleaner v0.05.180.pyw](https://github.com/karpuzikov/MCC/releases/latest) and double click it.
+Download [Music Collection Cleaner v0.05.180.pyw](https://raw.githubusercontent.com/karpuzikov/MCC/main/Music%20Collection%20Cleaner%20v0.05.180.pyw) and double click it.
 
 ## What it does
 
