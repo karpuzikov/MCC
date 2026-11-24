@@ -1,3 +1,15 @@
+## v0.5.181 - One header switch, MusicBrainz questions during Copy
+
+- The header shows Music Collection Cleaner and Release Map with a switch between them.
+- The Activity log shows every stage again. Each new scan clears the logs folder, so it holds only the latest run.
+- Stage animations follow the real progress and show the item count. The Release Map shows a wave while it updates affected releases.
+- Tracks whose artist and album artist tags both lack the scanned artist folder name are skipped.
+- Release Map columns share the free width, so opening a release no longer squeezes them.
+- Remix and live tracks in a kept release are marked "Not compared" instead of "Skip": they are copied with the release.
+- The gem is back in the note column. Perfect releases (CD, CUE, LOG 100%) are highlighted.
+- Copy writes Artist_UPDATED.txt beside the output folder, listing the added folders.
+- Copy asks what to do when MusicBrainz finds no match or several: Search on MusicBrainz, Retry, Skip, Skip all, or enter an MBID or release link. Other releases keep copying meanwhile.
+
 ## v0.5.180 - Fixes after v0.5.179
 
 - Keep Remixes / Keep Live recordings off ignores every remix and live track again, including remixes with extra featured artists.

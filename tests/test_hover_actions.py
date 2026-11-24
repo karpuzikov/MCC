@@ -65,8 +65,8 @@ class HoverActions(unittest.TestCase):
             ({'unique':True,'audioMatchEditions':0,'unverifiedEditions':0},'Unique to this release'),
             ({'unique':False,'coveredBy':['Retained Deluxe']},'Also on: Retained Deluxe'),
             ({'unique':True,'coveredBy':['Retained Deluxe']},'Also on: Retained Deluxe'),
-            ({'unique':False,'excluded':True,'isLive':True},'Skip: Live'),
-            ({'unique':True,'excluded':True,'isLive':True},'Skip: Live'),
+            ({'unique':False,'excluded':True,'isLive':True},'Not compared: Live'),
+            ({'unique':True,'excluded':True,'isLive':True},'Not compared: Live'),
             ({'unique':True,'manualSkip':True,'groupId':5},'Skip this recording everywhere'),
         ]
         statuses=self.run_js(r'''
@@ -316,6 +316,7 @@ process.stdout.write(JSON.stringify(evaluate(input.node,()=>({}))));
         policy=html[html.index('function uniqueAddedTitles('):html.index('function changedNodes(')]
         toggle=html[html.index('function receiveTrackToggle('):html.index('function receiveReleaseToggle(')]
         status=html[html.index('function exclusionStatus('):html.index('function closeDetails(')]
+        note_html=html[html.index('function trackNoteHtml('):html.index('function openDetails(')]
         results=self.run_js(r'''
 const input=JSON.parse(require('fs').readFileSync(0,'utf8'));
 const state=input.state,selectedId=1,current=state.nodes.find(n=>n.id===selectedId);
@@ -328,7 +329,7 @@ const rows=current.tracks.map(t=>{
     classList:{toggle:(c,on)=>on?classes.add(c):classes.delete(c)},classes};
   row.querySelector=s=>s==='.ignoreTrack'?row.button:
     s==='.trackGem'?(row.hasGem?{remove:()=>row.hasGem=false}:null):
-    s==='.titleText'?{insertAdjacentHTML:(where,html)=>{if(html.includes('trackGem'))row.hasGem=true;}}:null;
+    s==='.note'?{set innerHTML(html){row.hasGem=html.includes('trackGem');}}:null;
   return row;
 });
 const document={getElementById:()=>null,querySelectorAll:()=>rows};
@@ -336,7 +337,8 @@ const getNode=id=>state.nodes.find(n=>Number(n.id)===Number(id));
 const applyRootPatch=()=>{},receiveState=()=>{throw Error('Unexpected full-state fallback')};
 const changeKind=()=> 'added',replacementMap=()=>({}),paintReanalyzeHighlight=()=>{};
 const {trackStatus,trackNote}=new Function(input.status+'\nreturn {trackStatus,trackNote};')();
-eval(input.policy+'\n'+input.toggle);
+const esc=v=>String(v);
+eval(input.noteHtml+'\n'+input.policy+'\n'+input.toggle);
 const results=[];
 for(const p of input.payloads){
   receiveTrackToggle(JSON.stringify(p));
@@ -345,7 +347,7 @@ for(const p of input.payloads){
     rows:rows.map(r=>({index:r.dataset.index,highlight:r.classes.has('unique'),gem:r.hasGem}))});
 }
 process.stdout.write(JSON.stringify(results));
-''',{'state':initial,'payloads':payloads,'policy':policy,'toggle':toggle,'status':status})
+''',{'state':initial,'payloads':payloads,'policy':policy,'toggle':toggle,'status':status,'noteHtml':note_html})
         for result,count,titles,gem in zip(results,[1,0,1,2],[['Rare'],[],['Song'],['Song','Rare']],[True,False,False,True]):
             self.assertEqual(result['count'],count)
             self.assertEqual(result['titles'],titles)
