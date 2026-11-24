@@ -1,3 +1,46 @@
+## v0.5.180 - Fixes after v0.5.179
+
+- Keep Remixes / Keep Live recordings off ignores every remix and live track again, including remixes with extra featured artists.
+- The gem marks only tracks with no duplicates or other versions again; highlighted tracks keep their own colour.
+- A skipped track offers Keep; tracks skipped by an option or saved rule no longer show Skip.
+- Step 3 has the Release Map button again, styled like the other step buttons. Full rescan uses the same style. Folders appears in the header only while the map is open.
+- Opening the map no longer replaces the scan status with "Release Map".
+- Removed "Under construction", outlines around selected rows and tracks, and the bracket above Auto/Keep/Skip.
+- Related-release markers in All links use defined colours again.
+
+## v0.5.178 - Skip, remix families and Release Map refinement
+
+- Apply saved Skip rules before integrity and acoustic work; restore newly eligible audio incrementally and replan affected releases.
+- Track retention highlighting follows the completed eligible-recording plan rather than title/duration resemblance. Saved Skip is an independent checked menu action.
+- Display alternate versions within the same named remix family, without merging acoustic recordings.
+- Align and compact Release Map columns, track metadata and action controls; replace overlapping connectors with relation markers and linked-release tooltips.
+
+## v0.5.177 - Reuse unchanged scan analysis
+
+- Scan checks release folders by path and reuses valid tag, integrity, fingerprint, and comparison evidence. Changes to a member file invalidate the logical release. Full rescan rebuilds eligible audio evidence.
+- Saved exclusions and the Remix and Live settings apply before acoustic work. Unfamiliar-pattern review opens after acoustic matching. Review choices update the plan using the evidence from the same scan.
+- A reference-only set of folders can be scanned. Reference and update folders use the same discovery and audio checks.
+
+## v0.5.176 - Release choices and shared navigation
+
+- Auto, Keep and Skip are always visible in release details. Auto clears the override and shows the automatic result.
+- Folders and Release Map share one header. Map choices apply without freezing release details, with a visible working indicator.
+- Track duration differences appear only in Versions, sorted by title and then duration.
+
+## v0.5.175 - Automatic updates after map edits
+
+- Keep, Skip, Remix and Live update the export plan automatically. An already-selected release can be confirmed without running the optimizer. Other choices recalculate connected releases.
+- Scan defers full decoding until after inclusion choices. Re-enabling previously unexamined tracks checks their audio and compares them with cached recordings. Changes to source files still invalidate the cached plan.
+- Track-menu buttons work with Enter and Space and remain inside the viewport when zoomed. Optimization counters use the progress indicator.
+
+## v0.5.174 - Incremental Re-scan and integrated Release Map
+
+- Classification-only Remix/Live changes now attempt a safe in-memory re-plan; unchanged verified acoustic groups and comparisons are reused, with source-file stat and missing-fingerprint invalidation.
+- Explicit EP titles take precedence over anthology heuristics, including map family overrides.
+- Track action labels use Keep/Skip and reversible Remix/Live. Activity output is limited to warnings, failures and outcomes.
+- One native desktop window contains Folders and Release Map views. Copy/Move keeps the map open and displays the current destination folder and release target.
+- Integrity and silence-padding stages have specific waveform-based animations; the user can still use reduced-motion settings.
+
 ## v0.5.167 - Copy and Move audit fixes (Under construction ⚠️)
 
 - Protect Move exports from Undo before recycling any originals. Report the first recycle failure and the number of source folders already recycled.

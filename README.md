@@ -1,17 +1,10 @@
 # Music Collection Cleaner (MCC)
 
-**Version: 0.5.167 - Under construction ⚠️**
+**Version: 0.5.180**
 
 ## Download and run
 
-1. Run once in a terminal:
-
-```
-winget install -e --id Python.Python.3.12 && winget install -e --id Microsoft.EdgeWebView2Runtime
-```
-
-2. Download [Music Collection Cleaner v0.05.167.pyw](https://raw.githubusercontent.com/karpuzikov/MCC/main/Music%20Collection%20Cleaner%20v0.05.167.pyw).
-3. Double-click it.
+Download [Music Collection Cleaner v0.05.180.pyw](https://github.com/karpuzikov/MCC/releases/latest) and double click it.
 
 ## What it does
 
@@ -36,4 +29,4 @@ When the same songs exist in several versions, MCC prefers the better source, be
 
 Scanning never changes your files. Copy and Move run only when you click them. Use **Copy** first. Move sends originals to the Recycle Bin.
 
-[Changelog](CHANGELOG.md) · [Previous versions](version-history/) · [Development notes](CONTINUITY.md)
+[Changelog](CHANGELOG.md) · [Previous versions](version-history/)

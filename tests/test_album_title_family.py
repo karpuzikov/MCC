@@ -166,8 +166,8 @@ class EditionNamesAndKeepButton(unittest.TestCase):
             mcc._assign_release_map_display_groups(nodes, [a, b])
         self.assertEqual({n["displayGroupTitle"] for n in nodes}, {"今 Ima"})
 
-    def test_skipped_release_offers_keep_not_ignore(self):
-        source = (Path(mcc.__file__)).read_text(encoding="utf-8-sig")
-        code = source[source.index("const releaseAction="):].split(";", 1)[0]
-        self.assertIn('n.kind==="retained"?"Ignore":"Keep"', code)
-        self.assertIn('"toggleKeepRelease"', source)
+    def test_skipped_release_can_return_to_auto(self):
+        html = mcc._webview_release_map_html()
+        self.assertIn('n.releaseBlocked?"Skip":n.forceKeep?"Keep":"Auto"', html)
+        self.assertIn('["Auto","Keep","Skip"]', html)
+        self.assertIn('data-auto-result', html)

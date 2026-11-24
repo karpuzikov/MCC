@@ -7,9 +7,9 @@ from test_audio_safety import mcc
 class ReleaseAuditActions(unittest.TestCase):
     def setUp(self):
         self.snapshots = [
-            {"release_id": 7, "name": "Damaged candidate", "audit_issues": ["Corrupt/unreadable 07.flac: invalid sync code"]},
-            {"release_id": 8, "name": "Tracklist issue", "audit_issues": ["missing track number(s): 2"]},
-            {"release_id": 9, "name": "Clean release", "audit_issues": []},
+            {"release_id": 7, "action": "KEEP", "name": "Damaged candidate", "audit_issues": ["Corrupt/unreadable 07.flac: invalid sync code"]},
+            {"release_id": 8, "action": "ADD", "name": "Tracklist issue", "audit_issues": ["missing track number(s): 2"]},
+            {"release_id": 9, "action": "SKIP", "name": "Clean release", "audit_issues": []},
         ]
         self.blocked = set()
         self.pinned = set()
@@ -50,13 +50,12 @@ class ReleaseAuditActions(unittest.TestCase):
         self.assertEqual(self.blocked, set())
         self.assertEqual(self.pinned, set())
 
-    def test_release_map_exposes_both_actions_at_bottom_of_details(self):
+    def test_release_map_exposes_one_choice_group(self):
         html = mcc._webview_release_map_html()
-        self.assertIn('id="auditApproveBtn" title="Retain this release despite its audit warning">Approve', html)
-        self.assertIn('id="auditIgnoreBtn" title="Exclude this release from the retained plan">Ignore', html)
-        self.assertIn('bridge.reviewRelease(Number(n.id),"approve"', html)
-        self.assertIn('bridge.reviewRelease(Number(n.id),"ignore"', html)
-        self.assertIn("""+'<div id="tracks">'+tracks+'</div>'+auditActions;""", html)
+        self.assertIn('id="releaseChoice"', html)
+        self.assertIn('["Auto","Keep","Skip"]', html)
+        self.assertIn('bridge.setReleaseChoice(Number(n.id)', html)
+        self.assertNotIn('id="auditActions"', html)
 
 
 if __name__ == "__main__":

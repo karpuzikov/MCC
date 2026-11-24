@@ -65,9 +65,9 @@ class HoverActions(unittest.TestCase):
             ({'unique':True,'audioMatchEditions':0,'unverifiedEditions':0},'Unique to this release'),
             ({'unique':False,'coveredBy':['Retained Deluxe']},'Also on: Retained Deluxe'),
             ({'unique':True,'coveredBy':['Retained Deluxe']},'Also on: Retained Deluxe'),
-            ({'unique':False,'excluded':True,'isLive':True},'Excluded: Live'),
-            ({'unique':True,'excluded':True,'isLive':True},'Excluded: Live'),
-            ({'unique':True,'manualSkip':True,'groupId':5},'Ignored recording everywhere'),
+            ({'unique':False,'excluded':True,'isLive':True},'Skip: Live'),
+            ({'unique':True,'excluded':True,'isLive':True},'Skip: Live'),
+            ({'unique':True,'manualSkip':True,'groupId':5},'Skip this recording everywhere'),
         ]
         statuses=self.run_js(r'''
 const input=JSON.parse(require('fs').readFileSync(0,'utf8'));
@@ -149,7 +149,7 @@ process.stdout.write(JSON.stringify(input.tracks.map(t=>status(t,{kind:'retained
         self.assertEqual(node['ripLogProblems'],['x.log: unrecognized'])
         self.assertEqual(node['ripLogResults'],['a.log: 98% (EAC)','x.log: not recognized - unrecognized'])
 
-    def test_same_song_and_album_tag_within_8_seconds_on_another_retained_release_is_not_highlighted(self):
+    def test_same_title_and_length_do_not_override_distinct_acoustic_groups(self):
         ep=[mcc.Track(1,Path('EP/a.flac'),1,title='Die In 1977',artist='Re-TROS',album='CUT OFF!',duration=294.4,group_id=0),
             mcc.Track(1,Path('EP/b.flac'),2,title='TV Show',artist='Re-TROS',album='CUT OFF!',duration=296.4,group_id=1)]
         album=[mcc.Track(2,Path('Album/a.flac'),1,title='Die In 1977',artist='Rebuilding The Rights of Statues',album='Cut Off!',duration=310.2,group_id=2),
@@ -158,7 +158,7 @@ process.stdout.write(JSON.stringify(input.tracks.map(t=>status(t,{kind:'retained
         snapshots=mcc.build_decision_snapshot(releases,ep+album,{1,2},
             [mcc.ReleaseDecision(r.rid,'ADD','Plan') for r in releases])
         for node in self.ui_state(snapshots)['nodes']:
-            self.assertEqual([t['title'] for t in node['tracks'] if t['unique']],['Die In 1977'])
+            self.assertEqual([t['title'] for t in node['tracks'] if t['unique']],['Die In 1977','TV Show'])
 
     def ui_state(self,snapshots):
         with patch.object(mcc,'_load_pattern_categories',return_value={}), \
@@ -169,14 +169,14 @@ process.stdout.write(JSON.stringify(input.tracks.map(t=>status(t,{kind:'retained
     def render_track_rows(self,nodes):
         html=map_html()
         code=(html[html.index('function discNumbering('):html.index('function openDetails(')]
-              +html[html.index('  const allTracks=n.tracks||[];'):html.index('  let ignoreRelease="";',html.index('function openDetails('))])
+              +html[html.index('  const allTracks=n.tracks||[];'):html.index('  const choice=n.releaseBlocked?',html.index('function openDetails('))])
         status=html[html.index('function exclusionStatus('):html.index('function closeDetails(')]
         return self.run_js(r'''
 const input=JSON.parse(require('fs').readFileSync(0,'utf8'));
-const status=new Function(input.status+'\nreturn trackStatus;')();
-const render=new Function('n','state','activeTrack','esc','versionsForTrack','remixesForTrack','liveForTrack','trackStatus',input.code+'\nreturn tracks;');
+const {trackStatus:status,trackNote}=new Function(input.status+'\nreturn {trackStatus,trackNote};')();
+const render=new Function('n','state','activeTrack','esc','versionsForTrack','remixesForTrack','liveForTrack','trackStatus','trackNote',input.code+'\nreturn tracks;');
 const esc=value=>String(value).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;');
-process.stdout.write(JSON.stringify(input.nodes.map(n=>render(n,{editable:false},null,esc,()=>[],()=>[],()=>[],status))));
+process.stdout.write(JSON.stringify(input.nodes.map(n=>render(n,{editable:false},null,esc,()=>[],()=>[],()=>[],status,trackNote))));
 ''',{'code':code,'status':status,'nodes':nodes})
 
     def assert_highlighted_rows(self,node,rows,expected_titles):
@@ -215,7 +215,7 @@ const evaluate=new Function('n','replacementMap',input.code+'\nreturn {titles:un
 process.stdout.write(JSON.stringify(evaluate(input.node,()=>({}))));
 ''',{'code':code,'node':target})
         self.assertEqual(result['titles'],expected)
-        self.assertEqual(result['reason'],'Retained for: Ultralight Beam; Father Stretch My Hands Pt. 1; Pt. 2; +12 more')
+        self.assertEqual(result['reason'],'Keep for: Ultralight Beam; Father Stretch My Hands Pt. 1; Pt. 2; +12 more')
 
     def test_actual_bully_highlights_follow_logged_retention_reasons(self):
         fixture=json.loads((ROOT/'tests/fixtures/bully_song_presence.json').read_text())
@@ -328,14 +328,14 @@ const rows=current.tracks.map(t=>{
     classList:{toggle:(c,on)=>on?classes.add(c):classes.delete(c)},classes};
   row.querySelector=s=>s==='.ignoreTrack'?row.button:
     s==='.trackGem'?(row.hasGem?{remove:()=>row.hasGem=false}:null):
-    s==='.dur'?{insertAdjacentHTML:(where,html)=>{if(html.includes('trackGem'))row.hasGem=true;}}:null;
+    s==='.titleText'?{insertAdjacentHTML:(where,html)=>{if(html.includes('trackGem'))row.hasGem=true;}}:null;
   return row;
 });
 const document={getElementById:()=>null,querySelectorAll:()=>rows};
 const getNode=id=>state.nodes.find(n=>Number(n.id)===Number(id));
 const applyRootPatch=()=>{},receiveState=()=>{throw Error('Unexpected full-state fallback')};
 const changeKind=()=> 'added',replacementMap=()=>({}),paintReanalyzeHighlight=()=>{};
-const trackStatus=new Function(input.status+'\nreturn trackStatus;')();
+const {trackStatus,trackNote}=new Function(input.status+'\nreturn {trackStatus,trackNote};')();
 eval(input.policy+'\n'+input.toggle);
 const results=[];
 for(const p of input.payloads){
@@ -352,8 +352,8 @@ process.stdout.write(JSON.stringify(results));
             self.assertEqual(result['gem'],gem)
             self.assertEqual([r['highlight'] for r in result['rows']],['Song' in titles,'Rare' in titles])
             self.assertEqual([r['gem'] for r in result['rows']],[False,gem])
-            if titles:self.assertEqual(result['reason'],'Retained for: '+'; '.join(titles))
-            else:self.assertIn('Re-scan',result['reason'])
+            if titles:self.assertEqual(result['reason'],'Keep for: '+'; '.join(titles))
+            else:self.assertEqual(result['reason'],'Updating Skip.')
 
     def test_one_ignore_action_preserves_saved_categories_and_restore(self):
         html = map_html()
@@ -361,15 +361,15 @@ process.stdout.write(JSON.stringify(results));
         start = html.index('    let action="";')
         code = html[start:html.index('    const statusText=trackStatus(t,n);', start)]
         cases = [
-            ('normal', {}, True, ['remix', 'live'], 'Ignore'),
-            ('saved remix', {'patternKind': 'remix'}, True, ['live'], 'Ignore'),
-            ('saved live', {'patternKind': 'live'}, True, ['remix'], 'Ignore'),
+            ('normal', {}, True, ['remix', 'live'], 'Skip'),
+            ('saved remix', {'patternKind': 'remix'}, True, ['clear', 'live'], 'Skip'),
+            ('saved live', {'patternKind': 'live'}, True, ['remix', 'clear'], 'Skip'),
             ('saved skip', {'patternKind': 'skip', 'excluded': True}, True, ['remix', 'live'], None),
-            ('ignored', {'manualSkip': True, 'excluded': True}, True, ['remix', 'live'], 'Restore'),
-            ('pending ignore', {'manualSkip': True, 'pendingIgnore': True}, True, ['remix', 'live'], 'Restore'),
-            ('pending restore', {'excluded': True, 'pendingRestore': True}, True, ['remix', 'live'], 'Ignore'),
+            ('ignored', {'manualSkip': True, 'excluded': True}, True, ['remix', 'live'], 'Keep'),
+            ('pending ignore', {'manualSkip': True, 'pendingIgnore': True}, True, ['remix', 'live'], 'Keep'),
+            ('pending restore', {'excluded': True, 'pendingRestore': True}, True, ['remix', 'live'], 'Skip'),
             ('option excluded', {'excluded': True}, True, ['remix', 'live'], None),
-            ('ungrouped', {'groupId': -1}, True, ['remix', 'live'], 'Ignore'),
+            ('ungrouped', {'groupId': -1}, True, ['remix', 'live'], 'Skip'),
             ('read only', {'patternKind': 'skip'}, False, [], None),
         ]
         inputs = [{'track': {'index': 7, 'groupId': 42, **track_patch}, 'editable': editable}
