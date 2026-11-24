@@ -1,3 +1,8 @@
+## v0.5.187 - Organize only
+
+- New "Or organize only" row on the main page: every release in the selected folders goes through the organizer, with nothing scanned or skipped.
+- It uses the same options as Copy: Encode to ALAC/FLAC, AudioChecker, Split CUE, Get data from MusicBrainz, Download cover art. MusicBrainz questions appear here too.
+
 ## v0.5.186 - MusicBrainz finds newly added releases
 
 - A MusicBrainz search that found nothing is no longer remembered for 14 days; the next lookup asks again.
