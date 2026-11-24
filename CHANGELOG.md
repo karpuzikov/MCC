@@ -1,3 +1,7 @@
+## v0.5.188 - Startup fix
+
+- Fixed "Desktop bridge failed: getOrganizer" at startup; Organize only works.
+
 ## v0.5.187 - Organize only
 
 - New "Or organize only" row on the main page: every release in the selected folders goes through the organizer, with nothing scanned or skipped.
