@@ -1,10 +1,10 @@
 # Music Collection Cleaner (MCC)
 
-**Version: 0.5.188**
+**Version: 0.5.189**
 
 ## Download and run
 
-Download [Music Collection Cleaner v0.05.188.pyw](https://raw.githubusercontent.com/karpuzikov/MCC/main/Music%20Collection%20Cleaner%20v0.05.188.pyw) and double click it.
+Download [Music Collection Cleaner v0.05.189.pyw](https://raw.githubusercontent.com/karpuzikov/MCC/main/Music%20Collection%20Cleaner%20v0.05.189.pyw) and double click it.
 
 ## What it does
 

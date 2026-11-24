@@ -1,3 +1,7 @@
+## v0.5.189 - Organize button always available
+
+- Organize is enabled before an output folder is chosen; pressing it asks for the folder, then starts.
+
 ## v0.5.188 - Startup fix
 
 - Fixed "Desktop bridge failed: getOrganizer" at startup; Organize only works.
