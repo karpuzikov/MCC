@@ -1,3 +1,7 @@
+## v0.5.185 - Scan results kept after updates
+
+- Integrity checks, fingerprints and other scan results are reused after an MCC update; only unchanged files are skipped, as before.
+
 ## v0.5.184 - Retry answers right away
 
 - Retry and Use MBID look the release up immediately. The dialog says "Found on MusicBrainz" and moves on, or shows "Still not found" and stays on the same release.
