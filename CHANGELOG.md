@@ -1,3 +1,7 @@
+## v0.5.191 - Spotify artwork via Harmony
+
+- When Apple Music and MusicBrainz-linked Spotify have no cover, WEB releases look up the barcode on Harmony and download Spotify's largest cover (1400x1400). CD releases are not looked up this way.
+
 ## v0.5.190 - Default Organize folder
 
 - Organize only defaults to the first folder's name + " - Organized" next to it (e.g. C:\!deemix Music\Wiley - Organized); Browse picks another.
